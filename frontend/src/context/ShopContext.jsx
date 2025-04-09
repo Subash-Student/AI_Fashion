@@ -15,8 +15,9 @@ const ShopContextProvider = (props) => {
     const [cartItems, setCartItems] = useState({});
     const [products, setProducts] = useState([]);
     const [token, setToken] = useState('')
+    const [user,setUser] = useState({});
     const navigate = useNavigate();
-
+    const [singleProduct,setSingleProduct] = useState("");
 
     const addToCart = async (itemId, size) => {
 
@@ -124,6 +125,26 @@ const ShopContextProvider = (props) => {
         }
     }
 
+    const getUserData = async (token) => {
+        try {
+          console.log("hi")
+            if(token){
+                const response = await axios.get(backendUrl + '/api/user/myData',{
+                    headers:{token}
+                })
+                if (response.data.success) {
+                    setUser(response.data.user)
+                } else {
+                    toast.error(response.data.message)
+                }
+            }
+
+        } catch (error) {
+            console.log(error)
+            toast.error(error.message)
+        }
+    }
+
     const getUserCart = async ( token ) => {
         try {
             
@@ -136,9 +157,27 @@ const ShopContextProvider = (props) => {
             toast.error(error.message)
         }
     }
+    
+    const getSingleProduct =async(productId)=>{
+        try {
+            console.log(token)
+            const response = await axios.post(backendUrl + '/api/product/single',{productId},
+            {
+                headers:{token}
+            })
+            if (response.data.success) {
+                setSingleProduct(response.data.product)
+            }
+        } catch (error) {
+            console.log(error)
+            toast.error(error.message)
+        }
+    }
+
 
     useEffect(() => {
         getProductsData()
+        
     }, [])
 
     useEffect(() => {
@@ -148,6 +187,7 @@ const ShopContextProvider = (props) => {
         }
         if (token) {
             getUserCart(token)
+            getUserData(token)
         }
     }, [token])
 
@@ -157,7 +197,8 @@ const ShopContextProvider = (props) => {
         cartItems, addToCart,setCartItems,
         getCartCount, updateQuantity,
         getCartAmount, navigate, backendUrl,
-        setToken, token
+        setToken, token,
+        user,singleProduct,getSingleProduct
     }
 
     return (

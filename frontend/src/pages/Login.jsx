@@ -10,14 +10,14 @@ const Login = () => {
 
   const [name,setName] = useState('')
   const [password,setPasword] = useState('')
-  const [email,setEmail] = useState('')
+  const [contact,setContact] = useState('')
 
   const onSubmitHandler = async (event) => {
       event.preventDefault();
       try {
         if (currentState === 'Sign Up') {
           
-          const response = await axios.post(backendUrl + '/api/user/register',{name,email,password})
+          const response = await axios.post(backendUrl + '/api/user/register',{name,contact,password})
           if (response.data.success) {
             setToken(response.data.token)
             localStorage.setItem('token',response.data.token)
@@ -27,7 +27,7 @@ const Login = () => {
 
         } else {
 
-          const response = await axios.post(backendUrl + '/api/user/login', {email,password})
+          const response = await axios.post(backendUrl + '/api/user/login', {contact,password})
           if (response.data.success) {
             setToken(response.data.token)
             localStorage.setItem('token',response.data.token)
@@ -57,7 +57,7 @@ const Login = () => {
             <hr className='border-none h-[1.5px] w-8 bg-gray-800' />
         </div>
         {currentState === 'Login' ? '' : <input onChange={(e)=>setName(e.target.value)} value={name} type="text" className='w-full px-3 py-2 border border-gray-800' placeholder='Name' required/>}
-        <input onChange={(e)=>setEmail(e.target.value)} value={email} type="email" className='w-full px-3 py-2 border border-gray-800' placeholder='Email' required/>
+        <input onChange={(e)=>setContact(e.target.value)} value={contact} type="text" className='w-full px-3 py-2 border border-gray-800' placeholder='Phone / Email' required/>
         <input onChange={(e)=>setPasword(e.target.value)} value={password} type="password" className='w-full px-3 py-2 border border-gray-800' placeholder='Password' required/>
         <div className='w-full flex justify-between text-sm mt-[-8px]'>
             <p className=' cursor-pointer'>Forgot your password?</p>

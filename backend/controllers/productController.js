@@ -1,5 +1,7 @@
 import { v2 as cloudinary } from "cloudinary"
 import productModel from "../models/productModel.js"
+import userModel from "../models/userModel.js"
+
 
 // function for add product
 const addProduct = async (req, res) => {
@@ -75,15 +77,32 @@ const removeProduct = async (req, res) => {
 // function for single product info
 const singleProduct = async (req, res) => {
     try {
-        
-        const { productId } = req.body
-        const product = await productModel.findById(productId)
-        res.json({success:true,product})
+      const { productId,} = req.body;
 
+     const id = req.body.userId;
+
+      const user = await userModel.findById(id);
+      const product = await productModel.findById(productId);
+  
+      if (user && product) {
+        const isAlreadyPresent = user.recentlyViewed.some(
+          (item) => item._id.toString() === productId
+        );
+  
+        if (!isAlreadyPresent) {
+          user.recentlyViewed.push(product); // Push only ID, not full product object
+          await user.save();
+        }
+  
+        res.json({ success: true, product });
+      } else {
+        res.json({ success: false, message: "Product or User Not Found" });
+      }
     } catch (error) {
-        console.log(error)
-        res.json({ success: false, message: error.message })
+      console.log(error);
+      res.json({ success: false, message: error.message });
     }
-}
+  };
+  
 
 export { listProducts, addProduct, removeProduct, singleProduct }
