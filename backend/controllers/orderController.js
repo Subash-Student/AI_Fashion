@@ -265,7 +265,7 @@ const updateStatus = async (req, res) => {
         };
 
         const findOrder = user.orderStatus.find(order => order.orderId.toString() === orderId);
-        console.log({findOrder:findOrder})
+    
         
         if (findOrder) {
             findOrder.statusUpdates.push(newStatus);
@@ -284,4 +284,45 @@ const updateStatus = async (req, res) => {
 };
 
 
-export {verifyRazorpay, verifyStripe ,placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus}
+const cancelOrder = async(req,res)=>{
+
+    
+const {orderId,productId,reason} = req.body;
+ 
+const userId = req.body.userId;
+
+try {
+    
+    await orderModel.findByIdAndUpdate(orderId,{status:"Canceled",reason:reason});
+
+     // Update in user model
+     const user = await userModel.findById(userId);
+        
+
+     const newStatus = {
+         status:"Canceled",
+         timestamp: new Date()
+     };
+
+     const findOrder = user.orderStatus.find(order => order.orderId.toString() === orderId);
+ 
+     
+     if (findOrder) {
+         findOrder.statusUpdates.push(newStatus);
+     } else{
+         return  res.status(500).json({ success: false, message:  "order not found in user" });
+     }
+
+     await user.save();
+
+     res.json({ success: true, message: "Order Canceled" });
+
+    } catch (error) {
+        console.error("Status update error:", error);
+        res.status(500).json({ success: false, message: error.message || "Failed to Cancel Order" });
+    }
+
+}
+
+
+export {verifyRazorpay, verifyStripe ,placeOrder,cancelOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus}
