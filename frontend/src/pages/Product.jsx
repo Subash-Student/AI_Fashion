@@ -3,20 +3,37 @@ import { useParams } from 'react-router-dom'
 import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
 import RelatedProducts from '../components/RelatedProducts';
-
+import axios from "axios"
 const Product = () => {
 
   const { productId } = useParams();
-  const { getSingleProduct,singleProduct, currency ,addToCart } = useContext(ShopContext);
-  const [productData, setProductData] = useState(singleProduct);
-  const [image, setImage] = useState('')
-  const [size,setSize] = useState('')
+  const { currency, addToCart } = useContext(ShopContext);
+  const [productData, setProductData] = useState(null);
+  const [image, setImage] = useState('');
+  const [size, setSize] = useState('');
 
-  
   useEffect(() => {
-    getSingleProduct(productId);
-    setProductData(singleProduct)
-  }, [productId])
+    const fetchProduct = async () => {
+      try {
+        const userId = localStorage.getItem('userId'); // You should store this during login
+        const token = localStorage.getItem('token');
+        const res = await axios.post(
+          'http://localhost:4000/api/product/single',
+          { productId },
+          { headers: { token } }
+        );
+
+        if (res.data.success) {
+          setProductData(res.data.product);
+          setImage(res.data.product.image[0]);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchProduct();
+  }, [productId]);
 
   return productData ? (
     <div className='border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100'>

@@ -17,7 +17,7 @@ const ShopContextProvider = (props) => {
     const [token, setToken] = useState('')
     const [user,setUser] = useState({});
     const navigate = useNavigate();
-    const [singleProduct,setSingleProduct] = useState("");
+    
 
     const addToCart = async (itemId, size) => {
 
@@ -158,23 +158,7 @@ const ShopContextProvider = (props) => {
         }
     }
     
-    const getSingleProduct =async(productId)=>{
-        try {
-            console.log(token)
-            const response = await axios.post(backendUrl + '/api/product/single',{productId},
-            {
-                headers:{token}
-            })
-            if (response.data.success) {
-                setSingleProduct(response.data.product)
-            }
-        } catch (error) {
-            console.log(error)
-            toast.error(error.message)
-        }
-    }
-
-
+    
     useEffect(() => {
         getProductsData()
         
@@ -198,7 +182,7 @@ const ShopContextProvider = (props) => {
         getCartCount, updateQuantity,
         getCartAmount, navigate, backendUrl,
         setToken, token,
-        user,singleProduct,getSingleProduct
+        user,
     }
 
     return (
