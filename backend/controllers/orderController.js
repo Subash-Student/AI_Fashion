@@ -16,36 +16,60 @@ const razorpayInstance = new razorpay({
 })
 
 // Placing orders using COD Method
-const placeOrder = async (req,res) => {
-    
+const placeOrder = async (req, res) => {
     try {
-        
-        const { userId, items, amount, address} = req.body;
+        const { userId, items, amount, address } = req.body;
+
+        // Basic validation
+        if (!userId || !items?.length || !amount || !address) {
+            return res.status(400).json({ success: false, message: "Missing required fields" });
+        }
 
         const orderData = {
             userId,
             items,
             address,
             amount,
-            paymentMethod:"COD",
-            payment:false,
-            date: Date.now()
-        }
+            paymentMethod: "COD",
+            payment: false,
+            date: new Date() // Better than Date.now() for readability
+        };
 
-        const newOrder = new orderModel(orderData)
-        await newOrder.save()
+        const newOrder = new orderModel(orderData);
+        await newOrder.save();
 
-        await userModel.findByIdAndUpdate(userId,{cartData:{}})
+        // Update user's cart and order status (using $push to avoid overwriting)
+        await userModel.findByIdAndUpdate(
+            userId,
+            {
+                $set: { cartData: {} }, // Clear cart
+                $push: { 
+                    orderStatus: {
+                        orderId: newOrder._id,
+                        statusUpdates: [ // Array of status changes
+                            { 
+                                status: "Order Placed", 
+                                timestamp: new Date() 
+                            }
+                        ]
+                    }
+                }
+            }
+        );
 
-        res.json({success:true,message:"Order Placed"})
-
+        res.json({ 
+            success: true,
+            message: "Order Placed",
+        });
 
     } catch (error) {
-        console.log(error)
-        res.json({success:false,message:error.message})
+        console.error("Order placement error:", error);
+        res.status(500).json({
+            success: false,
+            message: error.message || "Failed to place order"
+        });
     }
-
-}
+};
 
 // Placing orders using Stripe Method
 const placeOrderStripe = async (req,res) => {
@@ -217,18 +241,47 @@ const userOrders = async (req,res) => {
 }
 
 // update order status from Admin Panel
-const updateStatus = async (req,res) => {
+const updateStatus = async (req, res) => {
     try {
-        
-        const { orderId, status } = req.body
+        const { orderId, status } = req.body;
 
-        await orderModel.findByIdAndUpdate(orderId, { status })
-        res.json({success:true,message:'Status Updated'})
+        const order = await orderModel.findById(orderId);
+        const userId = order?.userId;
+
+        if (!orderId || !status || !userId) {
+            return res.status(400).json({ success: false, message: "Missing orderId, status, or userId" });
+        }
+
+        // Update order status
+        await orderModel.findByIdAndUpdate(orderId, { status });
+
+        // Update in user model
+        const user = await userModel.findById(userId);
+        
+
+        const newStatus = {
+            status,
+            timestamp: new Date()
+        };
+
+        const findOrder = user.orderStatus.find(order => order.orderId.toString() === orderId);
+        console.log({findOrder:findOrder})
+        
+        if (findOrder) {
+            findOrder.statusUpdates.push(newStatus);
+        } else{
+            return  res.status(500).json({ success: false, message:  "order not found in user" });
+        }
+
+        await user.save();
+
+        res.json({ success: true, message: "Status Updated" });
 
     } catch (error) {
-        console.log(error)
-        res.json({success:false,message:error.message})
+        console.error("Status update error:", error);
+        res.status(500).json({ success: false, message: error.message || "Failed to update status" });
     }
-}
+};
+
 
 export {verifyRazorpay, verifyStripe ,placeOrder, placeOrderStripe, placeOrderRazorpay, allOrders, userOrders, updateStatus}

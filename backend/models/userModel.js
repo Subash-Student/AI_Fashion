@@ -10,6 +10,17 @@ const userSchema = new mongoose.Schema({
     orders:  { type: Array, default: [] },
     recentlyViewed:  { type: Array, default: [] },
     wishlist: { type: Array, default: [] },
+    orderStatus: [
+        {
+          orderId: String,
+          statusUpdates: [
+            {
+              status: String,
+              timestamp: Date,
+            },
+          ],
+        },
+      ],
 }, { minimize: false })
 
 const userModel = mongoose.models.user || mongoose.model('user',userSchema);
