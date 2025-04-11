@@ -161,4 +161,86 @@ const getUserData = async (req, res) => {
     }
 }
 
-export { loginUser, registerUser, adminLogin,getUserData }
+
+const editUserDetails = async (req, res) => {
+    const { userId, name, email, phone } = req.body;
+  
+    // Basic field presence check
+    if (!userId || !name || !email || !phone) {
+      return res.status(400).json({ success: false, message: 'All fields are required' });
+    }
+  
+    // Name validation (at least 2 characters)
+    if (typeof name !== 'string' || name.trim().length < 2) {
+      return res.status(400).json({ success: false, message: 'Invalid name' });
+    }
+  
+    // Email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return res.status(400).json({ success: false, message: 'Invalid email format' });
+    }
+  
+    // Phone number validation (10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(Number(phone))) {
+      return res.status(400).json({ success: false, message: 'Invalid phone number' });
+    }
+  
+    try {
+      const updatedUser = await userModel.findByIdAndUpdate(
+        userId,
+        { name, email, phone },
+        { new: true, runValidators: true }
+      );
+  
+      if (!updatedUser) {
+        return res.status(404).json({ success: false, message: 'User not found' });
+      }
+  
+      return res.status(200).json({
+        success: true,
+        message: 'User details updated successfully',
+        user: updatedUser,
+      });
+    } catch (error) {
+      console.error('Edit user error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Something went wrong. Please try again later.',
+      });
+    }
+  };
+  
+
+
+const editUserAddressByPincode = async (req, res) => {
+  try {
+    const userId = req.body.userId; 
+    const { address } = req.body;
+
+    
+    const updatedUser = await userModel.findByIdAndUpdate(
+      userId,
+      { address: address },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    return res.status(200).json({ success: true, message: "Address updated", address: address });
+  } catch (error) {
+    console.error("Error updating address by pincode:", error.message);
+    return res.status(500).json({ success: false, message: "Something went wrong" });
+  }
+};
+
+
+
+
+
+export { loginUser, registerUser, adminLogin,getUserData,editUserDetails,editUserAddressByPincode }
+
+

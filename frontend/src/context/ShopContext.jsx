@@ -17,7 +17,40 @@ const ShopContextProvider = (props) => {
     const [token, setToken] = useState('')
     const [user,setUser] = useState({});
     const navigate = useNavigate();
+    const [orderData, setOrderData] = useState([]);
+
+
     
+  const loadOrderData = async () => {
+    try {
+      if (!token) return;
+      const response = await axios.post(backendUrl + '/api/order/userorders', {}, {
+        headers: { token }
+      });
+
+      if (response.data.success) {
+        let allOrdersItem = [];
+        response.data.orders.forEach((order) => {
+          order.items.forEach((item) => {
+            item['status'] = order.status;
+            item['payment'] = order.payment;
+            item['paymentMethod'] = order.paymentMethod;
+            item['date'] = order.date;
+            item['orderId'] = order._id;
+            allOrdersItem.push(item);
+          });
+        });
+        setOrderData(allOrdersItem.reverse());
+      }
+    } catch (error) {
+      console.error("Error loading orders:", error);
+    }
+  };
+
+  useEffect(() => {
+    loadOrderData();
+  }, [token]);
+
 
     const addToCart = async (itemId, size) => {
 
@@ -181,8 +214,9 @@ const ShopContextProvider = (props) => {
         cartItems, addToCart,setCartItems,
         getCartCount, updateQuantity,
         getCartAmount, navigate, backendUrl,
-        setToken, token,
-        user,
+        setToken, token,orderData,
+        user,getUserData,
+        loadOrderData
     }
 
     return (

@@ -6,9 +6,8 @@ import { toast } from 'react-toastify';
 import { FaCheckCircle, FaTimesCircle, FaHourglassHalf, FaTruck, FaBox } from 'react-icons/fa';
 
 const Orders = () => {
-  const { backendUrl, token, currency } = useContext(ShopContext);
+  const { backendUrl,orderData, token, currency } = useContext(ShopContext);
 
-  const [orderData, setorderData] = useState([]);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -17,35 +16,7 @@ const Orders = () => {
 
   const statusSteps = ['Placed', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
 
-  const loadOrderData = async () => {
-    try {
-      if (!token) return;
-      const response = await axios.post(backendUrl + '/api/order/userorders', {}, {
-        headers: { token }
-      });
-
-      if (response.data.success) {
-        let allOrdersItem = [];
-        response.data.orders.forEach((order) => {
-          order.items.forEach((item) => {
-            item['status'] = order.status;
-            item['payment'] = order.payment;
-            item['paymentMethod'] = order.paymentMethod;
-            item['date'] = order.date;
-            item['orderId'] = order._id;
-            allOrdersItem.push(item);
-          });
-        });
-        setorderData(allOrdersItem.reverse());
-      }
-    } catch (error) {
-      console.error("Error loading orders:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadOrderData();
-  }, [token]);
+  
 
   const handleTrackOrder = (status) => {
     setSelectedStatus(status);
