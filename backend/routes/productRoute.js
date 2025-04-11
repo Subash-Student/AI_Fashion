@@ -1,5 +1,5 @@
 import express from 'express'
-import { listProducts, addProduct, removeProduct, singleProduct } from '../controllers/productController.js'
+import handleWishlist, { listProducts, addProduct, removeProduct, singleProduct } from '../controllers/productController.js'
 import upload from '../middleware/multer.js';
 import adminAuth from '../middleware/adminAuth.js';
 import authUser from '../middleware/auth.js';
@@ -10,5 +10,6 @@ productRouter.post('/add',adminAuth,upload.fields([{name:'image1',maxCount:1},{n
 productRouter.post('/remove',adminAuth,removeProduct);
 productRouter.post('/single',authUser,singleProduct);
 productRouter.get('/list',listProducts)
+productRouter.post("/wishlist/:isWishlist",authUser,handleWishlist)
 
 export default productRouter

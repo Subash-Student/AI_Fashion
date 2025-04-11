@@ -103,6 +103,50 @@ const singleProduct = async (req, res) => {
       res.json({ success: false, message: error.message });
     }
   };
+
   
 
-export { listProducts, addProduct, removeProduct, singleProduct }
+
+const handleWishlist = async (req, res) => {
+  const { productId, userId } = req.body
+  const isWishlist = req.params.isWishlist === 'add' 
+
+  try {
+    const user = await userModel.findById(userId)
+    const product = await productModel.findById(productId)
+
+    if (!user || !product) {
+      return res.status(404).json({ success: false, message: 'User or Product not found' })
+    }
+
+    if (isWishlist) {
+     
+      const alreadyInWishlist = user.wishlist.includes(productId)
+      if (!alreadyInWishlist) {
+        const { _id, name, price, image, category, subCategory, description, sizes } = product;
+        user.wishlist.push({ _id, name, price, image, category, subCategory, description, sizes });
+        await user.save()
+        return res.status(200).json({ success: true, message: 'Product added to wishlist' })
+      } else {
+        return res.status(200).json({ success: true, message: 'Product already in wishlist' })
+      }
+    } else {
+      
+      user.wishlist = user.wishlist.filter(
+        item => item._id.toString() !== productId
+      )
+      await user.save()
+      
+      return res.status(200).json({ success: true, message: 'Product removed from wishlist' })
+      
+    }
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ success: false, message: 'Something went wrong' })
+  }
+}
+
+export default handleWishlist
+
+
+export { listProducts, addProduct, removeProduct, singleProduct,handleWishlist }
