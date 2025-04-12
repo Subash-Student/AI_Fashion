@@ -77,6 +77,69 @@ const addProduct = async (req, res) => {
 };
 
 
+
+// edit product
+const updateProduct = async (req, res) => {
+  try {
+    const productId = req.body.id;
+    if (!productId) return res.status(400).json({ success: false, message: "Product ID missing." });
+
+    const product = await productModel.findById(productId);
+    if (!product) return res.status(404).json({ success: false, message: "Product not found." });
+
+    // === Update fields ===
+    const fields = [
+      "name", "description", "price", "category", "subCategory", "bestseller", "sizes", "brand",
+      "material", "fitType", "pattern", "colorOptions", "occasion", "washCare",
+      "inStock", "secondryColor", "returnable", "sleeveType", "neckType"
+    ];
+
+    fields.forEach(field => {
+      if (field in req.body) {
+        if (field === "sizes") {
+          product.sizes = JSON.parse(req.body.sizes);
+        } else {
+          product[field] = req.body[field];
+        }
+      }
+    });
+
+    // === Handle Images ===
+    const imageArray = [];
+    for (let i = 1; i <= 4; i++) {
+      const imageKey = `image${i}`;
+      const file = req.files?.[imageKey]?.[0];
+
+      if (file) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder: "products",
+        });
+        imageArray.push(result.secure_url);
+      } else if (req.body[imageKey]) {
+        imageArray.push(req.body[imageKey]); // existing URL
+      }
+    }
+    product.image = imageArray;
+
+    await product.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Product updated successfully.",
+      product,
+    });
+
+  } catch (error) {
+    console.error("Update Product Error:", error);
+    res.status(500).json({ success: false, message: "Internal Server Error." });
+  }
+};
+
+
+
+
+
+
 // function for list product
 const listProducts = async (req, res) => {
     try {
@@ -127,6 +190,23 @@ const singleProduct = async (req, res) => {
       } else {
         res.json({ success: false, message: "Product or User Not Found" });
       }
+    } catch (error) {
+      console.log(error);
+      res.json({ success: false, message: error.message });
+    }
+  };
+const adminSingleProduct = async (req, res) => {
+    try {
+      const { productId} = req.body;
+
+      const product = await productModel.findById(productId);
+  
+        if(!product){
+        res.json({ success: false, message: "Product  Not Found" });
+        }
+  
+       return res.json({ success: true, product });
+
     } catch (error) {
       console.log(error);
       res.json({ success: false, message: error.message });
@@ -217,4 +297,4 @@ const submitReview = async (req, res) => {
 
 
 
-export { listProducts, addProduct, removeProduct, singleProduct,handleWishlist,submitReview }
+export { listProducts, addProduct, removeProduct, singleProduct,handleWishlist,submitReview,adminSingleProduct,updateProduct }

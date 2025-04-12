@@ -3,8 +3,14 @@ import { assets } from '../assets/assets';
 import axios from 'axios';
 import { backendUrl } from '../App';
 import { toast } from 'react-toastify';
+import {useParams} from "react-router-dom"
+import { useEffect } from 'react';
 
 const Add = ({ token }) => {
+
+  const { id } = useParams();
+  const isEditMode = id !== "new";
+
   const [images, setImages] = useState({
     image1: false,
     image2: false,
@@ -30,62 +36,122 @@ const Add = ({ token }) => {
     inStock: true,
     secondryColor: "",
     returnable: false,
-    sleeveType:"",
-    neckType:""
+    sleeveType: "",
+    neckType: ""
   });
+
+  useEffect(() => {
+    if (isEditMode) {
+      axios.post(
+        'http://localhost:4000/api/product/admin/single',
+        { productId: id },
+        { headers: { token } }
+      )
+        .then((res) => {
+          const product = res.data.product;
+          const imgs = product.image || [];
+          setImages({
+            image1: imgs[0] || false,
+            image2: imgs[1] || false,
+            image3: imgs[2] || false,
+            image4: imgs[3] || false
+          });
+          setProduct({
+            name: product.name || "",
+            description: product.description || "",
+            price: product.price || "",
+            category: product.category || "Men",
+            subCategory: product.subCategory || "Topwear",
+            bestseller: product.bestseller || false,
+            sizes: product.sizes || [],
+            brand: product.brand || "",
+            material: product.material || "",
+            fitType: product.fitType || "",
+            pattern: product.pattern || "",
+            colorOptions: product.colorOptions || "",
+            occasion: product.occasion || "",
+            washCare: product.washCare || "",
+            inStock: product.inStock ?? true,
+            secondryColor: product.secondryColor || "",
+            returnable: product.returnable ?? false,
+            sleeveType: product.sleeveType || "",
+            neckType: product.neckType || ""
+          });
+        })
+        .catch((err) => {
+          toast.error("Error loading product details.");
+          console.error(err);
+        });
+    }
+  }, [id, isEditMode, token]);
+
+
 
   const onSubmitHandler = async (e) => {
     e.preventDefault();
-
+  
     try {
       const formData = new FormData();
-
+  
       // Append all product fields
       Object.keys(product).forEach(key => {
-        if (key === 'sizes') {
+        if (key === "sizes") {
           formData.append(key, JSON.stringify(product[key]));
         } else {
           formData.append(key, product[key]);
         }
       });
-
-      // Append images
+  
+      // Append product ID only in edit mode
+      if (isEditMode && id) {
+        formData.append("id", id);
+      }
+  
+      // Append images (only if file exists)
       Object.keys(images).forEach(key => {
         if (images[key]) {
           formData.append(key, images[key]);
         }
       });
-
-      const response = await axios.post(backendUrl + "/api/product/add", formData, {
+  
+      const url = isEditMode
+        ? backendUrl + "/api/product/update"
+        : backendUrl + "/api/product/add";
+  
+      const response = await axios.post(url, formData, {
         headers: { token },
       });
-
+  
       if (response.data.success) {
         toast.success(response.data.message);
-        // Reset form
-        setProduct({
-          ...product,
-          name: "",
-          description: "",
-          price: "",
-          sizes: [],
-          brand: "",
-          material: "",
-          fitType: "",
-          pattern: "",
-          colorOptions: "",
-          occasion: "",
-          washCare: "",
-          secondryColor: "",
-          sleeveType:"",
-          neckType:""
-        });
-        setImages({
-          image1: false,
-          image2: false,
-          image3: false,
-          image4: false
-        });
+  
+        if (!isEditMode) {
+          
+          setProduct({
+            ...product,
+            name: "",
+            description: "",
+            price: "",
+            sizes: [],
+            brand: "",
+            material: "",
+            fitType: "",
+            pattern: "",
+            colorOptions: "",
+            occasion: "",
+            washCare: "",
+            secondryColor: "",
+            sleeveType: "",
+            neckType: ""
+          });
+  
+          setImages({
+            image1: false,
+            image2: false,
+            image3: false,
+            image4: false
+          });
+        }
       } else {
         toast.error(response.data.message);
       }
@@ -94,6 +160,7 @@ const Add = ({ token }) => {
       toast.error(error.message);
     }
   };
+  
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -136,7 +203,7 @@ const Add = ({ token }) => {
       const response = await axios.get(backendUrl +"/api/extract-dress-info",formData,{
         headers:{token}
       });
-
+     setImages(product.image)
       if (response.data.success) {
         const data = response.data.data;
         toast.success(response.data.message);
@@ -185,7 +252,18 @@ const Add = ({ token }) => {
         <div className="flex gap-2 flex-wrap">
           {[images.image1, images.image2, images.image3, images.image4].map((img, idx) => (
             <label key={idx} htmlFor={`image${idx + 1}`}>
-              <img className="w-20 h-20 object-cover border" src={!img ? assets.upload_area : URL.createObjectURL(img)} alt="" />
+              <img
+  className="w-20 h-20 object-cover border"
+  src={
+    !img
+      ? assets.upload_area
+      : typeof img === "string"
+        ? img
+        : URL.createObjectURL(img)
+  }
+  alt=""
+/>
+
               <input 
                 type="file" 
                 hidden 
@@ -432,7 +510,7 @@ const Add = ({ token }) => {
         </label>
       </div>
 
-      <button type="submit" className="w-32 py-3 mt-4 bg-black text-white rounded-md">ADD</button>
+      <button type="submit" className="w-32 py-3 mt-4 bg-black text-white rounded-md">{!isEditMode ? "ADD" : "UPDATE"}</button>
     </form>
   );
 };
