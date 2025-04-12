@@ -146,7 +146,46 @@ const handleWishlist = async (req, res) => {
   }
 }
 
-export default handleWishlist
 
 
-export { listProducts, addProduct, removeProduct, singleProduct,handleWishlist }
+const submitReview = async (req, res) => {
+  const { productId, review, rating,userId } = req.body;
+
+  if (!productId || !review || !rating) {
+    return res.status(400).json({ success: false, message: 'Missing fields' });
+  }
+
+  try {
+    const product = await productModel.findById(productId);
+    const user = await userModel.findById(userId) 
+
+    if (!product || !user) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    // Add the new review
+    const newReview = {
+      userName:user.name,
+      review,
+      rating: Number(rating),
+      date: new Date()
+    };
+
+    product.reviews.push(newReview);
+
+    // Recalculate average rating
+    const total = product.reviews.reduce((acc, cur) => acc + cur.rating, 0);
+    product.averageRating = total / product.reviews.length;
+
+    await product.save();
+
+    res.status(200).json({ success: true, message: 'Review added successfully' });
+  } catch (error) {
+    console.error('Error submitting review:', error.message);
+    res.status(500).json({ success: false, message: 'Server error' });
+  }
+};
+
+
+
+export { listProducts, addProduct, removeProduct, singleProduct,handleWishlist,submitReview }
