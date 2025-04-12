@@ -168,6 +168,64 @@ useEffect(() => {
             ADD TO CART
           </button>
 
+{/* Product Additional Details with Scroll */}
+<div className='mt-8 sm:w-4/5'>
+  <h2 className='text-lg font-semibold mb-3'>Product Details</h2>
+  <div className='max-h-64 overflow-y-auto border rounded'>
+    <table className='w-full text-sm text-left'>
+      <tbody className='divide-y'>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Brand</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.brand}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Fit Type</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.fitType}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Material</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.material}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Color</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.colorOptions}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Secondary Color</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.secondryColor}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Sleeve Type</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.sleeveType}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Neck Type</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.neckType}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Occasion</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.occasion}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Pattern</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.pattern}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Wash Type</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.washCare}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>In Stock</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.inStock ? 'Yes' : 'No'}</td>
+        </tr>
+        <tr>
+          <td className='py-2 px-4 font-medium text-gray-700'>Returnable</td>
+          <td className='py-2 px-4 text-gray-600'>{productData.returnable ? 'Yes' : 'No'}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 
 
 
@@ -195,7 +253,7 @@ useEffect(() => {
     className={`border px-5 py-3 text-sm ${activeTab === 'reviews' ? 'bg-gray-200' : ''}`}
     onClick={() => setActiveTab('reviews')}
   >
-    Reviews (122)
+    Reviews ({productData.reviews.length})
   </button>
 </div>
 
