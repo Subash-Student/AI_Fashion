@@ -152,7 +152,6 @@ const Dashboard = () => {
           <h2 className="text-2xl font-bold mb-4">👤 Profile</h2>
           <div className="bg-white shadow-lg rounded-2xl p-6 space-y-3">
             <p><strong>Name:</strong> {allUserData.profile.name}</p>
-            <p><strong>Email:</strong> {allUserData.profile.email}</p>
             <p><strong>Phone:</strong> {allUserData.profile.phone}</p>
             <button className="mt-4 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700" onClick={() => setShowModal(true)}>Edit Profile</button>
           </div>

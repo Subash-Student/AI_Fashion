@@ -8,7 +8,8 @@ dotenv.config();
 const generateOTP = () => Math.floor(1000 + Math.random() * 9000).toString();
 
 
-const twoFactorApiKey = process.env.twoFactorApiKey;
+const twoFactorApiKey = '7d6499b7-1a9e-11f0-8b17-0200cd936042'; 
+
 
 export const sendOtp = async (req, res) => {
   const { phone } = req.body;

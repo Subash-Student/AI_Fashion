@@ -11,29 +11,21 @@ const createToken = (id) => {
 // Route for user login
 const loginUser = async (req, res) => {
     try {
-        const { contact, password } = req.body;
+        const { phone, password } = req.body;
 
-        let email = "";
-        let phone = "";
+       
 
-        // Validate contact input
-        if (validator.isEmail(contact)) {
-            email = contact;
-        } else if (/^\d{10}$/.test(contact)) {
-            phone = contact;
-        } else {
-            return res.json({ success: false, message: "Please enter a valid email or phone number" });
-        }
+        if (!(/^\d{10}$/.test(phone))) {
+            return res.json({ success: false, message: "Please enter a valid  phone number" });
+        } 
 
         // Password validation
         if (password.length < 8) {
             return res.json({ success: false, message: "Please enter a strong password (min 8 chars)" });
         }
 
-        // Find user by email or phone
-        const user = email
-            ? await userModel.findOne({ email })
-            : await userModel.findOne({ phone });
+        // Find user by   phone
+        const user = await userModel.findOne({ phone });
 
         if (!user) {
             return res.json({ success: false, message: "User doesn't exist" });
@@ -50,11 +42,6 @@ const loginUser = async (req, res) => {
         res.json({
             success: true,
             token,
-            user: {
-                name: user.name,
-                email: user.email,
-                phone: user.phone
-            }
         });
 
     } catch (error) {
@@ -67,27 +54,19 @@ const loginUser = async (req, res) => {
 // REGISTER USER
 const registerUser = async (req, res) => {
     try {
-        const { name, contact, password } = req.body;
+        const { name, phone, password } = req.body;
 
-        let email = "";
-        let phone = "";
-
-        // Validate contact input
-        if (validator.isEmail(contact)) {
-            email = contact;
-        } else if (/^\d{10}$/.test(contact)) {
-            phone = contact;
-        } else {
-            return res.json({ success: false, message: "Please enter a valid email or phone number" });
-        }
+        
+        if (!(/^\d{10}$/.test(phone))) {
+            return res.json({ success: false, message: "Please enter a valid   phone number" });
+        } 
 
         // Password validation
         if (password.length < 8) {
-            return res.json({ success: false, message: "Password must be at least 8 characters long" });
+            return res.json({ success: false, message: "Please enter a strong password (min 8 chars)" });
         }
-
         // Check if user already exists
-        const existingUser = await userModel.findOne({ $or: [{ email }, { phone }] });
+        const existingUser = await userModel.findOne({ phone });
         if (existingUser) {
             return res.json({ success: false, message: "User already exists" });
         }
@@ -99,7 +78,6 @@ const registerUser = async (req, res) => {
         // Create user
         const newUser = new userModel({
             name,
-            email,
             phone,
             password: hashedPassword
         });
@@ -110,11 +88,6 @@ const registerUser = async (req, res) => {
         res.json({
             success: true,
             token,
-            user: {
-                name: user.name,
-                email: user.email,
-                phone: user.phone
-            }
         });
 
     } catch (error) {
@@ -163,10 +136,10 @@ const getUserData = async (req, res) => {
 
 
 const editUserDetails = async (req, res) => {
-    const { userId, name, email, phone } = req.body;
+    const { userId, name,  phone } = req.body;
   
     // Basic field presence check
-    if (!userId || !name || !email || !phone) {
+    if (!userId || !name || !phone) {
       return res.status(400).json({ success: false, message: 'All fields are required' });
     }
   
@@ -175,11 +148,7 @@ const editUserDetails = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Invalid name' });
     }
   
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ success: false, message: 'Invalid email format' });
-    }
+   
   
     // Phone number validation (10 digits)
     const phoneRegex = /^\d{10}$/;
@@ -190,7 +159,7 @@ const editUserDetails = async (req, res) => {
     try {
       const updatedUser = await userModel.findByIdAndUpdate(
         userId,
-        { name, email, phone },
+        { name,  phone },
         { new: true, runValidators: true }
       );
   
@@ -237,6 +206,33 @@ const editUserAddressByPincode = async (req, res) => {
   }
 };
 
+
+
+
+export const resetPassword = async(req,res)=>{
+
+    const{newPassword,phone} = req.body;
+  
+        try {
+            const   user = await userModel.findOne({phone});
+
+            const salt = await bcrypt.genSalt(10);
+            const newHashedPassword =  await bcrypt.hash(newPassword,salt);
+
+            user.password = newHashedPassword;
+            
+            await user.save();
+            
+            res.json({success:true,message:"Your password has been updated successfully !",data:user})
+            
+            
+        } catch (error) {
+            console.log(error);
+            return res.json({success:false,message:"Failed To Update Password !"});
+
+        }
+    
+}
 
 
 
