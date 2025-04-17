@@ -18,16 +18,17 @@ const ShopContextProvider = (props) => {
     const [user,setUser] = useState({});
     const navigate = useNavigate();
     const [orderData, setOrderData] = useState([]);
-
+    const[isLoading,setIsLoading] = useState(false);
 
     
   const loadOrderData = async () => {
     try {
       if (!token) return;
+      setIsLoading(true)
       const response = await axios.post(backendUrl + '/api/order/userorders', {}, {
         headers: { token }
       });
-
+      setIsLoading(false)
       if (response.data.success) {
         let allOrdersItem = [];
         response.data.orders.forEach((order) => {
@@ -77,8 +78,10 @@ const ShopContextProvider = (props) => {
 
         if (token) {
             try {
-
+      setIsLoading(true)
+               
                 await axios.post(backendUrl + '/api/cart/add', { itemId, size }, { headers: { token } })
+                setIsLoading(false)
 
             } catch (error) {
                 console.log(error)
@@ -114,8 +117,10 @@ const ShopContextProvider = (props) => {
 
         if (token) {
             try {
+                setIsLoading(true)
 
                 await axios.post(backendUrl + '/api/cart/update', { itemId, size, quantity }, { headers: { token } })
+                setIsLoading(false)
 
             } catch (error) {
                 console.log(error)
@@ -144,8 +149,11 @@ const ShopContextProvider = (props) => {
 
     const getProductsData = async () => {
         try {
+            setIsLoading(true)
 
             const response = await axios.get(backendUrl + '/api/product/list')
+      setIsLoading(false)
+
             if (response.data.success) {
                 setProducts(response.data.products.reverse())
             } else {
@@ -162,9 +170,13 @@ const ShopContextProvider = (props) => {
         try {
           console.log("hi")
             if(token){
+      setIsLoading(true)
+
                 const response = await axios.get(backendUrl + '/api/user/myData',{
                     headers:{token}
                 })
+      setIsLoading(false)
+
                 if (response.data.success) {
                     setUser(response.data.user)
                 } else {
@@ -180,8 +192,11 @@ const ShopContextProvider = (props) => {
 
     const getUserCart = async ( token ) => {
         try {
+      setIsLoading(true)
             
             const response = await axios.post(backendUrl + '/api/cart/get',{},{headers:{token}})
+      setIsLoading(false)
+
             if (response.data.success) {
                 setCartItems(response.data.cartData)
             }
@@ -216,7 +231,9 @@ const ShopContextProvider = (props) => {
         getCartAmount, navigate, backendUrl,
         setToken, token,orderData,
         user,getUserData,
-        loadOrderData
+        loadOrderData,
+        isLoading,
+        setIsLoading
     }
 
     return (

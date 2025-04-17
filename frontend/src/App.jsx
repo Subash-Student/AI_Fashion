@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Collection from './pages/Collection'
@@ -16,11 +16,18 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify'
 import Dashboard from './pages/DashBoard'
+import ProtectRoute from './utils/ProtectRoute'
+import { ShopContext } from './context/ShopContext'
+import Loader from './components/Loader'
 
 const App = () => {
+
+  const {isLoading} = useContext(ShopContext)
+
   return (
     <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
       <ToastContainer />
+      {isLoading && <Loader />}
       <Navbar />
       <SearchBar />
       <Routes>
@@ -30,9 +37,9 @@ const App = () => {
         <Route path='/about' element={<About />} />
         <Route path='/contact' element={<Contact />} />
         <Route path='/product/:productId' element={<Product />} />
-        <Route path='/cart' element={<Cart />} />
+        <Route path='/cart' element={<Cart />}/>
         <Route path='/login' element={<Login />} />
-        <Route path='/place-order' element={<PlaceOrder />} />
+        <Route path='/place-order' element={<ProtectRoute><PlaceOrder /></ProtectRoute>} />
         <Route path='/orders' element={<Orders />} />
         <Route path='/verify' element={<Verify />} />
       </Routes>
