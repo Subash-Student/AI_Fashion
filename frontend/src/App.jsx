@@ -19,6 +19,7 @@ import Dashboard from './pages/DashBoard'
 import ProtectRoute from './utils/ProtectRoute'
 import { ShopContext } from './context/ShopContext'
 import Loader from './components/Loader'
+import VoiceAssistant from './components/VoiceAssistant'
 
 const App = () => {
 
@@ -27,6 +28,7 @@ const App = () => {
   return (
     <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
       <ToastContainer />
+      <VoiceAssistant />
       {isLoading && <Loader />}
       <Navbar />
       <SearchBar />

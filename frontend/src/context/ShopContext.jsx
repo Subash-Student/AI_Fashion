@@ -168,7 +168,7 @@ const ShopContextProvider = (props) => {
 
     const getUserData = async (token) => {
         try {
-          console.log("hi")
+         
             if(token){
       setIsLoading(true)
 

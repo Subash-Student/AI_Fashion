@@ -8,7 +8,7 @@ const RecentlyViewed = () => {
     const {user} = useContext(ShopContext);
     const [recentlyViewed,setRecentlyViewed] = useState([]);
    
-    console.log(user)
+  
     useEffect(()=>{
         setRecentlyViewed(user.recentlyViewed);
     },[user])
