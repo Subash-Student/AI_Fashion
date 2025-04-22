@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { toast } from "react-hot-toast";
+import { toast } from 'react-toastify'
 
 export default function VoiceMicOverlay() {
   const [showMic, setShowMic] = useState(false);

@@ -185,9 +185,13 @@ const singleProduct = async (req, res) => {
           user.recentlyViewed.push(product); // Push only ID, not full product object
           await user.save();
         }
-  
+
         res.json({ success: true, product });
-      } else {
+        
+      } else if (product){
+        res.json({ success: true, product });
+      }else{
+        
         res.json({ success: false, message: "Product or User Not Found" });
       }
     } catch (error) {

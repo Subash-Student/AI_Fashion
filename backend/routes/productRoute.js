@@ -8,7 +8,7 @@ const productRouter = express.Router();
 
 productRouter.post('/add',adminAuth,upload.fields([{name:'image1',maxCount:1},{name:'image2',maxCount:1},{name:'image3',maxCount:1},{name:'image4',maxCount:1}]),addProduct);
 productRouter.post('/remove',adminAuth,removeProduct);
-productRouter.post('/single',authUser,singleProduct);
+productRouter.post('/single',singleProduct);
 productRouter.post('/admin/single',authUser,adminSingleProduct);
 productRouter.get('/list',listProducts)
 productRouter.post("/wishlist/:isWishlist",authUser,handleWishlist)

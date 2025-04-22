@@ -142,7 +142,7 @@ const Orders = () => {
                   >
                     Track
                   </button>
-                  {!isCancelled && (
+                  {(!isCancelled && !isDelivered) && (
                     <button
                       onClick={() => handleCancelOrder(item)}
                       className="border border-red-500 text-red-500 px-4 py-1.5 rounded-full hover:bg-red-500 hover:text-white text-sm"
