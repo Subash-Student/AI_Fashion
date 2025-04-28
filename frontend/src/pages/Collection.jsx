@@ -3,22 +3,34 @@ import { ShopContext } from '../context/ShopContext';
 import { assets } from '../assets/assets';
 import Title from '../components/Title';
 import ProductItem from '../components/ProductItem';
+import VoiceAssistance from '../components/VoiceAssistant';
 
 const Collection = () => {
-  const { products, search, showSearch } = useContext(ShopContext);
+  const { 
+    products, 
+    navigate,
+    search, 
+    showSearch, 
+    category, 
+    setCategory, 
+    subCategory, 
+    setSubCategory, 
+    material, 
+    setMaterial, 
+    returnable, 
+    setReturnable, 
+    inStock, 
+    setInStock, 
+    sortType, 
+    setSortType, 
+    priceRange, 
+    setPriceRange 
+} = useContext(ShopContext);
 
   const [showFilter, setShowFilter] = useState(false);
   const [filterProducts, setFilterProducts] = useState([]);
 
-  // Filter States
-  const [category, setCategory] = useState([]);
-  const [subCategory, setSubCategory] = useState([]);
-  const [material, setMaterial] = useState([]);
-  const [returnable, setReturnable] = useState(null);
-  const [inStock, setInStock] = useState(null);
-  const [sortType, setSortType] = useState('relavent');
-  const [priceRange, setPriceRange] = useState([0, 5000]);
-
+  
   const toggleFilterArray = (value, setter, state) => {
     if (state.includes(value)) {
       setter(state.filter((item) => item !== value));
@@ -111,8 +123,14 @@ const Collection = () => {
     setPriceRange([0, 5000]);
   };
 
+  const pageValues = {
+    currentPage: "common",
+};
+
   return (
+  
     <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
+      <VoiceAssistance pageValues={pageValues} />
       {/* Filters */}
       <div className='min-w-60'>
         <p

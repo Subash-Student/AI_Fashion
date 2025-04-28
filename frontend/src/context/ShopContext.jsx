@@ -3,9 +3,11 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios'
 
+
 export const ShopContext = createContext();
 
 const ShopContextProvider = (props) => {
+
 
     const currency = '₹';
     const delivery_fee = 10;
@@ -20,6 +22,13 @@ const ShopContextProvider = (props) => {
     const [orderData, setOrderData] = useState([]);
     const[isLoading,setIsLoading] = useState(false);
 
+  const [category, setCategory] = useState([]);
+  const [subCategory, setSubCategory] = useState([]);
+  const [material, setMaterial] = useState([]);
+  const [returnable, setReturnable] = useState(null);
+  const [inStock, setInStock] = useState(null);
+  const [sortType, setSortType] = useState('relavent');
+  const [priceRange, setPriceRange] = useState([0, 5000]);
     
   const loadOrderData = async () => {
     try {
@@ -226,15 +235,21 @@ const ShopContextProvider = (props) => {
     const value = {
         products, currency, delivery_fee,
         search, setSearch, showSearch, setShowSearch,
-        cartItems, addToCart,setCartItems,
+        cartItems, addToCart, setCartItems,
         getCartCount, updateQuantity,
         getCartAmount, navigate, backendUrl,
-        setToken, token,orderData,
-        user,getUserData,
+        setToken, token, orderData,
+        user, getUserData,
         loadOrderData,
-        isLoading,
-        setIsLoading
-    }
+        isLoading, setIsLoading,
+        category, setCategory,
+        subCategory, setSubCategory,
+        material, setMaterial,
+        returnable, setReturnable,
+        inStock, setInStock,
+        sortType, setSortType,
+        priceRange, setPriceRange
+    };
 
     return (
         <ShopContext.Provider value={value}>

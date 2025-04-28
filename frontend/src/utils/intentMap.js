@@ -1,6 +1,6 @@
 export const arrayOfIntents = [
     {
-      page: "/",
+      page: "common",
       intents: [
         "login",
         "register",
@@ -12,6 +12,9 @@ export const arrayOfIntents = [
         "navigate_dashboard",
         "navigate_collection",
         "navigate_wishlist",
+        "navigate_nextPage",
+        "navigate_priviousPage",
+        "navigate_cart",
         "search_product",
         "apply_filter",
       ],
@@ -23,19 +26,19 @@ export const arrayOfIntents = [
           name: ""
         },
         navigation: {
-          currentPage: "/",
+          currentPage: "",
           to: ""
         },
-        search: {
-          query: ""
-        },
+        searchItemName:"",
+
         filters: {
-          categories: [],
-          priceRange: {
-            min: 0,
-            max: 0
-          },
-          ratings: 0
+          category:"",
+          subCategory:"",
+          material:"",
+          returnable:false,
+          inStock:false,
+          priceRange:[0, 5000],
+          
         }
       }
     },

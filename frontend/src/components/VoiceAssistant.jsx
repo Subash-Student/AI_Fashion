@@ -1,8 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { toast } from 'react-toastify'
+import { extractInformation } from "../utils/extractInfo";
+import { ShopContext } from "../context/ShopContext";
 
-export default function VoiceMicOverlay() {
+export default function VoiceAssistance({pageValues}) {
+
+
+const contextValues = useContext(ShopContext);
   const [showMic, setShowMic] = useState(false);
   const [voiceText, setVoiceText] = useState("");
   const [processedText, setProcessedText] = useState(null);
@@ -121,6 +126,7 @@ Input:
       try {
         const result = JSON.parse(gptResponse);
         setProcessedText(result);
+        extractInformation(pageValues,processedText,contextValues)
         toast.success("Voice analyzed and structured successfully!");
       } catch (err) {
         console.error("Invalid JSON from GPT:", gptResponse);
