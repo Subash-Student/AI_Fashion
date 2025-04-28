@@ -26,7 +26,8 @@ import {
   handleUpdateShippingAddress,
   handleReadTheContent,
   handleRemoveFromWishlist,
-  handleMakeCall
+  handleMakeCall,
+  handleReset
 } from './intentHandler';
 
 import axios from "axios";
@@ -131,39 +132,42 @@ export const handleIntent = (finalResponse, pageValues, contextValues) => {
       case "register":
           return handleRegister(finalResponse, pageValues, contextValues);
       case "logout":
-          return handleLogout(finalResponse, pageValues, contextValues);   //done
+          return handleLogout(finalResponse, pageValues, contextValues);   // DONE
       case "navigate_home":
-          return handleNavigation(finalResponse, pageValues, contextValues); //done
+          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
       case "navigate_about":
-          return handleNavigation(finalResponse, pageValues, contextValues); //done
+          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
       case "navigate_contact":
-          return handleNavigation(finalResponse, pageValues, contextValues); //done
+          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
       case "navigate_orders":
-          return handleNavigation(finalResponse, pageValues, contextValues); //done
+          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
       case "navigate_dashboard":
-          return handleNavigation(finalResponse, pageValues, contextValues); //done
+          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
       case "navigate_collection":
-          return handleNavigation(finalResponse, pageValues, contextValues); //done
+          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
       case "navigate_wishlist":
-          return handleNavigation(finalResponse, pageValues, contextValues); //done
+          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
       case "navigate_cart":
-          return handleNavigation(finalResponse, pageValues, contextValues); //done
+          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
       case "search_product":
-          return handleApplyFilter(finalResponse, pageValues, contextValues); //done
+          return handleApplyFilter(finalResponse, pageValues, contextValues); // DONE
       case "apply_filter":
-          return handleApplyFilter(finalResponse, pageValues, contextValues); //done
+          return handleApplyFilter(finalResponse, pageValues, contextValues); // DONE
 
       // Collection Page Intents
       case "sort_by_price_low_to_high":
-          return handleSortByPriceLowToHigh(finalResponse, pageValues, contextValues);
+          return handleSortByPriceLowToHigh(finalResponse, pageValues, contextValues);  // DONE
       case "sort_by_price_high_to_low":
-          return handleSortByPriceHighToLow(finalResponse, pageValues, contextValues);
+          return handleSortByPriceHighToLow(finalResponse, pageValues, contextValues); // DONE
       case "choose_particular_product":
-          return handleChooseParticularProduct(finalResponse, pageValues, contextValues);
+          return handleChooseParticularProduct(finalResponse, pageValues, contextValues); // DONE
       case "ask_details":
           return handleAskDetails(finalResponse, pageValues, contextValues);
-      case "choose_particular_product":
-          return handleChooseProduct(finalResponse, pageValues, contextValues);
+      case "reset_filter":
+          return handleReset(finalResponse, pageValues, contextValues);  // DONE
+      case "reset_sorting":
+          return handleReset(finalResponse, pageValues, contextValues);  // DONE
+    
 
       // Product Details Page Intents
       case "add_to_cart":

@@ -49,7 +49,8 @@ export const arrayOfIntents = [
         "apply_filter",
         "sort_by_price_low_to_high",
         "sort_by_price_high_to_low",
-        "sort_by_best_seller",
+        "reset_filter",
+        "reset_sorting",
         "ask_question",
         "choose_particular_product"
       ],
@@ -59,19 +60,20 @@ export const arrayOfIntents = [
           query: ""
         },
         filters: {
-          categories: [],
-          priceRange: {
-            min: 0,
-            max: 0
-          },
-          ratings: 0
+          category:"",
+          subCategory:"",
+          material:"",
+          returnable:false,
+          inStock:false,
+          priceRange:[0, 5000],
+          
         },
         sort: {
           sortBy: ""
         },
         product: {
-          id: "",
-          name: ""
+          number: "",
+          
         }
       }
     },

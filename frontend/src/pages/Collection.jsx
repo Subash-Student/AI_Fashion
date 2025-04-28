@@ -24,11 +24,13 @@ const Collection = () => {
     sortType, 
     setSortType, 
     priceRange, 
-    setPriceRange 
+    setPriceRange ,
+    filterProducts,
+    setFilterProducts,
+    resetFilters
 } = useContext(ShopContext);
 
   const [showFilter, setShowFilter] = useState(false);
-  const [filterProducts, setFilterProducts] = useState([]);
 
   
   const toggleFilterArray = (value, setter, state) => {
@@ -112,16 +114,8 @@ const Collection = () => {
     sortProduct();
   }, [sortType]);
 
-  // ✅ RESET FILTERS
-  const resetFilters = () => {
-    setCategory([]);
-    setSubCategory([]);
-    setMaterial([]);
-    setReturnable(null);
-    setInStock(null);
-    setSortType('relavent');
-    setPriceRange([0, 5000]);
-  };
+
+ 
 
   const pageValues = {
     currentPage: "common",

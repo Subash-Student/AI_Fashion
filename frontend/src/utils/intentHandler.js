@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { ShopContext } from "../context/ShopContext";
 
-export const handleNavigation = (response,contextValues) => {
+export const handleNavigation = (response,pageValues,contextValues) => {
 
   const {navigate} = contextValues;
 
@@ -50,7 +50,7 @@ export const handleLogout = (response) => {
 };
 
 
-export const handleApplyFilter = (response, contextValues) => {
+export const handleApplyFilter = (response,pageValues, contextValues) => {
   const { 
     setSearch, 
     setShowSearch, 
@@ -80,9 +80,48 @@ export const handleApplyFilter = (response, contextValues) => {
 };
 
 
+export const handleReset = (response, pageValues, contextValues) => {
+  const { setSortType, resetFilters } = contextValues;
+
+  const intent = response?.intent || "";
+
+  if (intent.includes("reset_filter")) {
+    resetFilters();
+  } else {
+    setSortType("relevant");
+  }
+};
 
 
 
+
+export const handleSortByPriceLowToHigh = (response, pageValues, contextValues) => {
+  const { setSortType } = contextValues;
+  setSortType("low-high");
+};
+
+export const handleSortByPriceHighToLow = (response, pageValues, contextValues) => {
+  const { setSortType } = contextValues;
+  setSortType("high-low");
+};
+
+export const handleChooseParticularProduct = (response, pageValues, contextValues) => {
+  const { filterProducts, navigate } = contextValues;
+
+  const productNumber = response?.product?.number;
+
+  // Safer access
+  if (productNumber != null && filterProducts?.length >= productNumber) {
+    const product = filterProducts[productNumber - 1];
+    if (product?._id) {
+      navigate(`/product/${product._id}`);
+    } else {
+      console.error("Product ID not found!");
+    }
+  } else {
+    console.error("Invalid product number or filterProducts not loaded!");
+  }
+};
 
 
 
@@ -115,13 +154,7 @@ export const handleSearchProduct = (response) => {
   console.log("Applying Filter", response);
 };
 
-export const handleSortByPriceLowToHigh = (response) => {
-  console.log("Sorting by Price: Low to High", response);
-};
 
-export const handleSortByPriceHighToLow = (response) => {
-  console.log("Sorting by Price: High to Low", response);
-};
 
 export const handleSortByBestSeller = (response) => {
   console.log("Sorting by Best Seller", response);
@@ -131,9 +164,6 @@ export const handleAskDetails = (response) => {
   console.log("Asking for Details", response);
 };
 
-export const handleChooseParticularProduct = (response) => {
-  console.log("Choosing Particular Product", response);
-};
 
 export const handleAddToCart = (response) => {
   console.log("Adding to Cart", response);

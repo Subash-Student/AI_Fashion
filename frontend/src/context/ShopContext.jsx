@@ -29,7 +29,10 @@ const ShopContextProvider = (props) => {
   const [inStock, setInStock] = useState(null);
   const [sortType, setSortType] = useState('relavent');
   const [priceRange, setPriceRange] = useState([0, 5000]);
-    
+  
+  const [filterProducts, setFilterProducts] = useState([]);
+  
+
   const loadOrderData = async () => {
     try {
       if (!token) return;
@@ -232,6 +235,17 @@ const ShopContextProvider = (props) => {
         }
     }, [token])
 
+    const resetFilters = () => {
+        setCategory([]);
+        setSubCategory([]);
+        setMaterial([]);
+        setReturnable(null);
+        setInStock(null);
+        setSortType('relavent');
+        setPriceRange([0, 5000]);
+      };
+
+
     const value = {
         products, currency, delivery_fee,
         search, setSearch, showSearch, setShowSearch,
@@ -248,7 +262,9 @@ const ShopContextProvider = (props) => {
         returnable, setReturnable,
         inStock, setInStock,
         sortType, setSortType,
-        priceRange, setPriceRange
+        priceRange, setPriceRange,
+        filterProducts,setFilterProducts,
+        resetFilters
     };
 
     return (
