@@ -8,45 +8,12 @@ import { Star } from 'lucide-react'
 
 
 
-const dummyReviews = [
-  {
-    username: 'John Doe',
-    rating: 4,
-    review: 'Great product! Really loved the quality and delivery speed.',
-  },
-  {
-    username: 'Jane Smith',
-    rating: 5,
-    review: 'Exceeded my expectations. Highly recommended!',
-  },
-  {
-    username: 'Alex Johnson',
-    rating: 3,
-    review: 'Good product, but could be better in packaging.',
-  },
-  {
-    username: 'Emily Davis',
-    rating: 5,
-    review: 'Very comfortable and fits perfectly.',
-  },
-  {
-    username: 'Michael Brown',
-    rating: 4,
-    review: 'Decent price and fast shipping. Worth it.',
-  },
-]
-
-
-
-
 
 const Product = () => {
   const { productId } = useParams()
-  const { currency, addToCart,user } = useContext(ShopContext)
+  const { currency, addToCart,user,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist } = useContext(ShopContext)
   const [productData, setProductData] = useState(null)
   const [image, setImage] = useState('')
-  const [size, setSize] = useState('')
-  const [isWishlisted, setIsWishlisted] = useState(false)
   const [activeTab, setActiveTab] = useState('description')
 
 
@@ -72,7 +39,12 @@ const Product = () => {
 
     fetchProduct()
     
-
+   setPageValues({
+    currentPage:"ProductDetails",
+    values:{
+      productData:productData
+    }
+   })
 
 }, [productId])
 
@@ -87,25 +59,13 @@ useEffect(() => {
 
 
 
-  const toggleWishlist = async () => {
-    try {
-      const token = localStorage.getItem('token')
-      const url = `http://localhost:4000/api/product/wishlist/${isWishlisted ? 'remove' : 'add'}`
-      const res = await axios.post(url, { productId }, { headers: { token } })
-
-      if (res.data.success) {
-        setIsWishlisted(!isWishlisted)
-      }
-    } catch (error) {
-      console.error('Wishlist toggle error:', error)
-    }
-  }
+  
 
   return productData ? (
     <div className='border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100 relative'>
-
+  
       {/* Wishlist Icon at top right */}
-      <div className='absolute top-4 right-4 text-red-600 text-2xl cursor-pointer z-10' onClick={toggleWishlist}>
+      <div className='absolute top-4 right-4 text-red-600 text-2xl cursor-pointer z-10' onClick={()=>toggleWishlist(productId)}>
         {isWishlisted ? <FaHeart /> : <FaRegHeart />}
       </div>
 

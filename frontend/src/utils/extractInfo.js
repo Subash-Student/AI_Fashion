@@ -11,8 +11,8 @@ import {
   handleSortByBestSeller,
   handleAskDetails,
   handleChooseParticularProduct,
-  handleAddToCart,
-  handleAddToWishlist,
+  handleCart,
+  handleWishlist,
   handleRemoveFromCart,
   handleViewCart,
   handlePlaceOrder,
@@ -32,7 +32,9 @@ import {
 
 import axios from "axios";
 
-export const extractInformation = async (pageValues, voiceInputText,contextValues) => {
+export const extractInformation = async ( voiceInputText,contextValues) => {
+
+  const {pageValues} = contextValues;
 
   const {currentPage} = pageValues;
   try {
@@ -42,6 +44,8 @@ export const extractInformation = async (pageValues, voiceInputText,contextValue
       return { error: `No configuration found for page: ${currentPage}` };
     }
 
+    const commonConfig = arrayOfIntents[0];
+    
     const { intents, responseStructure } = pageConfig;
 
     // 2. Construct prompt for GPT
@@ -52,7 +56,14 @@ The current page is "${currentPage}".
 Here are the valid intents for this page:
 ${JSON.stringify(intents, null, 2)}
 
-Here is the expected response structure:
+If not match with above intents then check this common page intents:
+${JSON.stringify(commonConfig.intents, null, 2)}
+
+If it match with common page intents then hear the expected response structure:
+${JSON.stringify(commonConfig.responseStructure, null, 2)}
+
+
+If not then Here is the expected response structure:
 ${JSON.stringify(responseStructure, null, 2)}
 
 User said: "${voiceInputText}"
@@ -113,7 +124,7 @@ Return ONLY valid JSON and nothing else.
 
     const finalResponse = validateFields(responseStructure, result);
 
-    handleIntent(finalResponse,pageValues,contextValues)
+    handleIntent(finalResponse,contextValues)
      
   } catch (error) {
     console.error("Error in extractInformation:", error.message);
@@ -124,94 +135,98 @@ Return ONLY valid JSON and nothing else.
 
 
 
-export const handleIntent = (finalResponse, pageValues, contextValues) => {
+export const handleIntent = (finalResponse,  contextValues) => {
   switch (finalResponse.intent) {
       // Home Page Intents
       case "login":
-          return handleLogin(finalResponse, pageValues, contextValues);
+          return handleLogin(finalResponse,  contextValues);
       case "register":
-          return handleRegister(finalResponse, pageValues, contextValues);
+          return handleRegister(finalResponse,  contextValues);
       case "logout":
-          return handleLogout(finalResponse, pageValues, contextValues);   // DONE
+          return handleLogout(finalResponse,  contextValues);   // DONE
       case "navigate_home":
-          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
+          return handleNavigation(finalResponse,  contextValues); // DONE
       case "navigate_about":
-          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
+          return handleNavigation(finalResponse,  contextValues); // DONE
       case "navigate_contact":
-          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
+          return handleNavigation(finalResponse,  contextValues); // DONE
       case "navigate_orders":
-          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
+          return handleNavigation(finalResponse,  contextValues); // DONE
       case "navigate_dashboard":
-          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
+          return handleNavigation(finalResponse,  contextValues); // DONE
       case "navigate_collection":
-          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
+          return handleNavigation(finalResponse,  contextValues); // DONE
       case "navigate_wishlist":
-          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
+          return handleNavigation(finalResponse,  contextValues); // DONE
       case "navigate_cart":
-          return handleNavigation(finalResponse, pageValues, contextValues); // DONE
+          return handleNavigation(finalResponse,  contextValues); // DONE
       case "search_product":
-          return handleApplyFilter(finalResponse, pageValues, contextValues); // DONE
+          return handleApplyFilter(finalResponse,  contextValues); // DONE
       case "apply_filter":
-          return handleApplyFilter(finalResponse, pageValues, contextValues); // DONE
+          return handleApplyFilter(finalResponse,  contextValues); // DONE
 
       // Collection Page Intents
       case "sort_by_price_low_to_high":
-          return handleSortByPriceLowToHigh(finalResponse, pageValues, contextValues);  // DONE
+          return handleSortByPriceLowToHigh(finalResponse,  contextValues);  // DONE
       case "sort_by_price_high_to_low":
-          return handleSortByPriceHighToLow(finalResponse, pageValues, contextValues); // DONE
+          return handleSortByPriceHighToLow(finalResponse,  contextValues); // DONE
       case "choose_particular_product":
-          return handleChooseParticularProduct(finalResponse, pageValues, contextValues); // DONE
+          return handleChooseParticularProduct(finalResponse,  contextValues); // DONE
       case "ask_details":
-          return handleAskDetails(finalResponse, pageValues, contextValues);
+          return handleAskDetails(finalResponse,  contextValues);
       case "reset_filter":
-          return handleReset(finalResponse, pageValues, contextValues);  // DONE
+          return handleReset(finalResponse,  contextValues);  // DONE
       case "reset_sorting":
-          return handleReset(finalResponse, pageValues, contextValues);  // DONE
+          return handleReset(finalResponse,  contextValues);  // DONE
     
 
       // Product Details Page Intents
       case "add_to_cart":
-          return handleAddToCart(finalResponse, pageValues, contextValues);
+          return handleCart(finalResponse,  contextValues);   // DONE
+      case "remove_from_cart":
+          return handleCart(finalResponse,  contextValues);    // DONE
       case "add_to_wishlist":
-          return handleAddToWishlist(finalResponse, pageValues, contextValues);
+          return handleWishlist(finalResponse,  contextValues);  // DONE
+      case "remove_from_wishlist":
+          return handleWishlist(finalResponse,  contextValues);  // DONE
 
       // Cart Page Intents
       case "remove_from_cart":
-          return handleRemoveFromCart(finalResponse, pageValues, contextValues);
+          return handleRemoveFromCart(finalResponse,  contextValues);
       case "view_cart":
-          return handleViewCart(finalResponse, pageValues, contextValues);
+          return handleViewCart(finalResponse,  contextValues);
 
       // Place Order Page Intents
       case "place_order":
-          return handlePlaceOrder(finalResponse, pageValues, contextValues);
+          return handlePlaceOrder(finalResponse,  contextValues);
       case "select_payment_method":
-          return handleSelectPaymentMethod(finalResponse, pageValues, contextValues);
+          return handleSelectPaymentMethod(finalResponse,  contextValues);
       case "change_shipping_address":
-          return handleChangeShippingAddress(finalResponse, pageValues, contextValues);
+          return handleChangeShippingAddress(finalResponse,  contextValues);
 
       // Orders Page Intents
       case "track_order":
-          return handleTrackOrder(finalResponse, pageValues, contextValues);
+          return handleTrackOrder(finalResponse,  contextValues);
       case "cancel_order":
-          return handleCancelOrder(finalResponse, pageValues, contextValues);
+          return handleCancelOrder(finalResponse,  contextValues);
       case "review_order":
-          return handleReviewOrder(finalResponse, pageValues, contextValues);
+          return handleReviewOrder(finalResponse,  contextValues);
 
       // Dashboard Page Intents
       case "change_name":
-          return handleChangeName(finalResponse, pageValues, contextValues);
+          return handleChangeName(finalResponse,  contextValues);
       case "change_phone_number":
-          return handleChangePhoneNumber(finalResponse, pageValues, contextValues);
+          return handleChangePhoneNumber(finalResponse,  contextValues);
       case "update_shipping_address":
-          return handleUpdateShippingAddress(finalResponse, pageValues, contextValues);
+          return handleUpdateShippingAddress(finalResponse,  contextValues);
       case "read_the_content":
-          return handleReadTheContent(finalResponse, pageValues, contextValues);
+          return handleReadTheContent(finalResponse,  contextValues);
       case "remove_from_wishlist":
-          return handleRemoveFromWishlist(finalResponse, pageValues, contextValues);
+          return handleRemoveFromWishlist(finalResponse,  contextValues);
 
       // Contact Page Intents
       case "make_call":
-          return handleMakeCall(finalResponse, pageValues, contextValues);
+          return handleMakeCall(finalResponse,  contextValues);
 
       // Fallback for unrecognized intents
       default:

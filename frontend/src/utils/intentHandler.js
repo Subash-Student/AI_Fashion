@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { ShopContext } from "../context/ShopContext";
 
-export const handleNavigation = (response,pageValues,contextValues) => {
+export const handleNavigation = (response,contextValues) => {
 
   const {navigate} = contextValues;
 
@@ -50,7 +50,7 @@ export const handleLogout = (response) => {
 };
 
 
-export const handleApplyFilter = (response,pageValues, contextValues) => {
+export const handleApplyFilter = (response, contextValues) => {
   const { 
     setSearch, 
     setShowSearch, 
@@ -80,7 +80,7 @@ export const handleApplyFilter = (response,pageValues, contextValues) => {
 };
 
 
-export const handleReset = (response, pageValues, contextValues) => {
+export const handleReset = (response,  contextValues) => {
   const { setSortType, resetFilters } = contextValues;
 
   const intent = response?.intent || "";
@@ -95,22 +95,22 @@ export const handleReset = (response, pageValues, contextValues) => {
 
 
 
-export const handleSortByPriceLowToHigh = (response, pageValues, contextValues) => {
+export const handleSortByPriceLowToHigh = (response,  contextValues) => {
   const { setSortType } = contextValues;
   setSortType("low-high");
 };
 
-export const handleSortByPriceHighToLow = (response, pageValues, contextValues) => {
+export const handleSortByPriceHighToLow = (response,  contextValues) => {
   const { setSortType } = contextValues;
   setSortType("high-low");
 };
 
-export const handleChooseParticularProduct = (response, pageValues, contextValues) => {
+export const handleChooseParticularProduct = (response,  contextValues) => {
   const { filterProducts, navigate } = contextValues;
 
   const productNumber = response?.product?.number;
 
-  // Safer access
+ 
   if (productNumber != null && filterProducts?.length >= productNumber) {
     const product = filterProducts[productNumber - 1];
     if (product?._id) {
@@ -125,7 +125,48 @@ export const handleChooseParticularProduct = (response, pageValues, contextValue
 
 
 
+export const handleCart = (response, contextValues) => {
+  const { addToCart, updateQuantity, size, pageValues } = contextValues;
+  const action = response?.userAction?.cart;
+  const productData = pageValues?.values?.productData;
 
+  if (!productData || !action) {
+    console.error("Missing product data or action");
+    return;
+  }
+
+  if (action === "add") {
+    addToCart(productData._id, size);
+  } else if (action === "remove") {
+    updateQuantity(productData._id, size, 0);
+  } else {
+    console.warn("Unknown cart action:", action);
+  }
+};
+
+
+
+
+export const handleWishlist = (response, contextValues) => {
+  const { toggleWishlist, pageValues,setIsWishlisted } = contextValues;
+  const product = pageValues?.values?.productData;
+  const action = response?.userAction?.wishlist;
+
+  if (!product || !action) {
+    console.error("Missing product data or action");
+    return;
+  }
+
+  if (action === "add") {
+    setIsWishlisted(true)
+    toggleWishlist(product._id);
+  } else if (action === "remove") {
+    setIsWishlisted(false)
+    toggleWishlist(product._id);
+  } else {
+    console.warn("Unknown wishlist action:", action);
+  }
+};
 
 
 
@@ -141,41 +182,32 @@ export const handleChooseParticularProduct = (response, pageValues, contextValue
 
 export const handleLogin = (response) => {
   console.log("Handling login", response);
-};
+};  
 
 export const handleRegister = (response) => {
   console.log("Handling register", response);
-};
+};  
 
 
 
 
 export const handleSearchProduct = (response) => {
   console.log("Applying Filter", response);
-};
+};  
 
 
 
 export const handleSortByBestSeller = (response) => {
   console.log("Sorting by Best Seller", response);
-};
+};  
 
 export const handleAskDetails = (response) => {
   console.log("Asking for Details", response);
-};
+};  
 
 
-export const handleAddToCart = (response) => {
-  console.log("Adding to Cart", response);
-};
 
-export const handleAddToWishlist = (response) => {
-  console.log("Adding to Wishlist", response);
-};
 
-export const handleRemoveFromCart = (response) => {
-  console.log("Removing from Cart", response);
-};
 
 export const handleViewCart = (response) => {
   console.log("Viewing Cart", response);

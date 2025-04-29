@@ -4,7 +4,7 @@ import { toast } from 'react-toastify'
 import { extractInformation } from "../utils/extractInfo";
 import { ShopContext } from "../context/ShopContext";
 
-export default function VoiceAssistance({pageValues}) {
+export default function VoiceAssistance() {
 
 
 const contextValues = useContext(ShopContext);
@@ -126,7 +126,7 @@ Input:
       try {
         const result = JSON.parse(gptResponse);
         setProcessedText(result);
-        extractInformation(pageValues,processedText,contextValues)
+        extractInformation(processedText,contextValues)
         toast.success("Voice analyzed and structured successfully!");
       } catch (err) {
         console.error("Invalid JSON from GPT:", gptResponse);

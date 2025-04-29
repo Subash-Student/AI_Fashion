@@ -31,7 +31,13 @@ const ShopContextProvider = (props) => {
   const [priceRange, setPriceRange] = useState([0, 5000]);
   
   const [filterProducts, setFilterProducts] = useState([]);
+  const [isWishlisted, setIsWishlisted] = useState(false)
   
+  const [pageValues,setPageValues] = useState({
+    currentPage:"",
+    values:{}
+  })
+  const [size, setSize] = useState('')
 
   const loadOrderData = async () => {
     try {
@@ -246,6 +252,22 @@ const ShopContextProvider = (props) => {
       };
 
 
+      const toggleWishlist = async (productId) => {
+        try {
+          const token = localStorage.getItem('token')
+          const url = `http://localhost:4000/api/product/wishlist/${isWishlisted ? 'remove' : 'add'}`
+          const res = await axios.post(url, { productId }, { headers: { token } })
+    
+          if (res.data.success) {
+            setIsWishlisted(!isWishlisted)
+          }
+        } catch (error) {
+          console.error('Wishlist toggle error:', error)
+        }
+      }
+
+
+
     const value = {
         products, currency, delivery_fee,
         search, setSearch, showSearch, setShowSearch,
@@ -264,7 +286,7 @@ const ShopContextProvider = (props) => {
         sortType, setSortType,
         priceRange, setPriceRange,
         filterProducts,setFilterProducts,
-        resetFilters
+        resetFilters,pageValues,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist
     };
 
     return (

@@ -82,18 +82,16 @@ export const arrayOfIntents = [
       intents: [
         "ask_question",
         "add_to_cart",
-        "add_to_wishlist"
+        "add_to_wishlist",
+        "remove_from_cart",
+        "remove_from_wishlist"
       ],
       responseStructure: {
         intent: "",
-        product: {
-          id: "",
-          name: "",
-          detailsRequested: true
-        },
+        
         userAction: {
-          addToCart: false,
-          addToWishlist: false
+          cart: "add || remove",
+          wishlist: "add || remove"
         }
       }
     },

@@ -27,7 +27,8 @@ const Collection = () => {
     setPriceRange ,
     filterProducts,
     setFilterProducts,
-    resetFilters
+    resetFilters,
+    setPageValues
 } = useContext(ShopContext);
 
   const [showFilter, setShowFilter] = useState(false);
@@ -113,18 +114,20 @@ const Collection = () => {
   useEffect(() => {
     sortProduct();
   }, [sortType]);
+  useEffect(() => {
+    setPageValues({
+      currentPage:"collection"
+    })
+  }, []);
 
 
- 
 
-  const pageValues = {
-    currentPage: "common",
-};
 
+  
   return (
   
     <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
-      <VoiceAssistance pageValues={pageValues} />
+      
       {/* Filters */}
       <div className='min-w-60'>
         <p
