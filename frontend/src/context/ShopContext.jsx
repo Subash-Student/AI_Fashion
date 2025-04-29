@@ -39,6 +39,9 @@ const ShopContextProvider = (props) => {
   })
   const [size, setSize] = useState('')
 
+  const [cartData, setCartData] = useState([]);
+
+
   const loadOrderData = async () => {
     try {
       if (!token) return;
@@ -286,7 +289,7 @@ const ShopContextProvider = (props) => {
         sortType, setSortType,
         priceRange, setPriceRange,
         filterProducts,setFilterProducts,
-        resetFilters,pageValues,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist
+        resetFilters,pageValues,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist,cartData,setCartData
     };
 
     return (

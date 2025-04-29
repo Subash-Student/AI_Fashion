@@ -145,6 +145,22 @@ export const handleCart = (response, contextValues) => {
 };
 
 
+export const handleQuantityAndRemoveFromCartPage = (response, contextValues) => {
+  const {  updateQuantity,  pageValues,cartData } = contextValues;
+  
+  const removeProduct = cartData[Number(response.remove_product_number)-1]
+
+  if (action === "adjust_quantity") {
+    updateQuantity(removeProduct._id, removeProduct.size, response.quantity);
+
+  } else if (action === "remove") {
+    updateQuantity(removeProduct._id, removeProduct.size, 0);
+  } else {
+    console.warn("Unknown cart action:", action);
+  }
+};
+
+
 
 
 export const handleWishlist = (response, contextValues) => {

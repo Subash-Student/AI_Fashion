@@ -4,17 +4,14 @@ import {
   handleRegister,
   handleLogout,
   handleNavigation,
-  handleSearchProduct,
   handleApplyFilter,
   handleSortByPriceLowToHigh,
   handleSortByPriceHighToLow,
-  handleSortByBestSeller,
   handleAskDetails,
   handleChooseParticularProduct,
   handleCart,
   handleWishlist,
-  handleRemoveFromCart,
-  handleViewCart,
+  handleQuantityAndRemoveFromCartPage,
   handlePlaceOrder,
   handleSelectPaymentMethod,
   handleChangeShippingAddress,
@@ -191,10 +188,10 @@ export const handleIntent = (finalResponse,  contextValues) => {
           return handleWishlist(finalResponse,  contextValues);  // DONE
 
       // Cart Page Intents
-      case "remove_from_cart":
-          return handleRemoveFromCart(finalResponse,  contextValues);
-      case "view_cart":
-          return handleViewCart(finalResponse,  contextValues);
+      case "remove_from_cart_in_cartPage":
+          return handleQuantityAndRemoveFromCartPage(finalResponse,  contextValues);  // DONE
+      case "adjust_quantity":
+          return handleQuantityAndRemoveFromCartPage(finalResponse,  contextValues);   // DONE
 
       // Place Order Page Intents
       case "place_order":

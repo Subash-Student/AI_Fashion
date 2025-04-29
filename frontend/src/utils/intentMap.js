@@ -98,24 +98,17 @@ export const arrayOfIntents = [
     {
       page: "cart",
       intents: [
-        "remove_from_cart",
+        "remove_from_cart_in_cartPage",
         "ask_question",
-        "view_cart",
+        "adjust_quantity",
       ],
       responseStructure: {
         intent: "",
-        cart: {
-          items: [
-            {
-              productId: "",
-              quantity: 1
-            }
-          ]
-        },
-        action: {
-          viewCart: true,
-          removeItemId: ""
-        }
+        action:"remove || adjust_quantity",
+        adjust_quantity: "increment || decrement",
+        remove_product_number:"1,2,3,4,5,...",
+        quantity:"1,2,3,4,5,...",
+        
       }
     },
     {

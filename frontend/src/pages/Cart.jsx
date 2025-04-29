@@ -6,9 +6,9 @@ import CartTotal from '../components/CartTotal';
 
 const Cart = () => {
 
-  const { products, currency, cartItems, updateQuantity, navigate } = useContext(ShopContext);
+  const { products, currency, cartItems,cartData,setCartData, updateQuantity, navigate } = useContext(ShopContext);
 
-  const [cartData, setCartData] = useState([]);
+  
 
   useEffect(() => {
 
@@ -28,6 +28,12 @@ const Cart = () => {
       setCartData(tempData);
     }
   }, [cartItems, products])
+  
+  
+  console.log(cartItems)
+
+ 
+
 
   return (
     <div className='border-t pt-14'>
