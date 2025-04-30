@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useState,useEffect } from 'react'
 import Title from '../components/Title'
 import CartTotal from '../components/CartTotal'
 import { assets } from '../assets/assets'
@@ -9,24 +9,9 @@ import { toast } from 'react-toastify'
 const PlaceOrder = () => {
 
     const [method, setMethod] = useState('cod');
-    const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        street: '',
-        city: '',
-        state: '',
-        zipcode: '',
-        country: '',
-        phone: ''
-    })
-
-    const onChangeHandler = (event) => {
-        const name = event.target.name
-        const value = event.target.value
-        setFormData(data => ({ ...data, [name]: value }))
-    }
+    const { navigate,user,showPincodeModal, setShowPincodeModal, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
+    const [pincode, setPincode] = useState(Array(6).fill(""));
+   const [address,setAddress] = useState(user.address)
 
     const initPay = (order) => {
         const options = {
@@ -56,6 +41,20 @@ const PlaceOrder = () => {
         rzp.open()
     }
 
+    useEffect(() => {
+        const triggerSubmit = () => {
+          onSubmitHandler(new Event('submit-from-voice'));
+        };
+    
+        // Listen for global event
+        window.addEventListener('voice_place_order', triggerSubmit);
+    
+        return () => {
+          window.removeEventListener('voice_place_order', triggerSubmit);
+        };
+      }, []);
+
+
     const onSubmitHandler = async (event) => {
         event.preventDefault()
         try {
@@ -76,7 +75,7 @@ const PlaceOrder = () => {
             }
 
             let orderData = {
-                address: formData,
+                address: address,
                 items: orderItems,
                 amount: getCartAmount() + delivery_fee
             }
@@ -126,30 +125,53 @@ const PlaceOrder = () => {
     }
 
 
-    return (
-        <form onSubmit={onSubmitHandler} className='flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t'>
-            {/* ------------- Left Side ---------------- */}
-            <div className='flex flex-col gap-4 w-full sm:max-w-[480px]'>
+    const handlePincodeChange = (index, value) => {
+        const newPin = [...pincode];
+        if (/^\d?$/.test(value)) {
+          newPin[index] = value;
+          setPincode(newPin);
+        }
+      };
 
-                <div className='text-xl sm:text-2xl my-3'>
-                    <Title text1={'DELIVERY'} text2={'INFORMATION'} />
-                </div>
-                <div className='flex gap-3'>
-                    <input required onChange={onChangeHandler} name='firstName' value={formData.firstName} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="text" placeholder='First name' />
-                    <input required onChange={onChangeHandler} name='lastName' value={formData.lastName} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="text" placeholder='Last name' />
-                </div>
-                <input required onChange={onChangeHandler} name='email' value={formData.email} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="email" placeholder='Email address' />
-                <input required onChange={onChangeHandler} name='street' value={formData.street} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="text" placeholder='Street' />
-                <div className='flex gap-3'>
-                    <input required onChange={onChangeHandler} name='city' value={formData.city} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="text" placeholder='City' />
-                    <input onChange={onChangeHandler} name='state' value={formData.state} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="text" placeholder='State' />
-                </div>
-                <div className='flex gap-3'>
-                    <input required onChange={onChangeHandler} name='zipcode' value={formData.zipcode} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="number" placeholder='Zipcode' />
-                    <input required onChange={onChangeHandler} name='country' value={formData.country} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="text" placeholder='Country' />
-                </div>
-                <input required onChange={onChangeHandler} name='phone' value={formData.phone} className='border border-gray-300 rounded py-1.5 px-3.5 w-full' type="number" placeholder='Phone' />
-            </div>
+
+
+
+    const fetchAddressFromPincode = async () => {
+        const pin = pincode.join("");
+        if (pin.length === 6) {
+          try {
+            const res = await axios.get(`https://api.postalpincode.in/pincode/${pin}`);
+            const data = res.data[0];
+            if (data.Status === "Success") {
+              const postOffice = data.PostOffice[0];
+              const fullAddress = `${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${pin}`;
+                
+              setAddress(fullAddress);
+              setShowPincodeModal(false)
+            } else {
+              toast.error("Invalid pincode");
+            }
+          } catch (err) {
+            toast.error("Error fetching address");
+            console.error(err);
+          }
+        } else {
+          toast.warn("Enter a valid 6-digit pincode");
+        }
+      };
+
+    return (
+        <>
+        <div  className='flex flex-col sm:flex-row justify-between gap-4 pt-5 sm:pt-14 min-h-[80vh] border-t'>
+            {/* ------------- Left Side ---------------- */}
+            <section id="address">
+          <h2 className="text-2xl font-bold mb-4">🏠 Address</h2>
+          <div className="bg-white p-6 rounded-2xl shadow">
+            <p>{address || "No address set."}</p>
+            <button className="mt-4 bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700" onClick={() => setShowPincodeModal(true)}>Change Address</button>
+           
+          </div>
+        </section>
 
             {/* ------------- Right Side ------------------ */}
             <div className='mt-8'>
@@ -177,11 +199,37 @@ const PlaceOrder = () => {
                     </div>
 
                     <div className='w-full text-end mt-8'>
-                        <button type='submit' className='bg-black text-white px-16 py-3 text-sm'>PLACE ORDER</button>
+                        <button onClick={onSubmitHandler} type='submit' className='bg-black text-white px-16 py-3 text-sm'>PLACE ORDER</button>
                     </div>
                 </div>
             </div>
-        </form>
+            
+        </div>
+        {showPincodeModal && (
+            <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+              <div className="bg-white rounded-xl p-6 w-[90%] max-w-sm shadow-lg">
+                <h3 className="text-lg font-semibold mb-4 text-center">Enter Your 6-Digit Pincode</h3>
+                <div className="flex justify-between gap-2 mb-4">
+                  {pincode.map((digit, index) => (
+                    <input
+                      key={index}
+                      type="text"
+                      maxLength="1"
+                      value={digit}
+                      onChange={(e) => handlePincodeChange(index, e.target.value)}
+                      className="w-10 h-12 text-center text-lg border rounded"
+                    />
+                  ))}
+                </div>
+                <div className="flex justify-end gap-3">
+                  <button onClick={() => setShowPincodeModal(false)} className="px-4 py-2 bg-gray-300 text-gray-800 rounded">Cancel</button>
+                  <button onClick={fetchAddressFromPincode} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
+
     )
 }
 

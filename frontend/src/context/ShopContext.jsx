@@ -21,6 +21,7 @@ const ShopContextProvider = (props) => {
     const navigate = useNavigate();
     const [orderData, setOrderData] = useState([]);
     const[isLoading,setIsLoading] = useState(false);
+    const [showPincodeModal, setShowPincodeModal] = useState(false);
 
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
@@ -289,7 +290,7 @@ const ShopContextProvider = (props) => {
         sortType, setSortType,
         priceRange, setPriceRange,
         filterProducts,setFilterProducts,
-        resetFilters,pageValues,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist,cartData,setCartData
+        resetFilters,pageValues,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist,cartData,setCartData,showPincodeModal, setShowPincodeModal
     };
 
     return (

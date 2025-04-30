@@ -116,21 +116,10 @@ export const arrayOfIntents = [
       intents: [
         "ask_question",
         "place_order",
-        "select_payment_method",
         "change_shipping_address",
       ],
       responseStructure: {
         intent: "",
-        placeOrder:false || true,
-        shipping: {
-          selectedAddressId: "",
-          newAddress: {
-            street: "",
-            city: "",
-            pincode: "",
-            country: ""
-          }
-        },
       }
     },
     {

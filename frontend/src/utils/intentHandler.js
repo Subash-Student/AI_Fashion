@@ -185,8 +185,22 @@ export const handleWishlist = (response, contextValues) => {
 };
 
 
+export const handlePlaceOrder = (response) => {
 
 
+  window.dispatchEvent(new CustomEvent('voice_place_order'));
+
+
+};
+
+
+export const handleChangeShippingAddress = (response,contextValues) => {
+  
+  const{showPincodeModal, setShowPincodeModal} = contextValues;
+
+  setShowPincodeModal(true);
+
+};
 
 
 
@@ -229,17 +243,11 @@ export const handleViewCart = (response) => {
   console.log("Viewing Cart", response);
 };
 
-export const handlePlaceOrder = (response) => {
-  console.log("Placing Order", response);
-};
 
 export const handleSelectPaymentMethod = (response) => {
   console.log("Selecting Payment Method", response);
 };
 
-export const handleChangeShippingAddress = (response) => {
-  console.log("Changing Shipping Address", response);
-};
 
 export const handleTrackOrder = (response) => {
   console.log("Tracking Order", response);

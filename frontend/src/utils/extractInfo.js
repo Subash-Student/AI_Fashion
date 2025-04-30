@@ -195,11 +195,9 @@ export const handleIntent = (finalResponse,  contextValues) => {
 
       // Place Order Page Intents
       case "place_order":
-          return handlePlaceOrder(finalResponse,  contextValues);
-      case "select_payment_method":
-          return handleSelectPaymentMethod(finalResponse,  contextValues);
-      case "change_shipping_address":
-          return handleChangeShippingAddress(finalResponse,  contextValues);
+          return handlePlaceOrder(finalResponse,  contextValues);    // DONE
+      case "change_address":
+          return handleChangeShippingAddress(finalResponse,  contextValues);  // DONE
 
       // Orders Page Intents
       case "track_order":
