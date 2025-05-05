@@ -200,11 +200,11 @@ export const handleIntent = (finalResponse,  contextValues) => {
 
       // Orders Page Intents
       case "track_order":
-          return handleTrackOrder(finalResponse,  contextValues);
+          return handleTrackOrder(finalResponse,  contextValues);  // DONE
       case "cancel_order":
-          return handleCancelOrder(finalResponse,  contextValues);
+          return handleCancelOrder(finalResponse,  contextValues);  // DONE
       case "review_order":
-          return handleReviewOrder(finalResponse,  contextValues);
+          return handleReviewOrder(finalResponse,  contextValues);  // DONE
 
       // Dashboard Page Intents
       case "change_name":

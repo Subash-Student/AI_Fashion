@@ -1,7 +1,5 @@
 
-
-import { useContext } from "react";
-import { ShopContext } from "../context/ShopContext";
+import { toast } from 'react-toastify';
 
 export const handleNavigation = (response,contextValues) => {
 
@@ -203,31 +201,63 @@ export const handleChangeShippingAddress = (response,contextValues) => {
 };
 
 
-export const handleTrackOrder = (response,contextValues) => {
 
-  const {orderData} = contextValues;
-  const productName = response.productName;
 
-  const product = orderData.find(item =>{
-    return item.name.trim().toLowerCase() == product.trim().toLowerCase(); 
-  });
+const findProductByName = (orderData, name) => {
+  const lowerName = name.trim().toLowerCase();
 
   
+  let match = orderData.find(item =>
+    item?.name?.trim().toLowerCase() === lowerName
+  );
 
+  
+  if (!match) {
+    const fuzzyMatches = orderData.filter(item =>
+      item?.name?.toLowerCase().includes(lowerName)
+    );
+
+    if (fuzzyMatches.length === 1) {
+      match = fuzzyMatches[0];
+    } else if (fuzzyMatches.length > 1) {
+      toast.warn(`Multiple products matched "${name}". Please be more specific.`);
+    }
+  }
+
+  return match;
 };
 
+export const handleTrackOrder = (response, contextValues) => {
+  const { orderData, handleTrackOrder: openTrackModal } = contextValues;
+  const product = findProductByName(orderData, response.productName);
 
-
-
-
-
-
-export const handleCancelOrder = (response) => {
-  console.log("Cancelling Order", response);
+  if (product) {
+    openTrackModal(product.status);
+  } else {
+    toast.error(`Product "${response.productName}" not found in your orders.`);
+  }
 };
 
-export const handleReviewOrder = (response) => {
-  console.log("Reviewing Order", response);
+export const handleCancelOrder = (response, contextValues) => {
+  const { orderData, handleCancelOrder: openCancelModal } = contextValues;
+  const product = findProductByName(orderData, response.productName);
+
+  if (product) {
+    openCancelModal(product);
+  } else {
+    toast.error(`Product "${response.productName}" not found in your orders.`);
+  }
+};
+
+export const handleReviewOrder = (response, contextValues) => {
+  const { orderData, handleOpenReview } = contextValues;
+  const product = findProductByName(orderData, response.productName);
+
+  if (product) {
+    handleOpenReview(product._id);
+  } else {
+    toast.error(`Product "${response.productName}" not found in your orders.`);
+  }
 };
 
 

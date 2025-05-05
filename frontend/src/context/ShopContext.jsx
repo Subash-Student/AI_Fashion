@@ -43,6 +43,39 @@ const ShopContextProvider = (props) => {
   const [cartData, setCartData] = useState([]);
 
 
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedStatus, setSelectedStatus] = useState(null);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  const [showReviewModal, setShowReviewModal] = useState(false);
+  const [reviewText, setReviewText] = useState('');
+  const [reviewRating, setReviewRating] = useState(4);
+  const [reviewProductId, setReviewProductId] = useState(null);
+
+  const statusSteps = ['Order Placed', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
+
+  const handleTrackOrder = (status) => {
+    setSelectedStatus(status);
+    setShowStatusModal(true);
+  };
+
+  const handleCancelOrder = (item) => {
+    setSelectedItem(item);
+    setShowCancelModal(true);
+    setCancelReason('');
+  };
+
+   const handleOpenReview = (productId) => {
+    setReviewProductId(productId);
+    setReviewText('');
+    setReviewRating(4);
+    setShowReviewModal(true);
+  };
+
+
+
   const loadOrderData = async () => {
     try {
       if (!token) return;
@@ -272,7 +305,7 @@ const ShopContextProvider = (props) => {
 
 
 
-    const value = {
+      const value = {
         products, currency, delivery_fee,
         search, setSearch, showSearch, setShowSearch,
         cartItems, addToCart, setCartItems,
@@ -289,9 +322,31 @@ const ShopContextProvider = (props) => {
         inStock, setInStock,
         sortType, setSortType,
         priceRange, setPriceRange,
-        filterProducts,setFilterProducts,
-        resetFilters,pageValues,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist,cartData,setCartData,showPincodeModal, setShowPincodeModal
-    };
+        filterProducts, setFilterProducts,
+        resetFilters, pageValues, setPageValues,
+        size, setSize,
+        isWishlisted, setIsWishlisted, toggleWishlist,
+        cartData, setCartData,
+        showPincodeModal, setShowPincodeModal,
+      
+        // NEWLY ADDED:
+        showStatusModal, setShowStatusModal,
+        selectedStatus, setSelectedStatus,
+        showCancelModal, setShowCancelModal,
+        cancelReason, setCancelReason,
+        selectedItem, setSelectedItem,
+      
+        showReviewModal, setShowReviewModal,
+        reviewText, setReviewText,
+        reviewRating, setReviewRating,
+        reviewProductId, setReviewProductId,
+      
+        handleTrackOrder,
+        handleCancelOrder,
+        handleOpenReview,
+        statusSteps
+      };
+      
 
     return (
         <ShopContext.Provider value={value}>

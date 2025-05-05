@@ -6,46 +6,50 @@ import { toast } from 'react-toastify';
 import { FaCheckCircle, FaTimesCircle, FaHourglassHalf, FaTruck, FaBox, FaStar } from 'react-icons/fa';
 
 const Orders = () => {
-  const { backendUrl, orderData, token, currency } = useContext(ShopContext);
+  const {
+    backendUrl,
+    orderData,
+    token,
+    currency,
+  
+    // Newly destructured values
+    showStatusModal,
+    setShowStatusModal,
+    selectedStatus,
+    setSelectedStatus,
+  
+    showCancelModal,
+    setShowCancelModal,
+    cancelReason,
+    setCancelReason,
+    selectedItem,
+    setSelectedItem,
+  
+    showReviewModal,
+    setShowReviewModal,
+    reviewText,
+    setReviewText,
+    reviewRating,
+    setReviewRating,
+    reviewProductId,
+    setReviewProductId,
+  
+    handleTrackOrder,
+    handleCancelOrder,
+    handleOpenReview,
+    statusSteps
+  } = useContext(ShopContext);
+  
 
-  const [showStatusModal, setShowStatusModal] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState(null);
-  const [showCancelModal, setShowCancelModal] = useState(false);
-  const [cancelReason, setCancelReason] = useState('');
-  const [selectedItem, setSelectedItem] = useState(null);
+ 
 
-  const [showReviewModal, setShowReviewModal] = useState(false);
-  const [reviewText, setReviewText] = useState('');
-  const [reviewRating, setReviewRating] = useState(4);
-  const [reviewProductId, setReviewProductId] = useState(null);
-
-  const statusSteps = ['Order Placed', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
-
-  const handleTrackOrder = (status) => {
-    setSelectedStatus(status);
-    setShowStatusModal(true);
-  };
-
-  const handleCancelOrder = (item) => {
-    setSelectedItem(item);
-    setShowCancelModal(true);
-    setCancelReason('');
-  };
-
-   const handleOpenReview = (productId) => {
-    setReviewProductId(productId);
-    setReviewText('');
-    setReviewRating(4);
-    setShowReviewModal(true);
-  };
-console.log(reviewText)
   const submitReview = async (text = reviewText) => {
     try {
 
       console.log(reviewText)
       const res = await axios.post(
         backendUrl + '/api/product/review/add',
-        { productId: reviewProductId, review: te, rating: reviewRating },
+        { productId: reviewProductId, review: text, rating: reviewRating },
         { headers: { token } }
       );
 
