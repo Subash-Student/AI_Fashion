@@ -21,7 +21,7 @@ import {
   handleChangePhoneNumber,
   handleUpdateShippingAddress,
   handleReadTheContent,
-  handleRemoveFromWishlist,
+  
   handleMakeCall,
   handleReset
 } from './intentHandler';
@@ -168,13 +168,10 @@ export const handleIntent = (finalResponse,  contextValues) => {
           return handleSortByPriceHighToLow(finalResponse,  contextValues); // DONE
       case "choose_particular_product":
           return handleChooseParticularProduct(finalResponse,  contextValues); // DONE
-      case "ask_details":
-          return handleAskDetails(finalResponse,  contextValues);
-      case "reset_filter":
-          return handleReset(finalResponse,  contextValues);  // DONE
-      case "reset_sorting":
-          return handleReset(finalResponse,  contextValues);  // DONE
-    
+          case "reset_filter":
+              return handleReset(finalResponse,  contextValues);  // DONE
+              case "reset_sorting":
+                  return handleReset(finalResponse,  contextValues);  // DONE
 
       // Product Details Page Intents
       case "add_to_cart":
@@ -208,19 +205,21 @@ export const handleIntent = (finalResponse,  contextValues) => {
 
       // Dashboard Page Intents
       case "change_name":
-          return handleChangeName(finalResponse,  contextValues);
+          return handleChangeName(finalResponse,  contextValues);  // DONE
       case "change_phone_number":
-          return handleChangePhoneNumber(finalResponse,  contextValues);
+          return handleChangePhoneNumber(finalResponse,  contextValues);  // DONE
       case "update_shipping_address":
-          return handleUpdateShippingAddress(finalResponse,  contextValues);
-      case "read_the_content":
-          return handleReadTheContent(finalResponse,  contextValues);
-      case "remove_from_wishlist":
-          return handleRemoveFromWishlist(finalResponse,  contextValues);
+          return handleUpdateShippingAddress(finalResponse,  contextValues);  // DONE
+          // Contact Page Intents
+          case "make_call":
+              return handleMakeCall(finalResponse,  contextValues);  // DONE
+      
+          case "ask_details":
+            return handleAskDetails(finalResponse,  contextValues);
 
-      // Contact Page Intents
-      case "make_call":
-          return handleMakeCall(finalResponse,  contextValues);
+          case "read_the_content":
+            return handleReadTheContent(finalResponse,  contextValues);
+
 
       // Fallback for unrecognized intents
       default:

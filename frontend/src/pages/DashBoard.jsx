@@ -20,18 +20,16 @@ const Dashboard = () => {
     }
   };
 
-  const { user, token, orderData, getUserData, loadOrderData } = useContext(ShopContext);
+  const { user, token, orderData, getUserData,setIsWishlisted,isWishlisted, loadOrderData ,showModal,setShowModal} = useContext(ShopContext);
 
   const [allUserData, setAllUserData] = useState({
     profile: user,
     orders: orderData
   });
 
-  const [showModal, setShowModal] = useState(false);
   const [showPincodeModal, setShowPincodeModal] = useState(false);
   const [formData, setFormData] = useState({
     name: allUserData.profile.name,
-    email: allUserData.profile.email,
     phone: allUserData.profile.phone,
   });
   const [pincode, setPincode] = useState(Array(6).fill(""));
@@ -93,6 +91,99 @@ const Dashboard = () => {
     }
   };
 
+
+
+  useEffect(() => {
+    // Start the voice prompt when the modal is shown
+    if (showPincodeModal) {
+       
+        handleVoiceInput()
+    }
+}, [showPincodeModal]);
+
+const handleVoiceInput = () => {
+    const utterance = new SpeechSynthesisUtterance("Say your pincode");
+    utterance.rate = 0.8; // Slow speech
+    utterance.pitch = 1; // Neutral pitch
+    utterance.voice = speechSynthesis.getVoices().find(voice => voice.lang === "en-US"); // Choose a suitable voice
+    speechSynthesis.speak(utterance);
+
+    // After the speech, start listening for voice input
+    utterance.onend = () => {
+        startListening();
+    };
+};
+
+const startListening = () => {
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.start();
+
+    // Automatically stop listening after 5 seconds
+    const stopTimer = setTimeout(() => {
+        recognition.stop();
+        console.log("Mic turned off after 5 seconds");
+    }, 5000);
+
+    recognition.onresult = async (event) => {
+        clearTimeout(stopTimer); // stop timer if result comes early
+        const transcript = event.results[0][0].transcript;
+        console.log("Transcript: ", transcript);
+        const cleanedPincode = await cleanPincode(transcript);
+        if (cleanedPincode.length === 6) {
+            setPincode(cleanedPincode.split(''));
+            await fetchAddressFromPincode(cleanedPincode);
+        } else {
+            toast.error("Please say a valid 6-digit pincode");
+        }
+    };
+
+    recognition.onerror = (event) => {
+        clearTimeout(stopTimer);
+        recognition.stop(); // make sure it stops on error too
+        toast.error("Error recognizing voice input");
+        console.log(event.error);
+    };
+};
+
+
+const cleanPincode = async (transcript) => {
+    try {
+        // Send the transcription to GPT-4 API for cleaning
+        const prompt = `Extract a 6-digit pincode from this input: "${transcript}". Please return only the 6-digit number.`;
+
+        const response = await axios.post(
+            'https://api.openai.com/v1/completions', 
+            {
+                model: 'gpt-4',
+                prompt: prompt,
+                max_tokens: 10,
+                temperature: 0.0,
+            },
+            {
+                headers: {
+                    'Authorization': `Bearer YOUR_OPENAI_API_KEY`
+                }
+            }
+        );
+
+        // Extract the cleaned pincode from the response
+        const cleanedPincode = response.data.choices[0].text.trim().replace(/\D/g, '');
+        return cleanedPincode; // Return only the digits
+    } catch (error) {
+        console.error("Error cleaning pincode with GPT-4:", error);
+        toast.error("Error cleaning pincode. Please try again.");
+        return '';
+    }
+};
+
+
+
+
+
   const fetchAddressFromPincode = async () => {
     const pin = pincode.join("");
     if (pin.length === 6) {
@@ -130,6 +221,105 @@ const Dashboard = () => {
       toast.warn("Enter a valid 6-digit pincode");
     }
   };
+
+
+  useEffect(() => {
+    // Start the voice prompt when the modal is shown
+    if (showModal) {
+       
+      handleVoiceInputForNmaeAndPhone()
+    }
+}, [showModal]);
+
+const handleVoiceInputForNmaeAndPhone = () => {
+    const utterance = new SpeechSynthesisUtterance("Say your name and phone number like my name is John Doe and my number is 9876543210");
+    utterance.rate = 0.8; // Slow speech
+    utterance.pitch = 1; // Neutral pitch
+    utterance.voice = speechSynthesis.getVoices().find(voice => voice.lang === "en-US"); // Choose a suitable voice
+    speechSynthesis.speak(utterance);
+
+    // After the speech, start listening for voice input
+    utterance.onend = () => {
+      startListeningforNameAndPhone();
+    };
+};
+
+const startListeningforNameAndPhone = () => {
+    const recognition = new window.webkitSpeechRecognition();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.start();
+
+    // Automatically stop listening after 5 seconds
+    const stopTimer = setTimeout(() => {
+        recognition.stop();
+        console.log("Mic turned off after 5 seconds");
+    }, 5000);
+
+    recognition.onresult = async (event) => {
+        clearTimeout(stopTimer); // stop timer if result comes early
+        const transcript = event.results[0][0].transcript;
+        console.log("Transcript: ", transcript);
+        const cleanedData = await extractNameAndPhone(transcript);
+        if (cleanedData) {
+            setFormData(cleanedData)
+            await handleSave();
+        } else {
+            toast.error("Please say a name and phone number");
+        }
+    };
+
+    recognition.onerror = (event) => {
+        clearTimeout(stopTimer);
+        recognition.stop(); // make sure it stops on error too
+        toast.error("Error recognizing voice input");
+        console.log(event.error);
+    };
+};
+
+
+const extractNameAndPhone = async (transcript) => {
+  try {
+      const prompt = `Extract the full name and 10-digit phone number from this sentence: "${transcript}". Return the result strictly in JSON format like this: {"name": "Full Name", "phone": "1234567890"}.`;
+
+      const response = await axios.post(
+          'https://api.openai.com/v1/completions',
+          {
+              model: 'text-davinci-003', // Use 'gpt-4' with chat completion endpoint if needed
+              prompt: prompt,
+              max_tokens: 60,
+              temperature: 0.0,
+          },
+          {
+              headers: {
+                  'Authorization': `Bearer YOUR_OPENAI_API_KEY`
+              }
+          }
+      );
+
+      const rawText = response.data.choices[0].text.trim();
+
+      // Try parsing the JSON string
+      const result = JSON.parse(rawText);
+      return {
+          name: result.name || '',
+          phone: result.phone || ''
+      };
+  } catch (error) {
+      console.error("Error extracting name and phone with GPT:", error);
+      toast.error("Failed to extract name and phone.");
+      return { name: '', phone: '' };
+  }
+};
+
+
+
+
+
+
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-white to-blue-50 text-gray-900 font-sans">
@@ -206,7 +396,6 @@ const Dashboard = () => {
           <div className="bg-white rounded-xl p-6 w-[90%] max-w-md shadow-lg">
             <h3 className="text-lg font-semibold mb-4">Edit Profile</h3>
             <input type="text" name="name" value={formData.name} onChange={handleChange} placeholder="Name" className="w-full mb-3 px-3 py-2 border rounded" />
-            <input type="email" name="email" value={formData.email} onChange={handleChange} placeholder="Email" className="w-full mb-3 px-3 py-2 border rounded" />
             <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" className="w-full mb-3 px-3 py-2 border rounded" />
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-300 text-gray-800 rounded">Cancel</button>

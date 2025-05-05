@@ -201,8 +201,6 @@ export const handleChangeShippingAddress = (response,contextValues) => {
 };
 
 
-
-
 const findProductByName = (orderData, name) => {
   const lowerName = name.trim().toLowerCase();
 
@@ -261,31 +259,57 @@ export const handleReviewOrder = (response, contextValues) => {
 };
 
 
+export const handleUpdateShippingAddress = (response,contextValues) => {
+  const{showPincodeModal, setShowPincodeModal} = contextValues;
 
+  setShowPincodeModal(true);
 
-
-
-
-
-
-export const handleChangeName = (response) => {
-  console.log("Changing Name", response);
 };
 
-export const handleChangePhoneNumber = (response) => {
-  console.log("Changing Phone Number", response);
+
+export const handleChangeName = (response,contextValues) => {
+  
+  const {setShowModel} = contextValues;
+
+  setShowModel(true);
+
+
 };
 
-export const handleUpdateShippingAddress = (response) => {
-  console.log("Updating Shipping Address", response);
+export const handleChangePhoneNumber = (response,contextValues) => {
+  const {setShowModel} = contextValues;
+
+  setShowModel(true);
+
 };
+
+
+export const handleMakeCall = (response) => {
+
+  const phone = "9788306886"
+  if (!phone || phone.length < 10) {
+    console.error("Invalid phone number:", phone);
+    alert("Invalid phone number provided.");
+    return;
+  }
+
+  const telUrl = `tel:${phone}`;
+  console.log("Making a Call to", telUrl);
+
+  // Open the phone dialer
+  window.location.href = telUrl;
+};
+
+
+
+
+
+
+
+
 
 export const handleReadTheContent = (response) => {
   console.log("Reading the Content", response);
-};
-
-export const handleRemoveFromWishlist = (response) => {
-  console.log("Removing from Wishlist", response);
 };
 
 
@@ -300,6 +324,3 @@ export const handleRegister = (response) => {
 export const handleAskDetails = (response) => {
   console.log("Asking for Details", response);
 };  
-export const handleMakeCall = (response) => {
-  console.log("Making a Call", response);
-};
