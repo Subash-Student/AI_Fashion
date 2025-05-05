@@ -13,7 +13,6 @@ import {
   handleWishlist,
   handleQuantityAndRemoveFromCartPage,
   handlePlaceOrder,
-  handleSelectPaymentMethod,
   handleChangeShippingAddress,
   handleTrackOrder,
   handleCancelOrder,

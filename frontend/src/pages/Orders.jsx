@@ -16,10 +16,10 @@ const Orders = () => {
 
   const [showReviewModal, setShowReviewModal] = useState(false);
   const [reviewText, setReviewText] = useState('');
-  const [reviewRating, setReviewRating] = useState(0);
+  const [reviewRating, setReviewRating] = useState(4);
   const [reviewProductId, setReviewProductId] = useState(null);
 
-  const statusSteps = ['Placed', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
+  const statusSteps = ['Order Placed', 'Processing', 'Shipped', 'Out for Delivery', 'Delivered'];
 
   const handleTrackOrder = (status) => {
     setSelectedStatus(status);
@@ -32,18 +32,20 @@ const Orders = () => {
     setCancelReason('');
   };
 
-  const handleOpenReview = (productId) => {
+   const handleOpenReview = (productId) => {
     setReviewProductId(productId);
     setReviewText('');
-    setReviewRating(0);
+    setReviewRating(4);
     setShowReviewModal(true);
   };
-
-  const submitReview = async () => {
+console.log(reviewText)
+  const submitReview = async (text = reviewText) => {
     try {
+
+      console.log(reviewText)
       const res = await axios.post(
         backendUrl + '/api/product/review/add',
-        { productId: reviewProductId, review: reviewText, rating: reviewRating },
+        { productId: reviewProductId, review: te, rating: reviewRating },
         { headers: { token } }
       );
 
@@ -64,12 +66,12 @@ const Orders = () => {
     return index !== -1 ? index : -1;
   };
 
-  const submitCancelOrder = async () => {
+  const submitCancelOrder = async (text = cancelReason) => {
     try {
       const response = await axios.post(backendUrl + '/api/order/cancel', {
         orderId: selectedItem.orderId,
         productId: selectedItem.id,
-        reason: cancelReason
+        reason: text
       }, {
         headers: { token }
       });
@@ -92,6 +94,85 @@ const Orders = () => {
     if (s === 'shipped' || s === 'out for delivery') return <FaTruck className="text-blue-600" />;
     return <FaHourglassHalf className="text-yellow-500" />;
   };
+console.log(orderData)
+
+useEffect(() => {
+  if (showStatusModal && selectedStatus) {
+    const utterance = new SpeechSynthesisUtterance(`Your order status is: ${selectedStatus}`);
+    window.speechSynthesis.speak(utterance);
+  }
+}, [showStatusModal, selectedStatus]);
+
+
+
+useEffect(() => {
+  // Start the voice prompt when the modal is shown
+  if(showReviewModal){
+    handleVoiceInput("review")
+  }
+ 
+
+}, [showReviewModal]);
+
+useEffect(() => {
+  // Start the voice prompt when the modal is shown
+  if(showCancelModal){
+    handleVoiceInput("cancel");
+
+  }
+
+}, [showCancelModal]);
+
+const handleVoiceInput = (action) => {
+  const utterance = new SpeechSynthesisUtterance(`${action==="review" ? "say your review":"say your reason to cancel"}`);
+  utterance.rate = 0.8; // Slow speech
+  utterance.pitch = 1; // Neutral pitch
+  utterance.voice = speechSynthesis.getVoices().find(voice => voice.lang === "en-US"); // Choose a suitable voice
+  speechSynthesis.speak(utterance);
+
+  // After the speech, start listening for voice input
+  utterance.onend = () => {
+      startListening(action);
+  };
+};
+
+const startListening = (action) => {
+  const recognition = new window.webkitSpeechRecognition();
+  recognition.lang = "en-US";
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+
+  recognition.start();
+
+  // Automatically stop listening after 5 seconds
+  const stopTimer = setTimeout(() => {
+      recognition.stop();
+      console.log("Mic turned off after 5 seconds");
+  }, 5000);
+
+  recognition.onresult = async (event) => {
+      clearTimeout(stopTimer); // stop timer if result comes early
+      const transcript = event.results[0][0].transcript;
+      console.log("Transcript: ", transcript);
+      if(action === "review"){
+        setReviewText(transcript);
+        submitReview(transcript)
+      }else{
+        setCancelReason(transcript);
+        submitCancelOrder(transcript)
+      }
+  };
+
+  recognition.onerror = (event) => {
+      clearTimeout(stopTimer);
+      recognition.stop(); // make sure it stops on error too
+      toast.error("Error recognizing voice input");
+      console.log(event.error);
+  };
+};
+
+
+
 
   return (
     <div className="border-t pt-16 b-50 min-h-screen">

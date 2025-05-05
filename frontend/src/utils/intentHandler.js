@@ -203,55 +203,24 @@ export const handleChangeShippingAddress = (response,contextValues) => {
 };
 
 
+export const handleTrackOrder = (response,contextValues) => {
 
+  const {orderData} = contextValues;
+  const productName = response.productName;
 
+  const product = orderData.find(item =>{
+    return item.name.trim().toLowerCase() == product.trim().toLowerCase(); 
+  });
 
+  
 
-
-
-
-export const handleLogin = (response) => {
-  console.log("Handling login", response);
-};  
-
-export const handleRegister = (response) => {
-  console.log("Handling register", response);
-};  
-
-
-
-
-export const handleSearchProduct = (response) => {
-  console.log("Applying Filter", response);
-};  
-
-
-
-export const handleSortByBestSeller = (response) => {
-  console.log("Sorting by Best Seller", response);
-};  
-
-export const handleAskDetails = (response) => {
-  console.log("Asking for Details", response);
-};  
-
-
-
-
-
-export const handleViewCart = (response) => {
-  console.log("Viewing Cart", response);
 };
 
 
-export const handleSelectPaymentMethod = (response) => {
-  console.log("Selecting Payment Method", response);
-};
 
 
-export const handleTrackOrder = (response) => {
-  console.log("Tracking Order", response);
-};
+
+
 
 export const handleCancelOrder = (response) => {
   console.log("Cancelling Order", response);
@@ -260,6 +229,14 @@ export const handleCancelOrder = (response) => {
 export const handleReviewOrder = (response) => {
   console.log("Reviewing Order", response);
 };
+
+
+
+
+
+
+
+
 
 export const handleChangeName = (response) => {
   console.log("Changing Name", response);
@@ -281,6 +258,18 @@ export const handleRemoveFromWishlist = (response) => {
   console.log("Removing from Wishlist", response);
 };
 
+
+export const handleLogin = (response) => {
+  console.log("Handling login", response);
+};  
+
+export const handleRegister = (response) => {
+  console.log("Handling register", response);
+};  
+
+export const handleAskDetails = (response) => {
+  console.log("Asking for Details", response);
+};  
 export const handleMakeCall = (response) => {
   console.log("Making a Call", response);
 };

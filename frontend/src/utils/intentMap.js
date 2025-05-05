@@ -132,17 +132,8 @@ export const arrayOfIntents = [
       ],
       responseStructure: {
         intent: "",
-        answer:"",
-        order: {
-          orderId: "",
-          productId: "",
-          reason: "",
-        },
-        review: {
-          productId:"",
-          rating: 0,
-          review: ""
-        }
+        productName:""
+  
       }
     },
     {
