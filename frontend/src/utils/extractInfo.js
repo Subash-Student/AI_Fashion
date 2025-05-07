@@ -28,11 +28,12 @@ import {
 
 import axios from "axios";
 
-export const extractInformation = async ( voiceInputText,contextValues) => {
+import axios from "axios";
 
-  const {pageValues} = contextValues;
+export const extractInformation = async (voiceInputText, contextValues) => {
+  const { pageValues } = contextValues;
+  const { currentPage } = pageValues;
 
-  const {currentPage} = pageValues;
   try {
     // 1. Find page config
     const pageConfig = arrayOfIntents.find((item) => item.page === currentPage);
@@ -41,49 +42,59 @@ export const extractInformation = async ( voiceInputText,contextValues) => {
     }
 
     const commonConfig = arrayOfIntents[0];
-    
+
     const { intents, responseStructure } = pageConfig;
 
-    // 2. Construct prompt for GPT
+    // 2. Construct prompt for GPT-3.5 Turbo
     const prompt = `
-You are an AI assistant that extracts structured intent data from user voice commands. 
-The current page is "${currentPage}". 
+    You are an AI assistant for an e-commerce platform that assists blind users. Your task is to process user voice input and match it to the correct intent based on the current page context. You will then structure the extracted information in a defined JSON format.
 
-Here are the valid intents for this page:
-${JSON.stringify(intents, null, 2)}
+    **Current page**: "${currentPage}"
+    
+    Here are the valid intents for this page:
+    ${JSON.stringify(intents, null, 2)}
+    
+    If the voice input doesn't match any of the above intents, check the common intents for the platform:
+    ${JSON.stringify(commonConfig.intents, null, 2)}
+    
+    Here is the expected response structure for this page:
+    ${JSON.stringify(responseStructure, null, 2)}
+    
+    **User voice input**:
+    "${voiceInputText}"
+    
+    Instructions:
+    - Based on the user's input, identify the best matching intent from the list above.
+    - If a match is found, fill in the relevant fields from the response structure.
+    - If a field cannot be confidently determined, mark it as "unknown".
+    - The response must be returned in valid JSON format. If any part of the input is unclear or does not fit, mark it as "unknown".
+    - Ensure the response structure is clear, consistent, and easily understandable, especially for users relying on screen readers.
+    
+    **Response format**:
+    {
+      "intent": "<matched_intent>",
+      "fields": {
+        "field1": "<value_or_unknown>",
+        "field2": "<value_or_unknown>",
+        ...
+      }
+    }
+    
+`;
 
-If not match with above intents then check this common page intents:
-${JSON.stringify(commonConfig.intents, null, 2)}
-
-If it match with common page intents then hear the expected response structure:
-${JSON.stringify(commonConfig.responseStructure, null, 2)}
-
-
-If not then Here is the expected response structure:
-${JSON.stringify(responseStructure, null, 2)}
-
-User said: "${voiceInputText}"
-
-Based on this, return a JSON object that:
-1. Selects the appropriate intent from the list.
-2. Fills in the required fields in the response structure.
-3. If any field cannot be determined, mark it as "unknown".
-
-Return ONLY valid JSON and nothing else.
-    `;
-
-    // 3. Call OpenAI API
+    // 3. Call GPT-3.5 Turbo API
     const gptResponse = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.2,
+        max_tokens: 300
       },
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer YOUR_OPENAI_API_KEY`, 
+          Authorization: `Bearer YOUR_OPENAI_API_KEY`,
         },
       }
     );
@@ -102,7 +113,7 @@ Return ONLY valid JSON and nothing else.
       return { error: "Failed to parse GPT response as JSON." };
     }
 
-    // 5. Validate result fields
+    // 5. Validate result fields to match expected structure
     const validateFields = (template, output) => {
       const validated = {};
       for (const key in template) {
@@ -120,13 +131,14 @@ Return ONLY valid JSON and nothing else.
 
     const finalResponse = validateFields(responseStructure, result);
 
-    handleIntent(finalResponse,contextValues)
-     
+    // 6. Process intent action based on final response
+    handleIntent(finalResponse, contextValues);
   } catch (error) {
     console.error("Error in extractInformation:", error.message);
     return { error: "Something went wrong during intent extraction." };
   }
 };
+
 
 
 

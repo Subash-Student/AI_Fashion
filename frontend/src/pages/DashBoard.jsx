@@ -111,8 +111,8 @@ const Dashboard = () => {
 
   const cleanPincode = async (transcript) => {
     try {
-      const response = await axios.post('https://      api.openai.com/v1/completions', {
-        model: 'gpt-4',
+      const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+        model: 'gpt-3.5-turbo',
         prompt: `Extract a 6-digit pincode from this input: "${transcript}". Please return only the 6-digit number.`,
         max_tokens: 10,
         temperature: 0.0,
@@ -202,8 +202,8 @@ const Dashboard = () => {
 
   const extractNameAndPhone = async (transcript) => {
     try {
-      const response = await axios.post('https://api.openai.com/v1/completions', {
-        model: 'text-davinci-003',
+      const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+        model: 'gpt-3.5-turbo',
         prompt: `Extract the full name and 10-digit phone number from this sentence: "${transcript}". Return the result strictly in JSON format like this: {"name": "Full Name", "phone": "1234567890"}.`,
         max_tokens: 60,
         temperature: 0.0,
