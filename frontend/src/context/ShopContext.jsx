@@ -42,6 +42,7 @@ const ShopContextProvider = (props) => {
   const [size, setSize] = useState('')
 
   const [cartData, setCartData] = useState([]);
+  const [showMic, setShowMic] = useState(false);
 
 
   const [showStatusModal, setShowStatusModal] = useState(false);
@@ -345,7 +346,9 @@ const ShopContextProvider = (props) => {
         handleTrackOrder,
         handleCancelOrder,
         handleOpenReview,
-        statusSteps
+        statusSteps,
+
+        showMic, setShowMic
       };
       
 

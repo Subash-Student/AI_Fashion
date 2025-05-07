@@ -14,7 +14,7 @@ const sections = [
 ];
 
 const Dashboard = () => {
-  const { user, token,setPageValues, orderData, getUserData, setIsWishlisted, isWishlisted, loadOrderData, showModal, setShowModal } = useContext(ShopContext);
+  const { user, token,setPageValues,showMic, setShowMic, orderData, getUserData, setIsWishlisted, isWishlisted, loadOrderData, showModal, setShowModal } = useContext(ShopContext);
   const [allUserData, setAllUserData] = useState({ profile: user, orders: orderData });
   const [showPincodeModal, setShowPincodeModal] = useState(false);
   const [formData, setFormData] = useState({ name: allUserData.profile.name, phone: allUserData.profile.phone });
@@ -170,6 +170,8 @@ const Dashboard = () => {
   };
 
   const startListeningForNameAndPhone = () => {
+    setShowMic(true)
+
     const recognition = new window.webkitSpeechRecognition();
     recognition.lang = "en-US";
     recognition.interimResults = false;
@@ -183,6 +185,8 @@ const Dashboard = () => {
     recognition.onresult = async (event) => {
       clearTimeout(stopTimer);
       const transcript = event.results[0][0].transcript;
+      setShowMic(false)
+
       const cleanedData = await extractNameAndPhone(transcript);
       if (cleanedData) {
         setFormData(cleanedData);
@@ -195,6 +199,8 @@ const Dashboard = () => {
     recognition.onerror = (event) => {
       clearTimeout(stopTimer);
       recognition.stop();
+      setShowMic(false)
+
       toast.error("Error recognizing voice input");
       console.log(event.error);
     };
@@ -331,6 +337,33 @@ const Dashboard = () => {
               <button onClick={() => setShowPincodeModal(false)} className="px-4 py-2 bg-gray-300 text-gray-800 rounded">Cancel</button>
               <button onClick={fetchAddressFromPincode} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Save</button>
             </div>
+          </div>
+        </div>
+      )}
+       {showMic && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/70">
+          <div className="relative flex flex-col items-center space-y-6">
+            <div className="relative flex items-center justify-center w-40 h-40">
+              <div className="absolute w-full h-full rounded-full bg-red-600 animate-pulse blur-sm"></div>
+              <div className="absolute w-28 h-28 rounded-full bg-red-500 animate-ping"></div>
+              <div className="relative z-10 w-20 h-20 rounded-full bg-white shadow-2xl flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-red-500 animate-bounce"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 18v3m0 0h3m-3 0H9m6-3a3 3 0 11-6 0V6a3 3 0 116 0v12z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-white text-xl font-semibold tracking-wide animate-pulse">Listening...</p>
           </div>
         </div>
       )}

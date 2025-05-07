@@ -8,7 +8,7 @@ import { textToSpeech } from "../utils/voiceContent";
 
 export default function VoiceAssistance() {
   const contextValues = useContext(ShopContext);
-  const [showMic, setShowMic] = useState(false);
+  const {showMic, setShowMic} = useContext(ShopContext);
   const [voiceText, setVoiceText] = useState("");
   const [processedText, setProcessedText] = useState(null);
   const timeoutRef = useRef(null);

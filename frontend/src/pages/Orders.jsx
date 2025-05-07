@@ -11,7 +11,7 @@ const Orders = () => {
     setSelectedStatus, showCancelModal, setShowCancelModal, cancelReason, setCancelReason, selectedItem, 
     setSelectedItem, showReviewModal, setShowReviewModal, reviewText, setReviewText, reviewRating, 
     setReviewRating, reviewProductId, setReviewProductId, handleTrackOrder, handleCancelOrder, 
-    handleOpenReview, statusSteps,setPageValues } = useContext(ShopContext);
+    handleOpenReview, statusSteps,setPageValues,showMic, setShowMic } = useContext(ShopContext);
 
   const submitReview = async (text = reviewText) => {
     try {
@@ -62,6 +62,7 @@ const Orders = () => {
   };
 
   const startListening = (action) => {
+    setShowMic(true)
     const recognition = new window.webkitSpeechRecognition();
     recognition.lang = "en-US";
     recognition.interimResults = false;
@@ -72,6 +73,7 @@ const Orders = () => {
     recognition.onresult = async (event) => {
       clearTimeout(stopTimer);
       const transcript = event.results[0][0].transcript;
+      setShowMic(false)
       if(action === "review") { setReviewText(transcript); submitReview(transcript) }
       else { setCancelReason(transcript); submitCancelOrder(transcript) }
     };
@@ -79,6 +81,8 @@ const Orders = () => {
     recognition.onerror = (event) => {
       clearTimeout(stopTimer);
       recognition.stop();
+      setShowMic(false)
+
       toast.error("Error recognizing voice input");
     };
   };
@@ -189,6 +193,33 @@ const Orders = () => {
               <button onClick={() => setShowCancelModal(false)} className="border border-gray-300 text-gray-700 px-4 py-2 rounded-full hover:bg-gray-100">Close</button>
               <button onClick={submitCancelOrder} className="bg-red-600 text-white px-4 py-2 rounded-full hover:bg-red-700" disabled={!cancelReason.trim()}>Confirm Cancel</button>
             </div>
+          </div>
+        </div>
+      )}
+        {showMic && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/70">
+          <div className="relative flex flex-col items-center space-y-6">
+            <div className="relative flex items-center justify-center w-40 h-40">
+              <div className="absolute w-full h-full rounded-full bg-red-600 animate-pulse blur-sm"></div>
+              <div className="absolute w-28 h-28 rounded-full bg-red-500 animate-ping"></div>
+              <div className="relative z-10 w-20 h-20 rounded-full bg-white shadow-2xl flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-red-500 animate-bounce"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 18v3m0 0h3m-3 0H9m6-3a3 3 0 11-6 0V6a3 3 0 116 0v12z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-white text-xl font-semibold tracking-wide animate-pulse">Listening...</p>
           </div>
         </div>
       )}

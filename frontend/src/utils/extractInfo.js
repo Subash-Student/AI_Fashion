@@ -28,7 +28,6 @@ import {
 
 import axios from "axios";
 
-import axios from "axios";
 
 export const extractInformation = async (voiceInputText, contextValues) => {
   const { pageValues } = contextValues;
