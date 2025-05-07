@@ -132,7 +132,7 @@ export default function VoiceAssistance() {
         setProcessedText(result);
   
         if (result.is_meaningful && result.confidence_score >= 0.7) {
-          extractInformation(result, contextValues);
+          extractInformation(result.rephrased_text, contextValues);
           toast.success("Voice analyzed and processed successfully!");
         } else {
           

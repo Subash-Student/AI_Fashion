@@ -142,99 +142,66 @@ export const extractInformation = async (voiceInputText, contextValues) => {
 
 
 
-export const handleIntent = (finalResponse,  contextValues) => {
-  switch (finalResponse.intent) {
-      // Home Page Intents
-      case "login":
-          return handleLogin(finalResponse,  contextValues);
-      case "register":
-          return handleRegister(finalResponse,  contextValues);
-      case "logout":
-          return handleLogout(finalResponse,  contextValues);   // DONE
-      case "navigate_home":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_about":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_contact":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_orders":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_dashboard":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_collection":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_wishlist":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_cart":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "search_product":
-          return handleApplyFilter(finalResponse,  contextValues); // DONE
-      case "apply_filter":
-          return handleApplyFilter(finalResponse,  contextValues); // DONE
+export const handleIntent = (finalResponse, contextValues) => {
+  const intentHandlers = {
+    // Authentication
+    login: handleLogin,
+    register: handleRegister,
+    logout: handleLogout,
 
-      // Collection Page Intents
-      case "sort_by_price_low_to_high":
-          return handleSortByPriceLowToHigh(finalResponse,  contextValues);  // DONE
-      case "sort_by_price_high_to_low":
-          return handleSortByPriceHighToLow(finalResponse,  contextValues); // DONE
-      case "choose_particular_product":
-          return handleChooseParticularProduct(finalResponse,  contextValues); // DONE
-          case "reset_filter":
-              return handleReset(finalResponse,  contextValues);  // DONE
-              case "reset_sorting":
-                  return handleReset(finalResponse,  contextValues);  // DONE
+    // Navigation
+    navigate_home: handleNavigation,
+    navigate_about: handleNavigation,
+    navigate_contact: handleNavigation,
+    navigate_orders: handleNavigation,
+    navigate_dashboard: handleNavigation,
+    navigate_collection: handleNavigation,
+    navigate_wishlist: handleNavigation,
+    navigate_cart: handleNavigation,
 
-      // Product Details Page Intents
-      case "add_to_cart":
-          return handleCart(finalResponse,  contextValues);   // DONE
-      case "remove_from_cart":
-          return handleCart(finalResponse,  contextValues);    // DONE
-      case "add_to_wishlist":
-          return handleWishlist(finalResponse,  contextValues);  // DONE
-      case "remove_from_wishlist":
-          return handleWishlist(finalResponse,  contextValues);  // DONE
+    // Search & Filters
+    search_product: handleApplyFilter,
+    apply_filter: handleApplyFilter,
+    reset_filter: handleReset,
+    reset_sorting: handleReset,
 
-      // Cart Page Intents
-      case "remove_from_cart_in_cartPage":
-          return handleQuantityAndRemoveFromCartPage(finalResponse,  contextValues);  // DONE
-      case "adjust_quantity":
-          return handleQuantityAndRemoveFromCartPage(finalResponse,  contextValues);   // DONE
+    // Collection Page
+    sort_by_price_low_to_high: handleSortByPriceLowToHigh,
+    sort_by_price_high_to_low: handleSortByPriceHighToLow,
+    choose_particular_product: handleChooseParticularProduct,
 
-      // Place Order Page Intents
-      case "place_order":
-          return handlePlaceOrder(finalResponse,  contextValues);    // DONE
-      case "change_address":
-          return handleChangeShippingAddress(finalResponse,  contextValues);  // DONE
+    // Product Actions
+    add_to_cart: handleCart,
+    remove_from_cart: handleCart,
+    add_to_wishlist: handleWishlist,
+    remove_from_wishlist: handleWishlist,
 
-      // Orders Page Intents
-      case "track_order":
-          return handleTrackOrder(finalResponse,  contextValues);  // DONE
-      case "cancel_order":
-          return handleCancelOrder(finalResponse,  contextValues);  // DONE
-      case "review_order":
-          return handleReviewOrder(finalResponse,  contextValues);  // DONE
+    // Cart Actions
+    remove_from_cart_in_cartPage: handleQuantityAndRemoveFromCartPage,
+    adjust_quantity: handleQuantityAndRemoveFromCartPage,
 
-      // Dashboard Page Intents
-      case "change_name":
-          return handleChangeName(finalResponse,  contextValues);  // DONE
-      case "change_phone_number":
-          return handleChangePhoneNumber(finalResponse,  contextValues);  // DONE
-      case "update_shipping_address":
-          return handleUpdateShippingAddress(finalResponse,  contextValues);  // DONE
-          // Contact Page Intents
-          case "make_call":
-              return handleMakeCall(finalResponse,  contextValues);  // DONE
-      
-          case "ask_details":
-            return handleAskDetails(finalResponse,  contextValues);  // DONE
+    // Order Actions
+    place_order: handlePlaceOrder,
+    change_address: handleChangeShippingAddress,
+    track_order: handleTrackOrder,
+    cancel_order: handleCancelOrder,
+    review_order: handleReviewOrder,
 
-          case "read_the_content":
-            return handleReadTheContent(finalResponse,  contextValues);  // DONE
+    // Profile Actions
+    change_name: handleChangeName,
+    change_phone_number: handleChangePhoneNumber,
+    update_shipping_address: handleUpdateShippingAddress,
 
+    // Contact Actions
+    make_call: handleMakeCall,
+    ask_details: handleAskDetails,
+    read_the_content: handleReadTheContent
+  };
 
-      // Fallback for unrecognized intents
-      default:
-          console.warn(`Unhandled intent: ${finalResponse.intent}`);
-          return;
+  const handler = intentHandlers[finalResponse.intent];
+  if (handler) {
+    return handler(finalResponse, contextValues);
   }
+
+  console.warn(`Unhandled intent: ${finalResponse.intent}`);
 };
