@@ -6,7 +6,7 @@ import CartTotal from '../components/CartTotal';
 import { getCartPageSummary, textToSpeech } from '../utils/voiceContent';
 
 const Cart = () => {
-    const { products, currency, cartItems, cartData, setCartData, updateQuantity,deliveryFee, getCartAmount, navigate } = useContext(ShopContext);
+    const { products, currency, cartItems, cartData,setPageValues, setCartData, updateQuantity,deliveryFee, getCartAmount, navigate } = useContext(ShopContext);
 
     useEffect(() => {
         if (products.length > 0) {
@@ -26,7 +26,8 @@ const Cart = () => {
       const speechText = getCartPageSummary(cartData,products,deliveryFee, getCartAmount);
       
       textToSpeech(speechText);
-      
+      setPageValues({ currentPage:"cart",pageContent:speechText})
+
         },[])
     return (
         <div className='border-t pt-14'>

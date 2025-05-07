@@ -8,7 +8,7 @@ import { getPlaceOrderPageSummary, textToSpeech } from '../utils/voiceContent';
 
 const PlaceOrder = () => {
     const [method, setMethod] = useState('cod');
-    const { navigate, user, showPincodeModal, setShowPincodeModal, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
+    const { navigate, user, showPincodeModal, setShowPincodeModal,setPageValues, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
     const [pincode, setPincode] = useState(Array(6).fill(""));
     const [address, setAddress] = useState(user.address);
 
@@ -119,6 +119,7 @@ const PlaceOrder = () => {
         const speechText = getPlaceOrderPageSummary(getCartAmount,address,delivery_fee);
         
         textToSpeech(speechText);
+    setPageValues({ currentPage:"placeOrder",pageContent:speechText})
         
           },[])
 

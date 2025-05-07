@@ -47,13 +47,13 @@ const Collection = () => {
 
     useEffect(() => { applyFilter(); }, [category, subCategory, material, returnable, inStock, priceRange, search, showSearch, products]);
     useEffect(() => { sortProduct(); }, [sortType]);
-    useEffect(() => { setPageValues({ currentPage: "collection" }); }, []);
-
+    
     useEffect(()=>{
-   
-      const speechText = getCollectionPageSummary();
-      
-      textToSpeech(speechText);
+        
+        const speechText = getCollectionPageSummary();
+        
+        textToSpeech(speechText);
+        setPageValues({ currentPage: "collection",pageContent:speechText });
       
         },[])
 

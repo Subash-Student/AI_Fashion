@@ -215,10 +215,10 @@ export const handleIntent = (finalResponse,  contextValues) => {
               return handleMakeCall(finalResponse,  contextValues);  // DONE
       
           case "ask_details":
-            return handleAskDetails(finalResponse,  contextValues);
+            return handleAskDetails(finalResponse,  contextValues);  // DONE
 
           case "read_the_content":
-            return handleReadTheContent(finalResponse,  contextValues);
+            return handleReadTheContent(finalResponse,  contextValues);  // DONE
 
 
       // Fallback for unrecognized intents

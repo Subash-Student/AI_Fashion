@@ -1,5 +1,6 @@
 
 import { toast } from 'react-toastify';
+import { textToSpeech } from './voiceContent';
 
 export const handleNavigation = (response,contextValues) => {
 
@@ -304,13 +305,62 @@ export const handleMakeCall = (response) => {
 
 
 
+export const handleReadTheContent = (response,contextValues) => {
+  
+  const {pageValues} = contextValues;
 
+  
+  const pageContent = pageValues.pageContent;
 
+  textToSpeech(pageContent)
 
-
-export const handleReadTheContent = (response) => {
-  console.log("Reading the Content", response);
 };
+
+
+
+export const handleAskDetails = async (response, contextValues) => {
+  const { pageValues } = contextValues;
+  const speechText = pageValues.speechText;
+  const question = response.question;
+
+  if (!speechText || !question) return;
+
+  try {
+    const apiKey = "YOUR_OPENAI_API_KEY";
+    const systemPrompt = "You are a helpful assistant. Read the context and answer the question clearly in a short sentence.";
+
+    const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: `Context:\n${speechText}\n\nQuestion: ${question}` }
+        ],
+        temperature: 0.7,
+      }),
+    });
+
+    const data = await gptResponse.json();
+
+    const finalAnswer = data?.choices?.[0]?.message?.content?.trim();
+
+    if (finalAnswer) {
+      textToSpeech(finalAnswer); // Speak the answer aloud
+    } else {
+      textToSpeech("Sorry, I could not find an answer.");
+    }
+  } catch (error) {
+    console.error("Error in GPT API call:", error);
+    textToSpeech("There was an error answering your question.");
+  }
+};
+ 
+
 
 
 export const handleLogin = (response) => {
@@ -321,6 +371,3 @@ export const handleRegister = (response) => {
   console.log("Handling register", response);
 };  
 
-export const handleAskDetails = (response) => {
-  console.log("Asking for Details", response);
-};  

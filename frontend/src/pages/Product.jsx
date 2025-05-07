@@ -27,7 +27,6 @@ const Product = () => {
       } catch (error) { console.error(error) }
     }
     fetchProduct()
-    setPageValues({ currentPage:"ProductDetails", values:{ productData:productData } })
   }, [productId])
 
   useEffect(() => {
@@ -41,6 +40,7 @@ const Product = () => {
    
     if(productData){
       const speechText = getProductPageSummary(productData);
+    setPageValues({ currentPage:"ProductDetails", values:{ productData:productData },pageContent:speechText })
       
       textToSpeech(speechText);
     }

@@ -74,7 +74,9 @@ export const arrayOfIntents = [
         product: {
           number: "",
           
-        }
+        },
+        question :""
+
       }
     },
     {
@@ -92,7 +94,8 @@ export const arrayOfIntents = [
         userAction: {
           cart: "add || remove",
           wishlist: "add || remove"
-        }
+        },
+        question :""
       }
     },
     {
@@ -108,7 +111,7 @@ export const arrayOfIntents = [
         adjust_quantity: "increment || decrement",
         remove_product_number:"1,2,3,4,5,...",
         quantity:"1,2,3,4,5,...",
-        
+        question :""
       }
     },
     {
@@ -120,6 +123,7 @@ export const arrayOfIntents = [
       ],
       responseStructure: {
         intent: "",
+        question :""
       }
     },
     {
@@ -132,7 +136,8 @@ export const arrayOfIntents = [
       ],
       responseStructure: {
         intent: "",
-        productName:""
+        productName:"",
+        question :""
   
       }
     },
@@ -152,11 +157,7 @@ export const arrayOfIntents = [
           name: "",
           phoneNumber: "",
           pincode:"",
-          wishlist: [
-            {
-              productId: "",
-            }
-          ]
+          question :""
         }
       }
     },
@@ -168,7 +169,8 @@ export const arrayOfIntents = [
       ],
       responseStructure: {
         intent: "",
-        answer:""
+        answer:"",
+        question :""
       }
     },
     {
@@ -181,7 +183,7 @@ export const arrayOfIntents = [
       responseStructure: {
         intent: "",
         makeCall: true,
-        answer:""
+        question :""
       }
     }
   ];

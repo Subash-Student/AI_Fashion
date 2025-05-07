@@ -11,7 +11,7 @@ const Orders = () => {
     setSelectedStatus, showCancelModal, setShowCancelModal, cancelReason, setCancelReason, selectedItem, 
     setSelectedItem, showReviewModal, setShowReviewModal, reviewText, setReviewText, reviewRating, 
     setReviewRating, reviewProductId, setReviewProductId, handleTrackOrder, handleCancelOrder, 
-    handleOpenReview, statusSteps } = useContext(ShopContext);
+    handleOpenReview, statusSteps,setPageValues } = useContext(ShopContext);
 
   const submitReview = async (text = reviewText) => {
     try {
@@ -87,6 +87,7 @@ const Orders = () => {
     const speechText = getOrdersPageSummary(orderData);
     
     textToSpeech(speechText);
+    setPageValues({ currentPage:"orders",pageContent:speechText})
     
       },[])
   return (

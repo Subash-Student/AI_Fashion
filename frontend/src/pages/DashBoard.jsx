@@ -14,7 +14,7 @@ const sections = [
 ];
 
 const Dashboard = () => {
-  const { user, token, orderData, getUserData, setIsWishlisted, isWishlisted, loadOrderData, showModal, setShowModal } = useContext(ShopContext);
+  const { user, token,setPageValues, orderData, getUserData, setIsWishlisted, isWishlisted, loadOrderData, showModal, setShowModal } = useContext(ShopContext);
   const [allUserData, setAllUserData] = useState({ profile: user, orders: orderData });
   const [showPincodeModal, setShowPincodeModal] = useState(false);
   const [formData, setFormData] = useState({ name: allUserData.profile.name, phone: allUserData.profile.phone });
@@ -224,6 +224,7 @@ const Dashboard = () => {
     const speechText = getDashboardPageSummary(allUserData);
     
     textToSpeech(speechText);
+    setPageValues({ currentPage:"dashboard",pageContent:speechText})
     
       },[])
   return (

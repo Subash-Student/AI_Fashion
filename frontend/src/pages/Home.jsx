@@ -12,7 +12,7 @@ import { ShopContext } from '../context/ShopContext'
 import { getHomePageSummary, textToSpeech } from '../utils/voiceContent'
 
 const Home = () => {
-  const {token} = useContext(ShopContext);
+  const {token,setPageValues} = useContext(ShopContext);
 
 
   useEffect(()=>{
@@ -20,6 +20,7 @@ const Home = () => {
 const speechText = getHomePageSummary();
 
 textToSpeech(speechText);
+setPageValues({ currentPage:"home",pageContent:speechText})
 
   },[])
 
