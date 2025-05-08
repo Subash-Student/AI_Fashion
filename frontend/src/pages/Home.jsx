@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react'
-import Hero from '../components/Hero'
+import Carousel from '../components/Carousel'
 import LatestCollection from '../components/LatestCollection'
 import BestSeller from '../components/BestSeller'
 import OurPolicy from '../components/OurPolicy'
@@ -12,6 +12,21 @@ import { ShopContext } from '../context/ShopContext'
 
 const Home = () => {
   const {token} = useContext(ShopContext);
+
+  const slides =  [
+    {
+        "scr": "https://picsum.photos/seed/picsum/600/400",
+        "alt": "image 1"
+    },
+    {
+        "scr": "https://picsum.photos/id/77/600/400",
+        "alt": "image 2"
+    },
+    {
+        "scr": "https://picsum.photos/id/8/600/400",
+        "alt": "image_3"
+    }
+]
 
   return (
     <div>
