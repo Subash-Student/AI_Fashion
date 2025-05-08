@@ -1,14 +1,14 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
-import { toast } from 'react-toastify'
+import { toast } from "react-toastify";
 import { extractInformation } from "../utils/extractInfo";
 import { ShopContext } from "../context/ShopContext";
+import { textToSpeech } from "../utils/voiceContent";
+
 
 export default function VoiceAssistance() {
-
-
-const contextValues = useContext(ShopContext);
-  const [showMic, setShowMic] = useState(false);
+  const contextValues = useContext(ShopContext);
+  const {showMic, setShowMic} = useContext(ShopContext);
   const [voiceText, setVoiceText] = useState("");
   const [processedText, setProcessedText] = useState(null);
   const timeoutRef = useRef(null);
@@ -86,58 +86,69 @@ const contextValues = useContext(ShopContext);
   const handleVoiceProcessing = async (text) => {
     try {
       const response = await axios.post(
-        "https://api.openai.com/v1/completions",
+        "https://api.openai.com/v1/chat/completions",
         {
-          model: "text-davinci-003",
-          prompt: `Analyze the following user input and respond only with a structured JSON object.
-
-- Determine if the input is meaningful or not.
-- If the input is incomplete or unclear, specify the reason.
-- Suggest how to improve or clarify the input.
-- Estimate a confidence score between 0 and 1 based on how understandable the input is.
-- Based on your analysis, return the appropriate intent and action required.
-
-Respond strictly in the following JSON format:
-
-{
-  "intent": "<valid_intent | invalid_input>",
-  "reason": "<short_reason>",
-  "suggestion": "<your_suggestion>",
-  "confidence_score": <decimal_between_0_and_1>,
-  "action_required": ["<action1>", "<action2>"]
-}
-
-Input:
-"""${text}"""`,
-          max_tokens: 300,
+          model: "gpt-3.5-turbo",
+          messages: [
+            {
+              role: "system",
+              content: `You are a smart assistant helping an e-commerce platform for blind users. Your job is to analyze voice inputs from users and return a structured response.`
+            },
+            {
+              role: "user",
+              content: `Please analyze and respond in the following JSON format:
+  
+  {
+    "is_meaningful": <true | false>,
+    "rephrased_text": "<cleaned and clear version of the user's input>",
+    "intent": "<intent such as 'search_product', 'add_to_cart', 'checkout', or 'invalid_input'>",
+    "reason": "<brief explanation>",
+    "suggestion": "<what the user should say or clarify>",
+    "confidence_score": <number between 0 and 1>,
+    "action_required": ["<action1>", "<action2>"]
+  }
+  
+  Voice Input:
+  """${text}"""
+  `
+            }
+          ],
           temperature: 0.5,
+          max_tokens: 300
         },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer YOUR_API_KEY_HERE`,
-          },
+            Authorization: `Bearer YOUR_API_KEY_HERE`
+          }
         }
       );
-
-      const gptResponse = response.data.choices[0].text.trim();
+  
+      const gptResponse = response.data.choices[0].message.content.trim();
       console.log("GPT Raw Response:", gptResponse);
-
+  
       try {
         const result = JSON.parse(gptResponse);
         setProcessedText(result);
-        extractInformation(processedText,contextValues)
-        toast.success("Voice analyzed and structured successfully!");
+  
+        if (result.is_meaningful && result.confidence_score >= 0.7) {
+          extractInformation(result.rephrased_text, contextValues);
+          toast.success("Voice analyzed and processed successfully!");
+        } else {
+          
+          textToSpeech(result.suggestion || "Please say your request more clearly.");
+          toast.warning("Voice input unclear. Suggesting improvement...");
+        }
+  
       } catch (err) {
         console.error("Invalid JSON from GPT:", gptResponse);
-        toast.error("Failed to process structured response.");
+        toast.error("Failed to parse structured GPT response.");
       }
     } catch (error) {
       console.error("Error calling GPT API:", error);
       toast.error("Failed to process voice input.");
     }
   };
-
   return (
     <>
       {showMic && (

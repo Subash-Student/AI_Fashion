@@ -1,9 +1,21 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import Title from '../components/Title'
 import { assets } from '../assets/assets'
 import NewsletterBox from '../components/NewsletterBox'
+import { ShopContext } from '../context/ShopContext'
 
 const Contact = () => {
+
+  const {setPageValues} = useContext(ShopContext);
+
+
+  useEffect(()=>{
+   
+    
+    setPageValues({ currentPage:"contact",pageContent:""})
+    
+      },[])
+
   return (
     <div>
       

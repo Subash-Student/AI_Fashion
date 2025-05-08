@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Hero from '../components/Hero'
 import LatestCollection from '../components/LatestCollection'
 import BestSeller from '../components/BestSeller'
@@ -9,17 +9,9 @@ import Mens from '../components/Mens'
 import Women from '../components/Women'
 import Kids from '../components/Kids'
 import { ShopContext } from '../context/ShopContext'
-import { Carousel } from '../components/Carousel'
-
-import c1 from '../assets/c1.jpg'
-import c2 from '../assets/c2.jpg'
-import c3 from '../assets/c3.jpg'
-import c4 from '../assets/c4.jpg'
-
-import {slides} from '../components/carouselData.json'
 
 const Home = () => {
-  const { token } = useContext(ShopContext);
+  const {token} = useContext(ShopContext);
 
   return (
     <div>

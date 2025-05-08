@@ -28,11 +28,11 @@ import {
 
 import axios from "axios";
 
-export const extractInformation = async ( voiceInputText,contextValues) => {
 
-  const {pageValues} = contextValues;
+export const extractInformation = async (voiceInputText, contextValues) => {
+  const { pageValues } = contextValues;
+  const { currentPage } = pageValues;
 
-  const {currentPage} = pageValues;
   try {
     // 1. Find page config
     const pageConfig = arrayOfIntents.find((item) => item.page === currentPage);
@@ -41,49 +41,59 @@ export const extractInformation = async ( voiceInputText,contextValues) => {
     }
 
     const commonConfig = arrayOfIntents[0];
-    
+
     const { intents, responseStructure } = pageConfig;
 
-    // 2. Construct prompt for GPT
+    // 2. Construct prompt for GPT-3.5 Turbo
     const prompt = `
-You are an AI assistant that extracts structured intent data from user voice commands. 
-The current page is "${currentPage}". 
+    You are an AI assistant for an e-commerce platform that assists blind users. Your task is to process user voice input and match it to the correct intent based on the current page context. You will then structure the extracted information in a defined JSON format.
 
-Here are the valid intents for this page:
-${JSON.stringify(intents, null, 2)}
+    **Current page**: "${currentPage}"
+    
+    Here are the valid intents for this page:
+    ${JSON.stringify(intents, null, 2)}
+    
+    If the voice input doesn't match any of the above intents, check the common intents for the platform:
+    ${JSON.stringify(commonConfig.intents, null, 2)}
+    
+    Here is the expected response structure for this page:
+    ${JSON.stringify(responseStructure, null, 2)}
+    
+    **User voice input**:
+    "${voiceInputText}"
+    
+    Instructions:
+    - Based on the user's input, identify the best matching intent from the list above.
+    - If a match is found, fill in the relevant fields from the response structure.
+    - If a field cannot be confidently determined, mark it as "unknown".
+    - The response must be returned in valid JSON format. If any part of the input is unclear or does not fit, mark it as "unknown".
+    - Ensure the response structure is clear, consistent, and easily understandable, especially for users relying on screen readers.
+    
+    **Response format**:
+    {
+      "intent": "<matched_intent>",
+      "fields": {
+        "field1": "<value_or_unknown>",
+        "field2": "<value_or_unknown>",
+        ...
+      }
+    }
+    
+`;
 
-If not match with above intents then check this common page intents:
-${JSON.stringify(commonConfig.intents, null, 2)}
-
-If it match with common page intents then hear the expected response structure:
-${JSON.stringify(commonConfig.responseStructure, null, 2)}
-
-
-If not then Here is the expected response structure:
-${JSON.stringify(responseStructure, null, 2)}
-
-User said: "${voiceInputText}"
-
-Based on this, return a JSON object that:
-1. Selects the appropriate intent from the list.
-2. Fills in the required fields in the response structure.
-3. If any field cannot be determined, mark it as "unknown".
-
-Return ONLY valid JSON and nothing else.
-    `;
-
-    // 3. Call OpenAI API
+    // 3. Call GPT-3.5 Turbo API
     const gptResponse = await axios.post(
       "https://api.openai.com/v1/chat/completions",
       {
-        model: "gpt-4",
+        model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: prompt }],
         temperature: 0.2,
+        max_tokens: 300
       },
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer YOUR_OPENAI_API_KEY`, 
+          Authorization: `Bearer YOUR_OPENAI_API_KEY`,
         },
       }
     );
@@ -102,7 +112,7 @@ Return ONLY valid JSON and nothing else.
       return { error: "Failed to parse GPT response as JSON." };
     }
 
-    // 5. Validate result fields
+    // 5. Validate result fields to match expected structure
     const validateFields = (template, output) => {
       const validated = {};
       for (const key in template) {
@@ -120,8 +130,8 @@ Return ONLY valid JSON and nothing else.
 
     const finalResponse = validateFields(responseStructure, result);
 
-    handleIntent(finalResponse,contextValues)
-     
+    // 6. Process intent action based on final response
+    handleIntent(finalResponse, contextValues);
   } catch (error) {
     console.error("Error in extractInformation:", error.message);
     return { error: "Something went wrong during intent extraction." };
@@ -131,99 +141,67 @@ Return ONLY valid JSON and nothing else.
 
 
 
-export const handleIntent = (finalResponse,  contextValues) => {
-  switch (finalResponse.intent) {
-      // Home Page Intents
-      case "login":
-          return handleLogin(finalResponse,  contextValues);
-      case "register":
-          return handleRegister(finalResponse,  contextValues);
-      case "logout":
-          return handleLogout(finalResponse,  contextValues);   // DONE
-      case "navigate_home":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_about":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_contact":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_orders":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_dashboard":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_collection":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_wishlist":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "navigate_cart":
-          return handleNavigation(finalResponse,  contextValues); // DONE
-      case "search_product":
-          return handleApplyFilter(finalResponse,  contextValues); // DONE
-      case "apply_filter":
-          return handleApplyFilter(finalResponse,  contextValues); // DONE
 
-      // Collection Page Intents
-      case "sort_by_price_low_to_high":
-          return handleSortByPriceLowToHigh(finalResponse,  contextValues);  // DONE
-      case "sort_by_price_high_to_low":
-          return handleSortByPriceHighToLow(finalResponse,  contextValues); // DONE
-      case "choose_particular_product":
-          return handleChooseParticularProduct(finalResponse,  contextValues); // DONE
-          case "reset_filter":
-              return handleReset(finalResponse,  contextValues);  // DONE
-              case "reset_sorting":
-                  return handleReset(finalResponse,  contextValues);  // DONE
+export const handleIntent = (finalResponse, contextValues) => {
+  const intentHandlers = {
+    // Authentication
+    login: handleLogin,
+    register: handleRegister,
+    logout: handleLogout,
 
-      // Product Details Page Intents
-      case "add_to_cart":
-          return handleCart(finalResponse,  contextValues);   // DONE
-      case "remove_from_cart":
-          return handleCart(finalResponse,  contextValues);    // DONE
-      case "add_to_wishlist":
-          return handleWishlist(finalResponse,  contextValues);  // DONE
-      case "remove_from_wishlist":
-          return handleWishlist(finalResponse,  contextValues);  // DONE
+    // Navigation
+    navigate_home: handleNavigation,
+    navigate_about: handleNavigation,
+    navigate_contact: handleNavigation,
+    navigate_orders: handleNavigation,
+    navigate_dashboard: handleNavigation,
+    navigate_collection: handleNavigation,
+    navigate_wishlist: handleNavigation,
+    navigate_cart: handleNavigation,
 
-      // Cart Page Intents
-      case "remove_from_cart_in_cartPage":
-          return handleQuantityAndRemoveFromCartPage(finalResponse,  contextValues);  // DONE
-      case "adjust_quantity":
-          return handleQuantityAndRemoveFromCartPage(finalResponse,  contextValues);   // DONE
+    // Search & Filters
+    search_product: handleApplyFilter,
+    apply_filter: handleApplyFilter,
+    reset_filter: handleReset,
+    reset_sorting: handleReset,
 
-      // Place Order Page Intents
-      case "place_order":
-          return handlePlaceOrder(finalResponse,  contextValues);    // DONE
-      case "change_address":
-          return handleChangeShippingAddress(finalResponse,  contextValues);  // DONE
+    // Collection Page
+    sort_by_price_low_to_high: handleSortByPriceLowToHigh,
+    sort_by_price_high_to_low: handleSortByPriceHighToLow,
+    choose_particular_product: handleChooseParticularProduct,
 
-      // Orders Page Intents
-      case "track_order":
-          return handleTrackOrder(finalResponse,  contextValues);  // DONE
-      case "cancel_order":
-          return handleCancelOrder(finalResponse,  contextValues);  // DONE
-      case "review_order":
-          return handleReviewOrder(finalResponse,  contextValues);  // DONE
+    // Product Actions
+    add_to_cart: handleCart,
+    remove_from_cart: handleCart,
+    add_to_wishlist: handleWishlist,
+    remove_from_wishlist: handleWishlist,
 
-      // Dashboard Page Intents
-      case "change_name":
-          return handleChangeName(finalResponse,  contextValues);  // DONE
-      case "change_phone_number":
-          return handleChangePhoneNumber(finalResponse,  contextValues);  // DONE
-      case "update_shipping_address":
-          return handleUpdateShippingAddress(finalResponse,  contextValues);  // DONE
-          // Contact Page Intents
-          case "make_call":
-              return handleMakeCall(finalResponse,  contextValues);  // DONE
-      
-          case "ask_details":
-            return handleAskDetails(finalResponse,  contextValues);
+    // Cart Actions
+    remove_from_cart_in_cartPage: handleQuantityAndRemoveFromCartPage,
+    adjust_quantity: handleQuantityAndRemoveFromCartPage,
 
-          case "read_the_content":
-            return handleReadTheContent(finalResponse,  contextValues);
+    // Order Actions
+    place_order: handlePlaceOrder,
+    change_address: handleChangeShippingAddress,
+    track_order: handleTrackOrder,
+    cancel_order: handleCancelOrder,
+    review_order: handleReviewOrder,
 
+    // Profile Actions
+    change_name: handleChangeName,
+    change_phone_number: handleChangePhoneNumber,
+    update_shipping_address: handleUpdateShippingAddress,
 
-      // Fallback for unrecognized intents
-      default:
-          console.warn(`Unhandled intent: ${finalResponse.intent}`);
-          return;
+    // Contact Actions
+    make_call: handleMakeCall,
+    ask_details: handleAskDetails,
+    read_the_content: handleReadTheContent
+  };
+
+  const handler = intentHandlers[finalResponse.intent];
+  if (handler) {
+    return handler(finalResponse, contextValues);
   }
+
+  console.warn(`Unhandled intent: ${finalResponse.intent}`);
 };
