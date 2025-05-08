@@ -18,8 +18,7 @@ const Kids = () => {
       <div className='text-center text-3xl py-8'>
         <Title text1={'Kids'} text2={'Collections'}/>
         <p className='w-3/4 m-auto text-xs sm:text-sm md:text-base text-gray-600'>
-        Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the.
-        </p>
+        Fun, stylish, and comfortable – our kids’ collection has everything they need to play and shine.        </p>
       </div>
 
       <div className='grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 gap-y-6'>

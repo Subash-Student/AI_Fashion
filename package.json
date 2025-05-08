@@ -1,0 +1,20 @@
+{
+  "name": "ai_fashion",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Subash-Student/AI_Fashion.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Subash-Student/AI_Fashion/issues"
+  },
+  "homepage": "https://github.com/Subash-Student/AI_Fashion#readme",
+  "description": ""
+}

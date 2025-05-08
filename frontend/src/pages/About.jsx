@@ -8,6 +8,22 @@ const About = () => {
 
     const {setPageValues} = useContext(ShopContext);
 
+<<<<<<< HEAD
+      <div className='my-10 flex flex-col md:flex-row gap-16'>
+          <img className='w-full md:max-w-[450px]' src={assets.about_img} alt="" />
+          <div className='flex flex-col justify-center gap-6 md:w-2/4 text-gray-600'>
+              <b >FeelWays was born out of a passion for innovation and a commitment to inclusivity, aiming to revolutionize how visually impaired individuals experience online shopping.</b>
+              <p>Our journey began with a clear vision: to create a voice-powered, AI-enabled platform where users can independently explore and purchase fashion items with ease and confidence.
+
+Since our inception, we've focused on curating a stylish and accessible collection of dresses, enriched with detailed, voice-readable descriptions powered by AI. By combining fashion with cutting-edge technology, we ensure that every user—regardless of visual ability—can enjoy a seamless and empowering shopping experience.</p>
+              <b className='text-gray-800'>Our Mission</b>
+              <p>At FeelWays, our mission is to make online shopping inclusive, intuitive, and intelligent. We are dedicated to enabling independence through voice interaction, haptic feedback, and smart AI assistance—bringing choice, convenience, and confidence to every step of the journey.
+
+</p>
+          </div>
+      </div>
+=======
+>>>>>>> 8f51ced88088cf1a7456199c500c1ea10d780207
 
     useEffect(()=>{
      

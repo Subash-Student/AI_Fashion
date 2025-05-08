@@ -9,35 +9,26 @@ import Mens from '../components/Mens'
 import Women from '../components/Women'
 import Kids from '../components/Kids'
 import { ShopContext } from '../context/ShopContext'
-import { getHomePageSummary, textToSpeech } from '../utils/voiceContent'
 
 const Home = () => {
-  const {token,setPageValues} = useContext(ShopContext);
-
-
-  useEffect(()=>{
-   
-const speechText = getHomePageSummary();
-
-textToSpeech(speechText);
-setPageValues({ currentPage:"home",pageContent:speechText})
-
-  },[])
-
+  const {token} = useContext(ShopContext);
 
   return (
     <div>
-      <Hero />
-      {token && 
-      <RecentlyViewed />
+      <div className='Caro'>
+        <Carousel data={slides} />
+      </div>
+      {/* <Hero/> */}
+      {token &&
+        <RecentlyViewed />
       }
-      <LatestCollection/>
-      <BestSeller/>
+      <LatestCollection />
+      <BestSeller />
       <Mens />
       <Women />
       <Kids />
-      <OurPolicy/>
-      <NewsletterBox/>
+      <OurPolicy />
+      <NewsletterBox />
     </div>
   )
 }
