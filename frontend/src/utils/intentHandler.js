@@ -210,6 +210,28 @@ export const handleUpdateShippingAddress = (_, { setShowPincodeModal }) => {
   provideVoiceFeedback("Updating shipping address.");
 };
 
+const handleOrderAction = (response, contextValues, handler) => {
+  const product = findProductByName(contextValues.orderData, response.productName);
+  product ? handler(product) : toast.error(`Product "${response.productName}" not found in your orders.`);
+};
+
+const findProductByName = (orderData, name) => {
+  const lowerName = name.trim().toLowerCase();
+  let match = orderData.find(item => item?.name?.trim().toLowerCase() === lowerName);
+  
+  if (!match) {
+    const fuzzyMatches = orderData.filter(item => item?.name?.toLowerCase().includes(lowerName));
+    if (fuzzyMatches.length === 1) match = fuzzyMatches[0];
+    else if (fuzzyMatches.length > 1) toast.warn(`Multiple products matched "${name}". Please be more specific.`);
+  }
+  return match;
+};
+
+export const handleTrackOrder = (response, contextValues) => handleOrderAction(response, contextValues, p => contextValues.handleTrackOrder(p.status));
+export const handleCancelOrder = (response, contextValues) => handleOrderAction(response, contextValues, contextValues.handleCancelOrder);
+export const handleReviewOrder = (response, contextValues) => handleOrderAction(response, contextValues, p => contextValues.handleOpenReview(p._id));
+
+
 export const handleChangeName = (_, { setShowModel }) => {
   toggleModal(setShowModel);
   vibratePattern([100, 50, 100]); // Name change feedback
@@ -234,7 +256,13 @@ export const handleMakeCall = () => {
   provideVoiceFeedback("Making a call.");
 };
 
-export const handleReadTheContent = async(_, { pageValues }) => {
+
+export const handleReadTheContent = (_, { pageValues }) => {
+  textToSpeech(pageValues.pageContent);
+};
+
+
+export const handleAskDetails = async(_, { pageValues }) => {
   const { speechText, question } = { ...pageValues, ...response };
   if (!speechText || !question) return;
 
