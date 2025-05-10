@@ -17,9 +17,15 @@ const Orders = () => {
     try {
       const res = await axios.post(backendUrl + '/api/product/review/add', 
         { productId: reviewProductId, review: text, rating: reviewRating }, { headers: { token } });
-      res.data.success ? toast.success('Review submitted successfully!') : toast.error('Failed to submit review');
+      if(res.data.success){
+        toast.success('Review submitted successfully!');
+        textToSpeech('Review submitted successfully!')
+      }else{
+        toast.error('Failed to submit review');
+        textToSpeech('Failed to submit review');
+      } 
       setShowReviewModal(false);
-    } catch (err) { toast.error('Something went wrong while submitting the review'); }
+    } catch (err) { toast.error('Something went wrong while submitting the review');textToSpeech('Something went wrong while submitting the review') }
   };
 
   const getStatusStepIndex = (status) => statusSteps.findIndex(s => s.toLowerCase() === status.toLowerCase());
@@ -29,9 +35,17 @@ const Orders = () => {
       const response = await axios.post(backendUrl + '/api/order/cancel', {
         orderId: selectedItem.orderId, productId: selectedItem.id, reason: text
       }, { headers: { token } });
-      response.data.success ? toast.success("Order cancelled successfully.") : toast.error("Failed to cancel order.");
+      if(response.data.success){
+        toast.success("Order cancelled successfully.")
+        textToSpeech("Order cancelled successfully.")
+        
+      }else{
+        toast.error("Failed to cancel order.");
+        textToSpeech("Failed to cancel order.");
+      }
+      
       setShowCancelModal(false);
-    } catch (error) { toast.error("Server error while cancelling order."); }
+    } catch (error) { toast.error("Server error while cancelling order.");textToSpeech("Server error while cancelling order.") }
   };
 
   const getStatusIcon = (status) => {
@@ -84,6 +98,8 @@ const Orders = () => {
       setShowMic(false)
 
       toast.error("Error recognizing voice input");
+      textToSpeech("Error recognizing voice input");
+
     };
   };
   useEffect(()=>{

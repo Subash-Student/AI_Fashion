@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState, useRef } from 'react';
 import { ShopContext } from '../context/ShopContext';
 import axios from 'axios';
 import { toast } from 'react-toastify';
+import { textToSpeech } from '../utils/voiceContent';
 
 const Login = () => {
   const [currentState, setCurrentState] = useState('Login');
@@ -40,6 +41,7 @@ const Login = () => {
     return new Promise((resolve) => {
       if (!('webkitSpeechRecognition' in window)) {
         toast.error('Speech recognition not supported in your browser');
+        textToSpeech('Speech recognition not supported in your browser');
         return;
       }
 
@@ -199,18 +201,26 @@ const Login = () => {
         if (response.data.success) {
           setToken(response.data.token);
           localStorage.setItem('token', response.data.token);
-          navigate("/")
+          textToSpeech("Successfully regitered");
+            setTimeout(() => {
+              navigate("/")
+            }, 2000);
         } else {
           toast.error(response.data.message);
+          textToSpeech(response.data.message);
         }
       } else if (currentState === 'Login') {
         const response = await axios.post(`${backendUrl}/api/user/login`, { phone:contact, password });
         if (response.data.success) {
           setToken(response.data.token);
           localStorage.setItem('token', response.data.token);
-          navigate("/")
+          textToSpeech("Successfully you are logged in");
+            setTimeout(() => {
+              navigate("/")
+            }, 2000);
         } else {
           toast.error(response.data.message);
+          textToSpeech(response.data.message);
         }
       } else if (currentState === 'Forgot Password') {
         if (!isOTPSent) {
@@ -226,6 +236,7 @@ const Login = () => {
             }
           } else {
             toast.error(response.data.message);
+            textToSpeech(response.data.message);
           }
         } else if (!isOTPVerified) {
           const response = await axios.post(`${backendUrl}/api/auth/verify-otp`, { phone:contact, otp });
@@ -245,10 +256,12 @@ const Login = () => {
             }
           } else {
             toast.error(response.data.message);
+            textToSpeech(response.data.message);
           }
         } else {
           if (newPassword !== confirmPassword) {
             toast.error('Passwords do not match');
+            textToSpeech('Passwords do not match');
             return;
           }
           const response = await axios.post(`${backendUrl}/api/user/reset-password`, { phone:contact, newPassword });
@@ -269,6 +282,7 @@ const Login = () => {
     } catch (error) {
       console.log(error);
       toast.error(error.message);
+      textToSpeech(error.message);
     }
   };
 

@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios'
+import { textToSpeech } from "../utils/voiceContent";
 
 
 export const ShopContext = createContext();
@@ -114,6 +115,7 @@ const ShopContextProvider = (props) => {
 
         if (!size) {
             toast.error('Select Product Size');
+            textToSpeech('Select Product Size');
             return;
         }
 
@@ -143,6 +145,7 @@ const ShopContextProvider = (props) => {
             } catch (error) {
                 console.log(error)
                 toast.error(error.message)
+                textToSpeech(error.message)
             }
         }
 
@@ -182,6 +185,7 @@ const ShopContextProvider = (props) => {
             } catch (error) {
                 console.log(error)
                 toast.error(error.message)
+                textToSpeech(error.message)
             }
         }
 
@@ -215,11 +219,13 @@ const ShopContextProvider = (props) => {
                 setProducts(response.data.products.reverse())
             } else {
                 toast.error(response.data.message)
+                textToSpeech(response.data.message)
             }
 
         } catch (error) {
             console.log(error)
             toast.error(error.message)
+            textToSpeech(error.message)
         }
     }
 
@@ -238,12 +244,14 @@ const ShopContextProvider = (props) => {
                     setUser(response.data.user)
                 } else {
                     toast.error(response.data.message)
+                    textToSpeech(response.data.message)
                 }
             }
 
         } catch (error) {
             console.log(error)
             toast.error(error.message)
+            textToSpeech(error.message)
         }
     }
 
@@ -260,6 +268,7 @@ const ShopContextProvider = (props) => {
         } catch (error) {
             console.log(error)
             toast.error(error.message)
+            textToSpeech(error.message)
         }
     }
     

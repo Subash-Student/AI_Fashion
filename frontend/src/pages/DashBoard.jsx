@@ -35,14 +35,17 @@ const Dashboard = () => {
       const res = await axios.post("http://localhost:4000/api/user/edit", { ...formData }, { headers: { token } });
       if (res.data.success) {
         toast.success("Profile updated successfully!");
+        textToSpeech("Profile updated successfully!");
         setAllUserData((prev) => ({ ...prev, profile: { ...formData } }));
         setTimeout(() => setShowModal(false), 1000);
       } else {
         toast.error(res.data.message || "Update failed");
+        textToSpeech(res.data.message || "Update failed");
       }
     } catch (error) {
       console.error("Error updating profile", error);
       toast.error("Server error. Please try again.");
+      textToSpeech("Server error. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -98,6 +101,7 @@ const Dashboard = () => {
         await fetchAddressFromPincode(cleanedPincode);
       } else {
         toast.error("Please say a valid 6-digit pincode");
+        textToSpeech("Please say a valid 6-digit pincode");
       }
     };
 
@@ -105,6 +109,7 @@ const Dashboard = () => {
       clearTimeout(stopTimer);
       recognition.stop();
       toast.error("Error recognizing voice input");
+      textToSpeech("Error recognizing voice input");
       console.log(event.error);
     };
   };
@@ -123,6 +128,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error cleaning pincode with GPT-4:", error);
       toast.error("Error cleaning pincode. Please try again.");
+      textToSpeech("Error cleaning pincode. Please try again.");
       return '';
     }
   };
@@ -139,20 +145,25 @@ const Dashboard = () => {
           const updateRes = await axios.post("http://localhost:4000/api/user/edit-address", { address: fullAddress }, { headers: { token } });
           if (updateRes.data.success) {
             toast.success("Address updated successfully!");
+            textToSpeech("Address updated successfully!");
             setAllUserData((prev) => ({ ...prev, profile: { ...prev.profile, address: fullAddress } }));
             setShowPincodeModal(false);
           } else {
             toast.error("Failed to update address");
+            textToSpeech("Failed to update address");
           }
         } else {
           toast.error("Invalid pincode");
+          textToSpeech("Invalid pincode");
         }
       } catch (err) {
         toast.error("Error fetching address");
+        textToSpeech("Error fetching address");
         console.error(err);
       }
     } else {
       toast.warn("Enter a valid 6-digit pincode");
+      textToSpeech("Enter a valid 6-digit pincode");
     }
   };
 
@@ -193,6 +204,7 @@ const Dashboard = () => {
         await handleSave();
       } else {
         toast.error("Please say a name and phone number");
+        textToSpeech("Please say a name and phone number");
       }
     };
 
@@ -202,6 +214,7 @@ const Dashboard = () => {
       setShowMic(false)
 
       toast.error("Error recognizing voice input");
+      textToSpeech("Error recognizing voice input");
       console.log(event.error);
     };
   };
@@ -222,6 +235,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Error extracting name and phone with GPT:", error);
       toast.error("Failed to extract name and phone.");
+      textToSpeech("Failed to extract name and phone.");
       return { name: '', phone: '' };
     }
   };
