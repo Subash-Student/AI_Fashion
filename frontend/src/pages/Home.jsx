@@ -33,7 +33,6 @@ const Home = () => {
       <div className='Caro'>
         <Carousel data={slides} />
       </div>
-      {/* <Hero/> */}
       {token &&
         <RecentlyViewed />
       }
@@ -43,7 +42,7 @@ const Home = () => {
       <Women />
       <Kids />
       <OurPolicy />
-      <NewsletterBox />
+      {/* <NewsletterBox /> */}
     </div>
   )
 }
