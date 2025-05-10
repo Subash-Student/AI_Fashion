@@ -42,7 +42,6 @@ const Home = () => {
       <Women />
       <Kids />
       <OurPolicy />
-      {/* <NewsletterBox /> */}
     </div>
   )
 }
