@@ -120,7 +120,7 @@ const Login = () => {
         temperature: 0.3
       }, {
         headers: {
-          'Authorization': `Bearer YOUR_OPENAI_API_KEY`,
+          'Authorization': `Bearer ${import.meta.env.GPT_API_KEY}`,
           'Content-Type': 'application/json'
         }
       });

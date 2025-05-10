@@ -93,7 +93,7 @@ export const extractInformation = async (voiceInputText, contextValues) => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer YOUR_OPENAI_API_KEY`,
+          Authorization: `Bearer ${import.meta.env.GPT_API_KEY}`,
         },
       }
     );

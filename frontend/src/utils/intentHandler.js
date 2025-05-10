@@ -267,12 +267,11 @@ export const handleAskDetails = async(_, { pageValues }) => {
   if (!speechText || !question) return;
 
   try {
-    const apiKey = "YOUR_OPENAI_API_KEY";
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
+        Authorization: `Bearer ${import.meta.env.GPT_API_KEY}`,
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",

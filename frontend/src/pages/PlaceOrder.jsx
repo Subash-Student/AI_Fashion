@@ -42,12 +42,12 @@ const PlaceOrder = () => {
 
     const cleanPincode = async (transcript) => {
         try {
-            const response = await axios.post('https://api.openai.com/v1/completions', {
-                model: 'gpt-4',
+            const response = await axios.post('https://api.openai.com/v1/chat/completions', {
+                model: 'gpt-3.5-turbo',
                 prompt: `Extract a 6-digit pincode from this input: "${transcript}". Please return only the 6-digit number.`,
                 max_tokens: 10,
                 temperature: 0.0,
-            }, { headers: { 'Authorization': `${import.meta.env.GPT_API_KEY}` } });
+            }, { headers: { 'Authorization': `Bearer ${import.meta.env.GPT_API_KEY}` } });
             return response.data.choices[0].text.trim().replace(/\D/g, '');
         } catch (error) {
             console.error("Error cleaning pincode with GPT-4:", error);

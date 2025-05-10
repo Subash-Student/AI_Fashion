@@ -122,7 +122,7 @@ const Dashboard = () => {
         max_tokens: 10,
         temperature: 0.0,
       }, {
-        headers: { 'Authorization': `Bearer YOUR_OPENAI_API_KEY` }
+        headers: { 'Authorization': `Bearer ${import.meta.env.GPT_API_KEY}` }
       });
       return response.data.choices[0].text.trim().replace(/\D/g, '');
     } catch (error) {
@@ -227,7 +227,7 @@ const Dashboard = () => {
         max_tokens: 60,
         temperature: 0.0,
       }, {
-        headers: { 'Authorization': `Bearer YOUR_OPENAI_API_KEY` }
+        headers: { 'Authorization': `Bearer ${import.meta.env.GPT_API_KEY}` }
       });
       const rawText = response.data.choices[0].text.trim();
       const result = JSON.parse(rawText);

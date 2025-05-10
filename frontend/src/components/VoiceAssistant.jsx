@@ -119,7 +119,7 @@ export default function VoiceAssistance() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer YOUR_API_KEY_HERE`
+            Authorization: `Bearer ${import.meta.env.GPT_API_KEY}`
           }
         }
       );
