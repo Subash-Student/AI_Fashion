@@ -1,4 +1,4 @@
-import React, { useContext,useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import Title from '../components/Title'
 import { assets } from '../assets/assets'
 import NewsletterBox from '../components/NewsletterBox'
@@ -8,21 +8,21 @@ import { FaPhoneAlt } from 'react-icons/fa'  // <-- import the phone icon
 
 const Contact = () => {
 
-  const {setPageValues} = useContext(ShopContext);
+  const { setPageValues } = useContext(ShopContext);
 
 
-  useEffect(()=>{
-   
-    
-    setPageValues({ currentPage:"contact",pageContent:""})
-    
-      },[])
+  useEffect(() => {
+
+
+    setPageValues({ currentPage: "contact", pageContent: "" })
+
+  }, [])
 
   return (
     <div>
-      
+
       <div className='text-center text-2xl pt-10 border-t'>
-          <Title text1={'CONTACT'} text2={'US'} />
+        <Title text1={'CONTACT'} text2={'US'} />
       </div>
 
       <div className='my-10 flex flex-col justify-center md:flex-row gap-10 mb-28'>
@@ -33,19 +33,16 @@ const Contact = () => {
           <p className=' text-gray-500'>Tel: (415) 555-0132 <br /> Email: admin@forever.com</p>
           <p className='font-semibold text-xl text-gray-600'>Contact Us</p>
           <p className='text-gray-500 flex items-center gap-2'>
-  <FaPhoneAlt className='text-gray-600' />
-  <a href="tel:9788306886" className='hover:underline'>
-  (+91)9788306886
-  </a>
- 
-</p>
+            <FaPhoneAlt className='text-gray-600' />
+            <a href="tel:9788306886" className='hover:underline'>
+              (+91)9788306886
+            </a>
 
-          {/* <p className=' text-gray-500'>Learn more about our teams and job openings.</p> */}
-          {/* <button className='border border-black px-8 py-4 text-sm hover:bg-black hover:text-white transition-all duration-500'>Explore Jobs</button> */}
+          </p>
+
         </div>
       </div>
 
-      {/* <NewsletterBox/> */}
     </div>
   )
 }
