@@ -86,11 +86,12 @@ export const arrayOfIntents = [
         "add_to_cart",
         "add_to_wishlist",
         "remove_from_cart",
-        "remove_from_wishlist"
+        "remove_from_wishlist",
+        "related_reviews",
       ],
       responseStructure: {
         intent: "",
-        
+        reviewAction:"read_best_reviews || read_bad_reviews || read_all_reviews",
         userAction: {
           cart: "add || remove",
           wishlist: "add || remove"

@@ -23,7 +23,8 @@ import {
   handleReadTheContent,
   
   handleMakeCall,
-  handleReset
+  handleReset,
+  handleReviews
 } from './intentHandler';
 
 import axios from "axios";
@@ -175,7 +176,7 @@ export const handleIntent = (finalResponse, contextValues) => {
     remove_from_cart: handleCart,
     add_to_wishlist: handleWishlist,
     remove_from_wishlist: handleWishlist,
-
+    read_the_reviews:handleReviews,
     // Cart Actions
     remove_from_cart_in_cartPage: handleQuantityAndRemoveFromCartPage,
     adjust_quantity: handleQuantityAndRemoveFromCartPage,

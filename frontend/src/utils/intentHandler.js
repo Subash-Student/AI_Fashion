@@ -296,11 +296,53 @@ export const handleAskDetails = async(_, { pageValues }) => {
   }
 };
 
-export const handleLogin = (response) => {
-  console.log("Handling login", response);
-  provideVoiceFeedback("Login functionality executed.");
+export const handleLogin = (response,contextValues) => {
+ 
+  const{navigate} = contextValues;
+
+  navigate("/login")
+
 };
-export const handleRegister = (response) => {
-  console.log("Handling register", response);
-  provideVoiceFeedback("Register functionality executed.");
+export const handleRegister = (response,contextValues) => {
+  const{navigate} = contextValues;
+
+  navigate("/login")
 };
+export const handleReviews = (response, contextValues) => {
+  const { pageValues, textToVoice } = contextValues;
+
+  const reviewActivity = response.reviewAction;
+  const productReviews = pageValues.values.productData.reviews;
+
+  // Step 1: Filter reviews
+  let filteredReviews = [];
+
+  if (reviewActivity === "read_best_reviews") {
+    filteredReviews = productReviews.filter(r => r.rating >= 4);
+  } else if (reviewActivity === "read_bad_reviews") {
+    filteredReviews = productReviews.filter(r => r.rating <= 2);
+  } else {
+    filteredReviews = productReviews; // "read_all_reviews"
+  }
+
+  // Step 2: Convert to human-readable sentences
+  const readableReviews = filteredReviews.map(review => {
+    const date = new Date(review.date).toLocaleDateString('en-US', {
+      year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    return `${review.userName} said: "${review.review}" on ${date}. Rating: ${review.rating} star${review.rating !== 1 ? 's' : ''}.`;
+  });
+
+  // Step 3: Join all sentences
+  const finalReviewText = readableReviews.join(" ");
+
+  // Step 4: Call textToVoice
+  if (finalReviewText) {
+    textToSpeech(finalReviewText);
+  } else {
+    textToSpeech("No reviews found based on your selection.");
+  }
+};
+
+
