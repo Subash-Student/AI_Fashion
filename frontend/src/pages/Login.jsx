@@ -4,6 +4,8 @@ import axios from 'axios';
 import { toast } from 'react-toastify';
 import { textToSpeech } from '../utils/voiceContent';
 
+
+
 const Login = () => {
   const [currentState, setCurrentState] = useState('Login');
   const { token, setToken, navigate, backendUrl } = useContext(ShopContext);
@@ -16,7 +18,7 @@ const Login = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isOTPSent, setIsOTPSent] = useState(false);
   const [isOTPVerified, setIsOTPVerified] = useState(false);
-  
+  const [pendingSubmit,setPendingSubmit] = useState(false)
   // Speech recognition state
   const [isListening, setIsListening] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -104,7 +106,11 @@ const Login = () => {
       await extractAndFillDetails(details, 'login');
     }
   };
-
+const responseStructure = {
+  name:"",
+  phone:"// 10 digits without any space",
+  password:"//without any space"
+}
   const extractAndFillDetails = async (text, action) => {
     try {
       // Call GPT API to extract structured data
@@ -112,7 +118,7 @@ const Login = () => {
         model: 'gpt-3.5-turbo',
         messages: [{
           role: 'system',
-          content: `Extract the following details from the user's speech: ${action === 'register' ? 'name, phone number, password' : 'phone number, password'}. Return as JSON.`
+          content: `Extract the following details from the user's speech: ${action === 'register' ? 'name, phoneNumber, password' : 'phoneNumber, password'}. Return as JSON structure like this ${responseStructure} .`
         }, {
           role: 'user',
           content: text
@@ -120,32 +126,41 @@ const Login = () => {
         temperature: 0.3
       }, {
         headers: {
-          'Authorization': `Bearer ${import.meta.env.GPT_API_KEY}`,
+          'Authorization': `Bearer ${import.meta.env.VITE_GPT_KEY}`,
           'Content-Type': 'application/json'
         }
       });
 
       const data = JSON.parse(response.data.choices[0].message.content);
-      
+      console.log(data)
       if (action === 'register') {
         if (data.name) setName(data.name);
-        if (data.phoneNumber) setContact(data.phoneNumber);
-        if (data.password) setPassword(data.password);
+        if (data.phoneNumber) setContact(data.phoneNumber.replaceAll(' ',''));
+        if (data.password) setPassword(data.password.replaceAll(' ',''));
       } else {
-        if (data.phoneNumber) setContact(data.phoneNumber);
-        if (data.password) setPassword(data.password);
+        if (data.phoneNumber) setContact(data.phoneNumber.replaceAll(' ',''));
+        if (data.password) setPassword(data.password.replaceAll(' ',''));
       }
 
-      // Auto-submit after a short delay
-      setTimeout(() => {
-        onSubmitHandler({ preventDefault: () => {} });
-      }, 1000);
+      setPendingSubmit(true);;
       
     } catch (error) {
       console.error('Error processing with GPT:', error);
       await speak("Sorry, I couldn't understand your details. Please try again.");
     }
   };
+
+  useEffect(() => {
+    if (pendingSubmit) {
+      const timeout = setTimeout(() => {
+        onSubmitHandler({ preventDefault: () => {} });
+        setPendingSubmit(false);
+      }, 1000); // small delay after setting state
+      return () => clearTimeout(timeout);
+    }
+  }, [pendingSubmit]); // ❌ no need to watch name/contact/password
+  
+
 
   useEffect(() => {
     if (token) {
@@ -156,11 +171,11 @@ const Login = () => {
         let message = "";
         switch(currentState) {
           case 'Sign Up':
-            message = "You are currently in registration page. What are you looking for? Login, Register, or Forgot Password?";
+            message = "You are currently in registration page. Are You Looking for Register ? or login ,forgotPassword";
             break;
           case 'Forgot Password':
             if (!isOTPSent) {
-              message = "You are currently in password recovery. What are you looking for? Login, Register, or Forgot Password?.";
+              message = "You are currently in password recovery. Are You Looking for password Recovery ? or login ,register";
             } else if (!isOTPVerified) {
               message = "Please say the OTP you received on your phone.";
             } else {
@@ -169,7 +184,7 @@ const Login = () => {
             break;
           case 'Login':
           default:
-            message = "You are currently in login page. What are you looking for? Login, Register, or Forgot Password?.";
+            message = "You are currently in login page.  Are You Looking for login ? or register ,password Recovery";
             break;
         }
         
@@ -195,14 +210,15 @@ const Login = () => {
   }, [currentState, token, isOTPSent, isOTPVerified]);
   const onSubmitHandler = async (event) => {
     event.preventDefault();
+    console.log({name,contact,password})
     try {
       if (currentState === 'Sign Up') {
         const response = await axios.post(`${backendUrl}/api/user/register`, { name, phone:contact, password });
         if (response.data.success) {
           setToken(response.data.token);
-          localStorage.setItem('token', response.data.token);
           textToSpeech("Successfully regitered");
-            setTimeout(() => {
+          setTimeout(() => {
+              localStorage.setItem('token', response.data.token);
               navigate("/")
             }, 2000);
         } else {
@@ -213,10 +229,10 @@ const Login = () => {
         const response = await axios.post(`${backendUrl}/api/user/login`, { phone:contact, password });
         if (response.data.success) {
           setToken(response.data.token);
-          localStorage.setItem('token', response.data.token);
           textToSpeech("Successfully you are logged in");
-            setTimeout(() => {
-              navigate("/")
+          setTimeout(() => {
+            localStorage.setItem('token', response.data.token);
+            navigate("/")
             }, 2000);
         } else {
           toast.error(response.data.message);
@@ -288,6 +304,34 @@ const Login = () => {
 
   // ... (rest of your existing JSX remains the same)
   return (
+    <>
+    {isListening && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-md bg-black/70">
+          <div className="relative flex flex-col items-center space-y-6">
+            <div className="relative flex items-center justify-center w-40 h-40">
+              <div className="absolute w-full h-full rounded-full bg-red-600 animate-pulse blur-sm"></div>
+              <div className="absolute w-28 h-28 rounded-full bg-red-500 animate-ping"></div>
+              <div className="relative z-10 w-20 h-20 rounded-full bg-white shadow-2xl flex items-center justify-center">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-10 w-10 text-red-500 animate-bounce"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 18v3m0 0h3m-3 0H9m6-3a3 3 0 11-6 0V6a3 3 0 116 0v12z"
+                  />
+                </svg>
+              </div>
+            </div>
+            <p className="text-white text-xl font-semibold tracking-wide animate-pulse">Listening...</p>
+          </div>
+        </div>
+      )}
     <form onSubmit={onSubmitHandler} className='flex flex-col items-center w-[90%] sm:max-w-96 m-auto mt-14 gap-4 text-gray-800'>
       <div className='inline-flex items-center gap-2 mb-2 mt-10'>
         <p className='prata-regular text-3xl'>{currentState}</p>
@@ -382,6 +426,9 @@ const Login = () => {
           : 'Reset Password'}
       </button>
     </form>
+    </>
+
+
   );
 };
 

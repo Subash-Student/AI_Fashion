@@ -52,14 +52,15 @@ export const handleNavigation = (response, { navigate }) => {
   handleNavigationAction(response.intent.split("_")[1], navigate);
 };
 
-export const handleLogout = () => {
+export const handleLogout = (response,contextValues) => {
   localStorage.removeItem("token");
+  const {setToken} = contextValues;
   setToken("");
   vibratePattern([100, 50, 100]); // Confirm logout
   provideVoiceFeedback("You have logged out successfully.");
 };
 
-const updateFilterState = (contextValues, response) => {
+const updateFilterState = ( response,contextValues) => {
   const { filters = {}, searchItemName } = response || {};
   const {
     setSearch, setShowSearch, setCategory, setSubCategory, setMaterial,
@@ -271,7 +272,7 @@ export const handleAskDetails = async(_, { pageValues }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${import.meta.env.GPT_API_KEY}`,
+        Authorization: `Bearer ${import.meta.env.VITE_GPT_KEY}`,
       },
       body: JSON.stringify({
         model: "gpt-3.5-turbo",

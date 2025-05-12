@@ -30,19 +30,21 @@ import {
 import axios from "axios";
 
 
+
 export const extractInformation = async (voiceInputText, contextValues) => {
   const { pageValues } = contextValues;
   const { currentPage } = pageValues;
-
+console.log(pageValues)
   try {
     // 1. Find page config
     const pageConfig = arrayOfIntents.find((item) => item.page === currentPage);
     if (!pageConfig) {
       return { error: `No configuration found for page: ${currentPage}` };
     }
+    console.log(pageConfig)
 
     const commonConfig = arrayOfIntents[0];
-
+console.log(commonConfig)
     const { intents, responseStructure } = pageConfig;
 
     // 2. Construct prompt for GPT-3.5 Turbo
@@ -94,7 +96,7 @@ export const extractInformation = async (voiceInputText, contextValues) => {
       {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${import.meta.env.GPT_API_KEY}`,
+          Authorization: `Bearer ${import.meta.env.VITE_GPT_KEY}`,
         },
       }
     );

@@ -47,7 +47,7 @@ const PlaceOrder = () => {
                 prompt: `Extract a 6-digit pincode from this input: "${transcript}". Please return only the 6-digit number.`,
                 max_tokens: 10,
                 temperature: 0.0,
-            }, { headers: { 'Authorization': `Bearer ${import.meta.env.GPT_API_KEY}` } });
+            }, { headers: { 'Authorization': `Bearer ${import.meta.env.VITE_GPT_KEY}` } });
             return response.data.choices[0].text.trim().replace(/\D/g, '');
         } catch (error) {
             console.error("Error cleaning pincode with GPT-4:", error);

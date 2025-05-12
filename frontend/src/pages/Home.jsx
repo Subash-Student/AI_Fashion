@@ -11,9 +11,17 @@ import Kids from '../components/Kids'
 import { ShopContext } from '../context/ShopContext'
 
 const Home = () => {
-  const {token} = useContext(ShopContext);
+  const {token,setPageValues,pageValues} = useContext(ShopContext);
 
-
+  useEffect(() => {
+    setPageValues({ currentPage: "common" });
+  }, []);
+  
+  useEffect(() => {
+    console.log("Updated pageValues in Home:", pageValues);
+    
+  }, [pageValues]);
+  
 
   return (
     <div>

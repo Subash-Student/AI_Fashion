@@ -9,7 +9,7 @@ import { getProductPageSummary, textToSpeech } from '../utils/voiceContent'
 
 const Product = () => {
   const { productId } = useParams()
-  const { currency, addToCart,user,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist } = useContext(ShopContext)
+  const { currency, addToCart,user,pageValues,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist } = useContext(ShopContext)
   const [productData, setProductData] = useState(null)
   const [image, setImage] = useState('')
   const [activeTab, setActiveTab] = useState('description')
@@ -36,17 +36,24 @@ const Product = () => {
     }
   }, [user, productData])
 
-  useEffect(()=>{
-   
-    if(productData){
+  useEffect(() => {
+    if (productData) {
       const speechText = getProductPageSummary(productData);
-    setPageValues({ currentPage:"ProductDetails", values:{ productData:productData },pageContent:speechText })
-      
-      textToSpeech(speechText);
+      setPageValues({
+        currentPage: "ProductDetails",
+        values: { productData },
+        pageContent: speechText
+      });
     }
+    // textToSpeech(speechText)
+  }, [productData]);
+  useEffect(() => {
+    console.log("Updated pageValues in Product page:", pageValues);
+  }, [pageValues]);
+  
 
-    
-      },[productData])
+
+
   return productData ? (
     <div className='border-t-2 pt-10 transition-opacity ease-in duration-500 opacity-100 relative'>
       <div className='absolute top-4 right-4 text-red-600 text-2xl cursor-pointer z-10' onClick={()=>toggleWishlist(productId)}>

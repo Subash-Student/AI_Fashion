@@ -6,6 +6,7 @@ import { ShopContext } from "../context/ShopContext";
 import { textToSpeech } from "../utils/voiceContent";
 
 
+
 export default function VoiceAssistance() {
   const contextValues = useContext(ShopContext);
   const {showMic, setShowMic} = useContext(ShopContext);
@@ -14,7 +15,7 @@ export default function VoiceAssistance() {
   const timeoutRef = useRef(null);
   const recognitionRef = useRef(null);
   const vibrationInterval = useRef(null);
-
+ 
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("Speech Recognition not supported on this browser");
@@ -119,7 +120,7 @@ export default function VoiceAssistance() {
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.GPT_API_KEY}`
+            Authorization: `Bearer ${import.meta.env.VITE_GPT_KEY}`
           }
         }
       );
@@ -130,16 +131,6 @@ export default function VoiceAssistance() {
       try {
         const result = JSON.parse(gptResponse);
         setProcessedText(result);
-  
-        if (result.is_meaningful && result.confidence_score >= 0.7) {
-          extractInformation(result.rephrased_text, contextValues);
-          toast.success("Voice analyzed and processed successfully!");
-        } else {
-          
-          textToSpeech(result.suggestion || "Please say your request more clearly.");
-          toast.warning("Voice input unclear. Suggesting improvement...");
-        }
-  
       } catch (err) {
         console.error("Invalid JSON from GPT:", gptResponse);
         toast.error("Failed to parse structured GPT response.");
@@ -149,6 +140,21 @@ export default function VoiceAssistance() {
       toast.error("Failed to process voice input.");
     }
   };
+
+  useEffect(() => {
+    if (!processedText) return;
+  
+    if (processedText.is_meaningful && processedText.confidence_score >= 0.7) {
+      if (processedText.rephrased_text) {
+        extractInformation(processedText.rephrased_text, contextValues);
+      } else {
+        textToSpeech(processedText.suggestion || "Please say your request more clearly.");
+        toast.warning("Voice input unclear. Suggesting improvement...");
+      }
+    }
+  }, [processedText, contextValues.pageValues]);
+
+
   return (
     <>
       {showMic && (
@@ -179,14 +185,14 @@ export default function VoiceAssistance() {
         </div>
       )}
 
-      {processedText && (
+      {/* {processedText && (
         <div className="fixed bottom-5 left-5 bg-white/90 p-4 rounded-xl shadow-lg w-80 text-gray-800">
           <h3 className="font-bold text-lg mb-2">Voice Analysis</h3>
           <pre className="text-sm whitespace-pre-wrap">
             {JSON.stringify(processedText, null, 2)}
           </pre>
         </div>
-      )}
+      )} */}
     </>
   );
 }
