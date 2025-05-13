@@ -196,33 +196,40 @@ const Add = ({ token }) => {
     
     const formData = new FormData();
 
-    formData.append("images",images);
+    console.log(images)
+
+    Object.values(images).forEach((imgFile) => {
+      if (imgFile) {
+        formData.append("images", imgFile); // same field name for multiple files
+      }
+    });
+
 
     try {
       
-      const response = await axios.get(backendUrl +"/api/extract-dress-info",formData,{
+      const response = await axios.post(backendUrl +"/api/gpt/extract-dress-info",formData,{
         headers:{token}
       });
-     setImages(product.image)
+    //  setImages(product.image)
       if (response.data.success) {
         const data = response.data.data;
         toast.success(response.data.message);
-        
+        console.log("response :",data)
         setProduct({
           ...product,
-          name: data.name,
+          name: data.productName,
           description: data.description,
           price: "",
           sizes: [],
           brand: data.brand,
           material: data.material,
-          fitType: data.fitType,
+          fitType: data.fit_type,
           pattern: data.pattern,
           colorOptions: data.color,
           occasion: data.occasion,
           washCare: data.washCare,
-          secondryColor:data.secondryColor,
-          sleeveType:data.sleeveType,
+          secondryColor:data.secondaryColor,
+          sleeveType:data.sleeve,
           neckType:data.neckType
         });
       } else {
@@ -235,7 +242,9 @@ const Add = ({ token }) => {
     }
 
   }
-
+useEffect(()=>{
+  console.log(product)
+},[product])
 
   return (
     <form onSubmit={onSubmitHandler} className="flex flex-col w-full items-start gap-5">
