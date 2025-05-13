@@ -134,16 +134,16 @@ export const handleChooseParticularProduct = (response, contextValues) => {
   handleProductAction(response, contextValues);
 };
 
-const handleCartAction = (contextValues, action, productId, size, quantity = 0) => {
+const handleCartAction = async(contextValues, action, productId, size, quantity = 0) => {
   const { addToCart, updateQuantity } = contextValues;
   if (action === "add") {
-    addToCart(productId, size);
+     addToCart(productId, size);
     vibratePattern([100, 50, 100]); // Cart add confirmation
     provideVoiceFeedback("Product added to the cart.");
   } else {
     updateQuantity(productId, size, quantity);
     vibratePattern([100, 50, 100]); // Cart quantity adjustment confirmation
-    provideVoiceFeedback(`Cart updated with quantity: ${quantity}.`);
+    provideVoiceFeedback(`Product remove from the cart.`);
   }
 };
 
@@ -151,14 +151,30 @@ export const handleCart = (response, contextValues) => {
   const { size, pageValues } = contextValues;
 
   const productData = pageValues?.values?.productData;
-
+  const action = response?.fields.userAction?.cart;
   if (!productData ) {
     vibratePattern([200, 100, 200]); // Error vibration
     provideVoiceFeedback("Missing product data or action.");
     return console.error("Missing product data ");
   }
+  if(!size){
+    vibratePattern([200, 100, 200]); // Error vibration
+    return provideVoiceFeedback("Please choose the size");
+  } 
+
   handleCartAction(contextValues, action, productData._id, size);
 };
+
+
+export const selectSize = (response,contextValues)=>{
+  const {setSize} = contextValues;
+
+  const size = response.fields.size;
+
+  setSize(size)
+
+}
+
 
 export const handleQuantityAndRemoveFromCartPage = (response, contextValues) => {
   const { cartData } = contextValues;
@@ -177,7 +193,7 @@ export const handleQuantityAndRemoveFromCartPage = (response, contextValues) => 
 export const handleWishlist = (response, contextValues) => {
   const { toggleWishlist, pageValues, setIsWishlisted } = contextValues;
   const product = pageValues?.values?.productData;
-  const action = response?.userAction?.wishlist;
+  const action = response?.fields.userAction?.wishlist;
 
   if (!product || !action) {
     vibratePattern([200, 100, 200]); // Error vibration

@@ -24,7 +24,8 @@ import {
   
   handleMakeCall,
   handleReset,
-  handleReviews
+  handleReviews,
+  selectSize
 } from './intentHandler';
 
 import axios from "axios";
@@ -133,7 +134,7 @@ console.log(commonConfig)
     };
 
     const finalResponse = validateFields(responseStructure, result);
-
+   console.log(result)
     // 6. Process intent action based on final response
     handleIntent(result, contextValues);
   } catch (error) {
@@ -201,7 +202,8 @@ export const handleIntent = (finalResponse, contextValues) => {
     ask_question: handleAskDetails,
     read_the_content: handleReadTheContent,
 
-    stopSpeech:stopSpeech()
+    stopSpeech:stopSpeech,
+    select_size:selectSize
   };
 
   const handler = intentHandlers[finalResponse.intent];

@@ -141,11 +141,12 @@ const ShopContextProvider = (props) => {
                
                 await axios.post(backendUrl + '/api/cart/add', { itemId, size }, { headers: { token } })
                 setIsLoading(false)
-
+              return true
             } catch (error) {
                 console.log(error)
                 toast.error(error.message)
                 textToSpeech(error.message)
+                return false
             }
         }
 

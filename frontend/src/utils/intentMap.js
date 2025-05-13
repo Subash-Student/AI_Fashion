@@ -90,10 +90,12 @@ export const arrayOfIntents = [
         "remove_from_cart",
         "remove_from_wishlist",
         "related_reviews",
+        "select_size",
       ],
       responseStructure: {
         intent: "",
         question :"",
+        size:"S || M || L || XL || XXL",
         reviewAction:"read_best_reviews || read_bad_reviews || read_all_reviews",
         userAction: {
           cart: "add || remove",
