@@ -79,7 +79,7 @@ const Product = () => {
           </div>
           <p className='pl-2'>({productData.reviews? productData.reviews.length : "122"}) Reviews</p>
           <p className='mt-5 text-3xl font-medium'>{currency}{productData.price}</p>
-          <p className='mt-5 text-gray-500 md:w-4/5'>{productData.description}</p>
+          {/* <p className='mt-5 text-gray-500 md:w-4/5'>{productData.description}</p> */}
           <div className='flex flex-col gap-4 my-8'>
             <p>Select Size</p>
             <div className='flex gap-2'>
@@ -131,8 +131,8 @@ const Product = () => {
         </div>
         {activeTab === 'description' ? (
           <div className='flex flex-col gap-4 border px-6 py-6 text-sm text-gray-500'>
-            <p>An e-commerce website is an online platform that facilitates the buying and selling of products or services over the internet. It serves as a virtual marketplace where businesses and individuals can showcase their products, interact with customers, and conduct transactions without the need for a physical presence.</p>
-            <p>E-commerce websites typically display products or services along with detailed descriptions, images, prices, and any available variations (e.g., sizes, colors). Each product usually has its own dedicated page with relevant information.</p>
+            <p>{productData.description}</p>
+            {/* <p>E-commerce websites typically display products or services along with detailed descriptions, images, prices, and any available variations (e.g., sizes, colors). Each product usually has its own dedicated page with relevant information.</p> */}
           </div>
         ) : (
           <div className='border px-6 py-6 text-sm text-gray-700 max-h-[300px] overflow-y-auto space-y-4'>
