@@ -5,6 +5,7 @@ export const arrayOfIntents = [
         "login",
         "register",
         "logout",
+        "stopSpeech",
         "navigate_home",
         "navigate_about",
         "navigate_contact",
@@ -17,6 +18,7 @@ export const arrayOfIntents = [
         "navigate_cart",
         "search_product",
         "apply_filter",
+        "read_the_content"
       ],
       responseStructure: {
         intent: "",
@@ -91,12 +93,12 @@ export const arrayOfIntents = [
       ],
       responseStructure: {
         intent: "",
+        question :"",
         reviewAction:"read_best_reviews || read_bad_reviews || read_all_reviews",
         userAction: {
           cart: "add || remove",
           wishlist: "add || remove"
         },
-        question :""
       }
     },
     {

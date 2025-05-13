@@ -149,13 +149,13 @@ const handleCartAction = (contextValues, action, productId, size, quantity = 0) 
 
 export const handleCart = (response, contextValues) => {
   const { size, pageValues } = contextValues;
-  const action = response?.userAction?.cart;
+
   const productData = pageValues?.values?.productData;
 
-  if (!productData || !action) {
+  if (!productData ) {
     vibratePattern([200, 100, 200]); // Error vibration
     provideVoiceFeedback("Missing product data or action.");
-    return console.error("Missing product data or action");
+    return console.error("Missing product data ");
   }
   handleCartAction(contextValues, action, productData._id, size);
 };
@@ -263,8 +263,12 @@ export const handleReadTheContent = (_, { pageValues }) => {
 };
 
 
-export const handleAskDetails = async(_, { pageValues }) => {
-  const { speechText, question } = { ...pageValues, ...response };
+export const handleAskDetails = async(response,contextValues) => {
+  const {pageValues} = contextValues;
+  const speechText = pageValues.pageContent;
+  const question = response.fields.question;
+  console.log(response)
+  console.log({speechText,question})
   if (!speechText || !question) return;
 
   try {

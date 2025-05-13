@@ -42,10 +42,10 @@ const Product = () => {
       setPageValues({
         currentPage: "ProductDetails",
         values: { productData },
-        pageContent: speechText
+        pageContent: speechText.text
       });
+      textToSpeech(speechText.text)
     }
-    // textToSpeech(speechText)
   }, [productData]);
   useEffect(() => {
     console.log("Updated pageValues in Product page:", pageValues);

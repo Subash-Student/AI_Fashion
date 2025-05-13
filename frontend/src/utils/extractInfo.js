@@ -28,20 +28,21 @@ import {
 } from './intentHandler';
 
 import axios from "axios";
+import { stopSpeech, textToSpeech } from "./voiceContent";
 
 
 
 export const extractInformation = async (voiceInputText, contextValues) => {
   const { pageValues } = contextValues;
   const { currentPage } = pageValues;
-console.log(pageValues)
+
   try {
     // 1. Find page config
     const pageConfig = arrayOfIntents.find((item) => item.page === currentPage);
     if (!pageConfig) {
       return { error: `No configuration found for page: ${currentPage}` };
     }
-    console.log(pageConfig)
+   
 
     const commonConfig = arrayOfIntents[0];
 console.log(commonConfig)
@@ -134,7 +135,7 @@ console.log(commonConfig)
     const finalResponse = validateFields(responseStructure, result);
 
     // 6. Process intent action based on final response
-    handleIntent(finalResponse, contextValues);
+    handleIntent(result, contextValues);
   } catch (error) {
     console.error("Error in extractInformation:", error.message);
     return { error: "Something went wrong during intent extraction." };
@@ -197,8 +198,10 @@ export const handleIntent = (finalResponse, contextValues) => {
 
     // Contact Actions
     make_call: handleMakeCall,
-    ask_details: handleAskDetails,
-    read_the_content: handleReadTheContent
+    ask_question: handleAskDetails,
+    read_the_content: handleReadTheContent,
+
+    stopSpeech:stopSpeech()
   };
 
   const handler = intentHandlers[finalResponse.intent];
@@ -207,4 +210,5 @@ export const handleIntent = (finalResponse, contextValues) => {
   }
 
   console.warn(`Unhandled intent: ${finalResponse.intent}`);
+  textToSpeech("Sorry!, you intent not match with any our website interaction")
 };

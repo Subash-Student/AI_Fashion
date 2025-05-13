@@ -1,5 +1,5 @@
 export const getProductPageSummary = (product) => {
-    console.log(product)
+
     const productName = product.name || "Product";
     const productPrice =   product.price;
     const productBrand = product.brand || "Unknown Brand";
@@ -16,11 +16,27 @@ export const getProductPageSummary = (product) => {
     const inStock = product.inStock ? "Yes" : "No";
     const returnable = product.returnable ? "Yes" : "No";
   
-    return `Welcome to the product page for ${productName}. This product is priced at ${productPrice} rupees and is from the brand ${productBrand}. It has a rating of ${productRating} stars, based on ${reviewsCount} reviews. 
-      Available sizes for this product include: ${availableSizes}. The available colors are: ${availableColors}. 
-      It is ideal for the occasion of ${occasion} and is made of ${material}. The sleeve type is ${sleeveType} and the neck type is ${neckType}. 
-      The product has a ${pattern} pattern and the wash care instructions are: ${washCare}.
-      Is it in stock? ${inStock}. You can return it? ${returnable}. We hope you enjoy your shopping experience!`;
+    const data = {
+    productPrice,
+     productBrand,
+     productRating ,
+     reviewsCount, 
+     availableSizes,
+     availableColors,
+     occasion ,
+     material, 
+     sleeveType, 
+     neckType ,
+     pattern ,
+     washCare ,
+     inStock ,
+     returnable 
+    }
+
+    return {
+        text:`Welcome to the product page for ${productName}. ${product.description}. We hope you enjoy your shopping experience!`,
+        data: data
+    }
   };
 
   export const getOrdersPageSummary = (orderData) => {
@@ -123,27 +139,32 @@ export const getCartPageSummary = (cartData, products, deliveryFee, getCartAmoun
 
 
 
+// Start speaking
 export const textToSpeech = (speechText) => {
     if (speechText) {
+      // Stop any ongoing speech before starting new one
+      window.speechSynthesis.cancel();
+  
       const speech = new SpeechSynthesisUtterance(speechText);
-      
-      // Set the speech rate (slower for clarity)
-      speech.rate = 0.9; // Slow down slightly for better understanding
-      
-      // Set the speech pitch (neutral, not too high or low)
-      speech.pitch = 1; // Neutral pitch, suitable for most listeners
-      
-      // Try to select a clear voice (male/female) if available
+  
+      // Configure settings
+      speech.rate = 0.9;
+      speech.pitch = 1;
+      speech.volume = 1;
+  
+      // Select a voice
       const voices = window.speechSynthesis.getVoices();
-      // Selecting a neutral and clear voice (first available male or female voice)
       const selectedVoice = voices.find(voice => voice.lang === 'en-US') || voices[0];
       speech.voice = selectedVoice;
-      
-      // Set the speech volume to a reasonable level (0.1 to 1.0)
-      speech.volume = 1; // Maximum volume (can adjust based on needs)
   
-      // Start speaking the text
+      // Speak the text
       window.speechSynthesis.speak(speech);
     }
-  }
+  };
+  
+  // Stop speaking
+  export const stopSpeech = () => {
+    window.speechSynthesis.cancel();
+  };
+  
   

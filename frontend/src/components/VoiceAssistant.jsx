@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { extractInformation } from "../utils/extractInfo";
 import { ShopContext } from "../context/ShopContext";
-import { textToSpeech } from "../utils/voiceContent";
+import { stopSpeech, textToSpeech } from "../utils/voiceContent";
 
 
 
@@ -77,6 +77,7 @@ export default function VoiceAssistance() {
   }, [showMic]);
 
   const startListening = () => {
+    stopSpeech()
     recognitionRef.current?.start();
   };
 
