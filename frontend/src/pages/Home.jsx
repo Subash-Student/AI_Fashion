@@ -17,10 +17,7 @@ const Home = () => {
     setPageValues({ currentPage: "common" });
   }, []);
   
-  useEffect(() => {
-    console.log("Updated pageValues in Home:", pageValues);
-    
-  }, [pageValues]);
+  
   
 
   return (

@@ -25,7 +25,8 @@ import {
   handleMakeCall,
   handleReset,
   handleReviews,
-  selectSize
+  selectSize,
+  readyToCheckOut
 } from './intentHandler';
 
 import axios from "axios";
@@ -46,7 +47,7 @@ export const extractInformation = async (voiceInputText, contextValues) => {
    
 
     const commonConfig = arrayOfIntents[0];
-console.log(commonConfig)
+console.log(pageConfig)
     const { intents, responseStructure } = pageConfig;
 
     // 2. Construct prompt for GPT-3.5 Turbo
@@ -150,19 +151,19 @@ console.log(commonConfig)
 export const handleIntent = (finalResponse, contextValues) => {
   const intentHandlers = {
     // Authentication
-    login: handleLogin,
-    register: handleRegister,
-    logout: handleLogout,
+    login: handleLogin, // WORKING
+    register: handleRegister, // WORKING
+    logout: handleLogout, // WORKING
 
     // Navigation
-    navigate_home: handleNavigation,
-    navigate_about: handleNavigation,
-    navigate_contact: handleNavigation,
-    navigate_orders: handleNavigation,
-    navigate_dashboard: handleNavigation,
-    navigate_collection: handleNavigation,
-    navigate_wishlist: handleNavigation,
-    navigate_cart: handleNavigation,
+    navigate_home: handleNavigation, // WORKING
+    navigate_about: handleNavigation, // WORKING
+    navigate_contact: handleNavigation, // WORKING
+    navigate_orders: handleNavigation, // WORKING
+    navigate_dashboard: handleNavigation, // WORKING
+    navigate_collection: handleNavigation, // WORKING
+    navigate_wishlist: handleNavigation, // WORKING
+    navigate_cart: handleNavigation, // WORKING
 
     // Search & Filters
     search_product: handleApplyFilter,
@@ -176,21 +177,22 @@ export const handleIntent = (finalResponse, contextValues) => {
     choose_particular_product: handleChooseParticularProduct,
 
     // Product Actions
-    add_to_cart: handleCart,
-    remove_from_cart: handleCart,
-    add_to_wishlist: handleWishlist,
-    remove_from_wishlist: handleWishlist,
-    read_the_reviews:handleReviews,
+    add_to_cart: handleCart, // WORKING
+    remove_from_cart: handleCart,  // WORKING
+    add_to_wishlist: handleWishlist, // WORKING
+    remove_from_wishlist: handleWishlist, // WORKING
+    related_reviews:handleReviews,  // WORKING
     // Cart Actions
-    remove_from_cart_in_cartPage: handleQuantityAndRemoveFromCartPage,
-    adjust_quantity: handleQuantityAndRemoveFromCartPage,
-
+    remove_from_cart_in_cartPage: handleQuantityAndRemoveFromCartPage, // WORKING
+    adjust_quantity: handleQuantityAndRemoveFromCartPage,  // WORKING
+    ready_to_checkOut:readyToCheckOut,  // WORKING
+    
     // Order Actions
     place_order: handlePlaceOrder,
     change_address: handleChangeShippingAddress,
-    track_order: handleTrackOrder,
-    cancel_order: handleCancelOrder,
-    review_order: handleReviewOrder,
+    track_order: handleTrackOrder,  // WORKING
+    cancel_order: handleCancelOrder, // WORKING
+    review_order: handleReviewOrder, // WORKING
 
     // Profile Actions
     change_name: handleChangeName,
@@ -198,12 +200,12 @@ export const handleIntent = (finalResponse, contextValues) => {
     update_shipping_address: handleUpdateShippingAddress,
 
     // Contact Actions
-    make_call: handleMakeCall,
+    make_call: handleMakeCall,  // WORKING
     ask_question: handleAskDetails,
-    read_the_content: handleReadTheContent,
+    read_the_content: handleReadTheContent, // WORKING
 
-    stopSpeech:stopSpeech,
-    select_size:selectSize
+    stopSpeech:stopSpeech,  // WORKING
+    select_size:selectSize, // WORKING
   };
 
   const handler = intentHandlers[finalResponse.intent];

@@ -146,6 +146,7 @@ export default function VoiceAssistance() {
     if (processedText.is_meaningful && processedText.confidence_score >= 0.7) {
       if (processedText.rephrased_text) {
         extractInformation(processedText.rephrased_text, contextValues);
+        setProcessedText(null)
       } else {
         textToSpeech(processedText.suggestion || "Please say your request more clearly.");
         toast.warning("Voice input unclear. Suggesting improvement...");

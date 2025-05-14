@@ -28,7 +28,7 @@ const Cart = () => {
       textToSpeech(speechText);
       setPageValues({ currentPage:"cart",pageContent:speechText})
 
-        },[])
+        },[cartData])
     return (
         <div className='border-t pt-14'>
             <div className='text-2xl mb-3'>

@@ -210,15 +210,15 @@ const responseStructure = {
   }, [currentState, token, isOTPSent, isOTPVerified]);
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    console.log({name,contact,password})
+    
     try {
       if (currentState === 'Sign Up') {
         const response = await axios.post(`${backendUrl}/api/user/register`, { name, phone:contact, password });
         if (response.data.success) {
-          setToken(response.data.token);
           textToSpeech("Successfully regitered");
           setTimeout(() => {
-              localStorage.setItem('token', response.data.token);
+            localStorage.setItem('token', response.data.token);
+            setToken(response.data.token);
               navigate("/")
             }, 2000);
         } else {
@@ -228,9 +228,9 @@ const responseStructure = {
       } else if (currentState === 'Login') {
         const response = await axios.post(`${backendUrl}/api/user/login`, { phone:contact, password });
         if (response.data.success) {
-          setToken(response.data.token);
           textToSpeech("Successfully you are logged in");
           setTimeout(() => {
+            setToken(response.data.token);
             localStorage.setItem('token', response.data.token);
             navigate("/")
             }, 2000);

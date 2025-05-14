@@ -3,6 +3,7 @@ import Title from '../components/Title';
 import { assets } from '../assets/assets';
 import NewsletterBox from '../components/NewsletterBox';
 import { ShopContext } from '../context/ShopContext';
+import { getAboutPageSummary, textToSpeech } from '../utils/voiceContent';
 
 const About = () => {
 
@@ -10,9 +11,12 @@ const About = () => {
 
 
     useEffect(() => {
+     
+        const speechText = getAboutPageSummary();
 
+        textToSpeech(speechText)
 
-        setPageValues({ currentPage: "about", pageContent: "" })
+        setPageValues({ currentPage: "about", pageContent: speechText })
 
     }, [])
 

@@ -1,5 +1,6 @@
 import { toast } from 'react-toastify';
 import { textToSpeech } from './voiceContent';
+import stringSimilarity from 'string-similarity';
 
 
 // Vibration Pattern Utility
@@ -53,11 +54,14 @@ export const handleNavigation = (response, { navigate }) => {
 };
 
 export const handleLogout = (response,contextValues) => {
-  localStorage.removeItem("token");
-  const {setToken} = contextValues;
-  setToken("");
-  vibratePattern([100, 50, 100]); // Confirm logout
   provideVoiceFeedback("You have logged out successfully.");
+  vibratePattern([100, 50, 100]); // Confirm logout
+  setTimeout(()=>{
+    localStorage.removeItem("token");
+    const {setToken,navigate} = contextValues;
+    setToken("");
+    navigate("/")
+  },1500)
 };
 
 const updateFilterState = ( response,contextValues) => {
@@ -178,8 +182,8 @@ export const selectSize = (response,contextValues)=>{
 
 export const handleQuantityAndRemoveFromCartPage = (response, contextValues) => {
   const { cartData } = contextValues;
-  const product = cartData[Number(response.remove_product_number) - 1];
-  const action = response.action;
+  const product = cartData[Number(response.fields.product_number_for_action) - 1];
+  const action = response.fields.action;
 
   if (!["adjust_quantity", "remove"].includes(action)) {
     vibratePattern([200, 100, 200]); // Error vibration
@@ -187,7 +191,7 @@ export const handleQuantityAndRemoveFromCartPage = (response, contextValues) => 
     return console.warn("Unknown cart action:", action);
   }
 
-  handleCartAction(contextValues, action, product._id, product.size, action === "adjust_quantity" ? response.quantity : 0);
+  handleCartAction(contextValues, action, product._id, product.size, action === "adjust_quantity" ? response.fields.quantity : 0);
 };
 
 export const handleWishlist = (response, contextValues) => {
@@ -228,21 +232,39 @@ export const handleUpdateShippingAddress = (_, { setShowPincodeModal }) => {
 };
 
 const handleOrderAction = (response, contextValues, handler) => {
-  const product = findProductByName(contextValues.orderData, response.productName);
-  product ? handler(product) : toast.error(`Product "${response.productName}" not found in your orders.`);
+  const product = findProductByName(contextValues.orderData, response.fields.productName);
+  product ? handler(product) : toast.error(`Product "${response.fields.productName}" not found in your orders.`);
 };
 
+
+const normalizeName = (name = '') =>
+  name
+    .toLowerCase()
+    .replace(/[^a-z0-9 ]/g, '') // Remove symbols
+    .replace(/\s+/g, ' ')       // Collapse spaces
+    .trim();
+
 const findProductByName = (orderData, name) => {
-  const lowerName = name.trim().toLowerCase();
-  let match = orderData.find(item => item?.name?.trim().toLowerCase() === lowerName);
-  
-  if (!match) {
-    const fuzzyMatches = orderData.filter(item => item?.name?.toLowerCase().includes(lowerName));
-    if (fuzzyMatches.length === 1) match = fuzzyMatches[0];
-    else if (fuzzyMatches.length > 1) toast.warn(`Multiple products matched "${name}". Please be more specific.`);
+  const normalizedInput = normalizeName(name);
+  const productNames = orderData.map(item => normalizeName(item.name));
+
+  const matches = stringSimilarity.findBestMatch(normalizedInput, productNames);
+  const bestMatch = matches.bestMatch;
+
+  // If similarity is above 0.8 (i.e. 80%), accept the match
+  if (bestMatch.rating >= 0.8) {
+    const index = matches.bestMatchIndex;
+    return orderData[index];
+  } else if (bestMatch.rating >= 0.6) {
+    toast.warn(`Closest match is "${orderData[matches.bestMatchIndex].name}" (low confidence).`);
+    return orderData[matches.bestMatchIndex];
+  } else {
+    toast.error(`No good match found for "${name}".`);
+    return null;
   }
-  return match;
 };
+
+
 
 export const handleTrackOrder = (response, contextValues) => handleOrderAction(response, contextValues, p => contextValues.handleTrackOrder(p.status));
 export const handleCancelOrder = (response, contextValues) => handleOrderAction(response, contextValues, contextValues.handleCancelOrder);
@@ -367,3 +389,12 @@ export const handleReviews = (response, contextValues) => {
 };
 
 
+export const readyToCheckOut = (response,contextValues)=>{
+
+  const {navigate} = contextValues;
+
+ textToSpeech("Yeah sure, Thanks for Your comfirmation");
+ setTimeout(()=>{
+   navigate('/place-order')
+ },2000)
+}

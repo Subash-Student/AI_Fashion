@@ -4,6 +4,7 @@ import { assets } from '../assets/assets'
 import NewsletterBox from '../components/NewsletterBox'
 import { ShopContext } from '../context/ShopContext'
 import { FaPhoneAlt } from 'react-icons/fa'  // <-- import the phone icon
+import { getContactPageSummary, textToSpeech } from '../utils/voiceContent'
 
 
 const Contact = () => {
@@ -12,9 +13,12 @@ const Contact = () => {
 
 
   useEffect(() => {
+ 
+    const speechText = getContactPageSummary();
 
+    textToSpeech(speechText)
 
-    setPageValues({ currentPage: "contact", pageContent: "" })
+    setPageValues({ currentPage: "contact", pageContent: speechText })
 
   }, [])
 
@@ -30,13 +34,17 @@ const Contact = () => {
         <div className='flex flex-col justify-center items-start gap-6'>
           <p className='font-semibold text-xl text-gray-600'>Our Store</p>
           <p className=' text-gray-500'>54709 Willms Station <br /> Suite 350, Washington, USA</p>
-          <p className=' text-gray-500'>Tel: (415) 555-0132 <br /> Email: admin@forever.com</p>
+          <p className=' text-gray-500'>Tel: 9788306886 <br /> Email: admin@forever.com</p>
           <p className='font-semibold text-xl text-gray-600'>Contact Us</p>
           <p className='text-gray-500 flex items-center gap-2'>
-            <FaPhoneAlt className='text-gray-600' />
-            <a href="tel:9788306886" className='hover:underline'>
-              (+91)9788306886
-            </a>
+          <button
+  onClick={() => window.location.href = 'tel:9788306886'}
+  className='flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition'
+>
+  <FaPhoneAlt className='text-white' />
+  Call Now
+</button>
+
 
           </p>
 

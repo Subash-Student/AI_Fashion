@@ -20,6 +20,8 @@ export const arrayOfIntents = [
         "apply_filter",
         "read_the_content",
         "ask_question",
+        "make_call",
+
 
       ],
       responseStructure: {
@@ -111,12 +113,13 @@ export const arrayOfIntents = [
         "remove_from_cart_in_cartPage",
         "ask_question",
         "adjust_quantity",
+        "ready_to_checkOut"
       ],
       responseStructure: {
         intent: "",
         action:"remove || adjust_quantity",
         adjust_quantity: "increment || decrement",
-        remove_product_number:"1,2,3,4,5,...",
+        product_number_for_action:"1,2,3,4,5,...",
         quantity:"1,2,3,4,5,...",
         question :""
       }

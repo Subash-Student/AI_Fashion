@@ -136,7 +136,12 @@ export const getCartPageSummary = (cartData, products, deliveryFee, getCartAmoun
 
 
 
-
+export const getContactPageSummary = ()=>{
+    return "Welcome to our Contact Page! You can find us at 54709 Willms Station, Suite 350, Washington, USA. If you need any help or have questions, feel free to call us at 415-555-0132 or email us at admin@forever.com. For direct assistance in India, you can also reach us at +91 97883 06886. We're always here to help!"
+}
+export const getAboutPageSummary = ()=>{
+    return "Welcome to FeelWays! We’re a fashion platform built with heart and innovation—designed especially to empower visually impaired individuals. Our goal is simple: to make online shopping more inclusive through voice-powered and AI-driven technology.From stylish dresses to smart, accessible experiences, everything we do is centered around ease, independence, and confidence. At FeelWays, we believe everyone deserves to shop with freedom—guided by voice, supported by AI, and delivered with care.We promise top-quality products, a smooth shopping experience, and exceptional support—every step of the way."
+}
 
 
 // Start speaking
