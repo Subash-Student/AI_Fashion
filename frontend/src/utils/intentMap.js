@@ -120,6 +120,7 @@ export const arrayOfIntents = [
         action:"remove || adjust_quantity",
         adjust_quantity: "increment || decrement",
         product_number_for_action:"1,2,3,4,5,...",
+        // productName:"",
         quantity:"1,2,3,4,5,...",
         question :""
       }

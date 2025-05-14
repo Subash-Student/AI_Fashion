@@ -182,7 +182,8 @@ export const selectSize = (response,contextValues)=>{
 
 export const handleQuantityAndRemoveFromCartPage = (response, contextValues) => {
   const { cartData } = contextValues;
-  const product = cartData[Number(response.fields.product_number_for_action) - 1];
+  // const product = findProductByName(cartData,response.fields.productName)
+  const product = cartData[Number(response.fields.product_number_for_action) - 1]; 
   const action = response.fields.action;
 
   if (!["adjust_quantity", "remove"].includes(action)) {
@@ -220,9 +221,12 @@ export const handlePlaceOrder = () => {
 const toggleModal = (setter) => setter(true);
 
 export const handleChangeShippingAddress = (_, { setShowPincodeModal }) => {
-  toggleModal(setShowPincodeModal);
   vibratePattern([100, 50, 100]); // Shipping address change feedback
   provideVoiceFeedback("Changing shipping address.");
+  setTimeout(()=>{
+    toggleModal(setShowPincodeModal);
+
+  },1500);
 };
 
 export const handleUpdateShippingAddress = (_, { setShowPincodeModal }) => {

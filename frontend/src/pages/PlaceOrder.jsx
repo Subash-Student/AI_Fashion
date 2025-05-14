@@ -8,7 +8,7 @@ import { getPlaceOrderPageSummary, textToSpeech } from '../utils/voiceContent';
 
 const PlaceOrder = () => {
     const [method, setMethod] = useState('cod');
-    const { navigate, user, showPincodeModal,showMic, setShowMic, setShowPincodeModal,setPageValues, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
+    const { navigate, user, showPincodeModal,showMic, setShowMic,loadOrderData, setShowPincodeModal,setPageValues, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
     const [pincode, setPincode] = useState(Array(6).fill(""));
     const [address, setAddress] = useState(user.address);
 
@@ -34,7 +34,7 @@ const PlaceOrder = () => {
             const cleanedPincode = await cleanPincode(event.results[0][0].transcript);
             if (cleanedPincode.length === 6) {
                 setPincode(cleanedPincode.split(''));
-                await fetchAddressFromPincode(cleanedPincode);
+                await fetchAddressFromPincode(cleanedPincode,true);
             } else toast.error("Please say a valid 6-digit pincode");textToSpeech("Please say a valid 6-digit pincode")
         };
         recognition.onerror = (event) => { clearTimeout(stopTimer); recognition.stop(); toast.error("Error recognizing voice input"); console.log(event.error); };
@@ -42,26 +42,44 @@ const PlaceOrder = () => {
 
     const cleanPincode = async (transcript) => {
         try {
-            const response = await axios.post('https://api.openai.com/v1/chat/completions', {
-                model: 'gpt-3.5-turbo',
-                prompt: `Extract a 6-digit pincode from this input: "${transcript}". Please return only the 6-digit number.`,
-                max_tokens: 10,
-                temperature: 0.0,
-            }, { headers: { 'Authorization': `Bearer ${import.meta.env.VITE_GPT_KEY}` } });
-            return response.data.choices[0].text.trim().replace(/\D/g, '');
+            const response = await axios.post(
+                'https://api.openai.com/v1/chat/completions',
+                {
+                    model: 'gpt-3.5-turbo',
+                    messages: [
+                        {
+                            role: 'user',
+                            content: `Extract a 6-digit pincode from this input: "${transcript}". Please return only the 6-digit number.`,
+                        },
+                    ],
+                    max_tokens: 10,
+                    temperature: 0.0,
+                },
+                {
+                    headers: {
+                        'Authorization': `Bearer ${import.meta.env.VITE_GPT_KEY}`,
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
+    
+            return response.data.choices[0].message.content.trim().replace(/\D/g, '');
         } catch (error) {
-            console.error("Error cleaning pincode with GPT-4:", error);
+            console.error("Error cleaning pincode with GPT:", error);
             toast.error("Error cleaning pincode. Please try again.");
-            textToSpeech("Error cleaning pincode. Please try again.")
+            textToSpeech("Error cleaning pincode. Please try again.");
             return '';
         }
     };
+    
 
-    const fetchAddressFromPincode = async () => {
+    const fetchAddressFromPincode = async (cleanedPin,isVoice) => {
         const pin = pincode.join("");
-        if (pin.length === 6) {
+        console.log({pin,cleanedPin})
+
+        if (pin.length === 6 || cleanedPin.length === 6) {
             try {
-                const res = await axios.get(`https://api.postalpincode.in/pincode/${pin}`);
+                const res = await axios.get(`https://api.postalpincode.in/pincode/${!isVoice ? pin : cleanedPin}`);
                 const data = res.data[0];
                 if (data.Status === "Success") {
                     const postOffice = data.PostOffice[0];
@@ -95,9 +113,19 @@ const PlaceOrder = () => {
             if (method === 'cod') {
                 const response = await axios.post(`${backendUrl}/api/order/place`, orderData, { headers: { token } });
                 if (response.data.success) {
-                    setCartItems({}); navigate('/orders');
-                    textToSpeech("your order successfully placed")
-                } else toast.error(response.data.message); textToSpeech(response.data.message)
+                    textToSpeech("Your order was successfully placed");
+                    loadOrderData();
+                    setTimeout(() => {
+                        navigate('/orders');
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 500); // Delay to ensure navigation happens before reload
+                    }, 2000); // Adjust the delay based on TTS duration
+                } else {
+                    toast.error(response.data.message);
+                    textToSpeech(response.data.message);
+                }
+                
             }
         } catch (error) {
             console.log(error);

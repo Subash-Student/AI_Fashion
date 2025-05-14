@@ -188,8 +188,8 @@ export const handleIntent = (finalResponse, contextValues) => {
     ready_to_checkOut:readyToCheckOut,  // WORKING
     
     // Order Actions
-    place_order: handlePlaceOrder,
-    change_address: handleChangeShippingAddress,
+    place_order: handlePlaceOrder, // WORKING
+    change_shipping_address: handleChangeShippingAddress, // WORKING
     track_order: handleTrackOrder,  // WORKING
     cancel_order: handleCancelOrder, // WORKING
     review_order: handleReviewOrder, // WORKING
