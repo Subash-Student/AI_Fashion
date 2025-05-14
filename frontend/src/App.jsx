@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Home from './pages/Home'
 import Collection from './pages/Collection'
@@ -20,11 +20,25 @@ import ProtectRoute from './utils/ProtectRoute'
 import { ShopContext } from './context/ShopContext'
 import Loader from './components/Loader'
 import VoiceAssistant from './components/VoiceAssistant'
+import { stopSpeech } from './utils/voiceContent'
 
 const App = () => {
 
   const {isLoading} = useContext(ShopContext)
-
+  useEffect(() => {
+    const handleDoubleClick = () => {
+      stopSpeech(); 
+      console.log("🛑 Speech stopped due to double-click"); 
+    };
+  
+    document.addEventListener("dblclick", handleDoubleClick);
+  
+    // Cleanup
+    return () => {
+      document.removeEventListener("dblclick", handleDoubleClick);
+    };
+  }, []);
+  
   return (
     <div className='px-4 sm:px-[5vw] md:px-[7vw] lg:px-[9vw]'>
       <ToastContainer />

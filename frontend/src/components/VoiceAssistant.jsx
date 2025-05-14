@@ -104,10 +104,8 @@ export default function VoiceAssistance() {
     "is_meaningful": <true | false>,
     "rephrased_text": "<cleaned and clear version of the user's input>",
     "intent": "<intent such as 'search_product', 'add_to_cart', 'checkout', or 'invalid_input'>",
-    "reason": "<brief explanation>",
     "suggestion": "<what the user should say or clarify>",
     "confidence_score": <number between 0 and 1>,
-    "action_required": ["<action1>", "<action2>"]
   }
   
   Voice Input:
@@ -152,8 +150,20 @@ export default function VoiceAssistance() {
         textToSpeech(processedText.suggestion || "Please say your request more clearly.");
         toast.warning("Voice input unclear. Suggesting improvement...");
       }
+    } else if (processedText.intent === "invalid_input") {
+      // Handle invalid input case
+      const suggestion = processedText.suggestion || "I didn't understand that. Please try again.";
+      setTimeout(() => {
+        textToSpeech(suggestion);
+      }, 500);
+      toast.warning(suggestion);
+    } else {
+      // Handle other low-confidence cases
+      const fallbackMessage = "Sorry, I didn't get that. Could you please repeat?";
+      textToSpeech(fallbackMessage);
+      toast.warning(fallbackMessage);
     }
-  }, [processedText, contextValues.pageValues]);
+  }, [processedText]);
 
 
   return (

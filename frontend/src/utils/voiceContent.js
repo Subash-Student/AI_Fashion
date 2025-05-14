@@ -141,30 +141,97 @@ export const getCartPageSummary = (cartData, products, deliveryFee, getCartAmoun
 
 // Start speaking
 export const textToSpeech = (speechText) => {
-    if (speechText) {
-      // Stop any ongoing speech before starting new one
-      window.speechSynthesis.cancel();
+    if (!speechText) return;
+    
+    // Stop any ongoing speech before starting new one
+    window.speechSynthesis.cancel();
   
-      const speech = new SpeechSynthesisUtterance(speechText);
+    const speech = new SpeechSynthesisUtterance(speechText);
   
-      // Configure settings
-      speech.rate = 0.9;
-      speech.pitch = 1;
-      speech.volume = 1;
-  
-      // Select a voice
+    // More natural sounding settings
+    speech.rate = 1.0; // Slightly faster than default (1.0 is normal speed)
+    speech.pitch = 0.9; // Slightly lower pitch sounds more natural
+    speech.volume = 1;
+    
+    // Wait for voices to be loaded
+    const loadVoices = new Promise(resolve => {
       const voices = window.speechSynthesis.getVoices();
-      const selectedVoice = voices.find(voice => voice.lang === 'en-US') || voices[0];
-      speech.voice = selectedVoice;
+      if (voices.length) {
+        resolve(voices);
+      } else {
+        window.speechSynthesis.onvoiceschanged = () => {
+          resolve(window.speechSynthesis.getVoices());
+        };
+      }
+    });
+  
+    loadVoices.then(voices => {
+      // Prefer voices that are marked as "natural" sounding
+      const naturalVoices = voices.filter(voice => 
+        voice.name.includes('Natural') || 
+        voice.name.includes('Premium') ||
+        voice.name.includes('Neural')
+      );
+      
+      // Select the best available voice
+      const selectedVoice = naturalVoices.find(voice => voice.lang === 'en-US') || 
+                           voices.find(voice => voice.lang === 'en-US') || 
+                           voices[0];
+      
+      if (selectedVoice) {
+        speech.voice = selectedVoice;
+      }
+      
+      // Add slight pauses between sentences for more natural rhythm
+      speech.text = speechText.replace(/\. /g, '. ');
   
       // Speak the text
       window.speechSynthesis.speak(speech);
-    }
+    });
   };
+  
   
   // Stop speaking
   export const stopSpeech = () => {
     window.speechSynthesis.cancel();
   };
   
-  
+let currentAudio;
+
+// export const stopSpeech = () => {
+//   if (currentAudio) {
+//     currentAudio.pause();
+//     currentAudio.currentTime = 0;
+//   }
+// };
+
+// export const textToSpeech = async (speechText) => {
+//   if (!speechText) return;
+
+//   try {
+//     const response = await fetch("https://api.openai.com/v1/audio/speech", {
+//       method: "POST",
+//       headers: {
+//         "Authorization": `Bearer ${import.meta.env.VITE_GPT_KEY}`,
+//         "Content-Type": "application/json"
+//       },
+//       body: JSON.stringify({
+//         model: "tts-1",
+//         input: speechText,
+//         voice: "echo"
+//       })
+//     });
+
+//     if (!response.ok) {
+//       console.error("OpenAI TTS Error", await response.json());
+//       return;
+//     }
+
+//     const audioBlob = await response.blob();
+//     const audioUrl = URL.createObjectURL(audioBlob);
+//     currentAudio = new Audio(audioUrl);
+//     currentAudio.play();
+//   } catch (error) {
+//     console.error("OpenAI TTS Failed:", error);
+//   }
+// };

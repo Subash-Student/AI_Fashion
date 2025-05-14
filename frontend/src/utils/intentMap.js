@@ -18,7 +18,9 @@ export const arrayOfIntents = [
         "navigate_cart",
         "search_product",
         "apply_filter",
-        "read_the_content"
+        "read_the_content",
+        "ask_question",
+
       ],
       responseStructure: {
         intent: "",
