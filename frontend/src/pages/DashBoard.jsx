@@ -14,30 +14,33 @@ const sections = [
 ];
 
 const Dashboard = () => {
-  const { user, token,setPageValues,showMic, setShowMic, orderData, getUserData, setIsWishlisted, isWishlisted, loadOrderData, showModal, setShowModal } = useContext(ShopContext);
+
+ 
+  const { user, token,setPageValues,showPincodeModal, setShowPincodeModal,showMic, setShowMic, orderData, getUserData, setIsWishlisted, isWishlisted, loadOrderData, showModal, setShowModal } = useContext(ShopContext);
   const [allUserData, setAllUserData] = useState({ profile: user, orders: orderData });
-  const [showPincodeModal, setShowPincodeModal] = useState(false);
+  
   const [formData, setFormData] = useState({ name: allUserData.profile.name, phone: allUserData.profile.phone });
   const [pincode, setPincode] = useState(Array(6).fill(""));
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    getUserData();
+    getUserData(token);
     loadOrderData();
   }, []);
 
   const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value });
 
-  const handleSave = async (e) => {
-    e.preventDefault();
+  const handleSave = async (data) => {
+    
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:4000/api/user/edit", { ...formData }, { headers: { token } });
+      const res = await axios.post("http://localhost:4000/api/user/edit", { ...data }, { headers: { token } });
       if (res.data.success) {
         toast.success("Profile updated successfully!");
+        getUserData(token)
         textToSpeech("Profile updated successfully!");
-        setAllUserData((prev) => ({ ...prev, profile: { ...formData } }));
-        setTimeout(() => setShowModal(false), 1000);
+        setAllUserData((prev) => ({ ...prev, profile: { ...data } }));
+        // setTimeout(() => setShowModal(false), 2000);
       } else {
         toast.error(res.data.message || "Update failed");
         textToSpeech(res.data.message || "Update failed");
@@ -82,6 +85,7 @@ const Dashboard = () => {
   };
 
   const startListening = () => {
+    setShowMic(true)
     const recognition = new window.webkitSpeechRecognition();
     recognition.lang = "en-US";
     recognition.interimResults = false;
@@ -95,6 +99,8 @@ const Dashboard = () => {
     recognition.onresult = async (event) => {
       clearTimeout(stopTimer);
       const transcript = event.results[0][0].transcript;
+      setShowMic(false)
+
       const cleanedPincode = await cleanPincode(transcript);
       if (cleanedPincode.length === 6) {
         setPincode(cleanedPincode.split(''));
@@ -118,61 +124,96 @@ const Dashboard = () => {
     try {
       const response = await axios.post('https://api.openai.com/v1/chat/completions', {
         model: 'gpt-3.5-turbo',
-        prompt: `Extract a 6-digit pincode from this input: "${transcript}". Please return only the 6-digit number.`,
+        messages: [
+          {
+            role: 'user',
+            content: `Extract a 6-digit pincode from this input: "${transcript}". Please return only the 6-digit number.`
+          }
+        ],
         max_tokens: 10,
         temperature: 0.0,
       }, {
-        headers: { 'Authorization': `Bearer ${import.meta.env.VITE_GPT_KEY}` }
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_GPT_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
-      return response.data.choices[0].text.trim().replace(/\D/g, '');
+  
+      return response.data.choices[0].message.content.trim().replace(/\D/g, '');
+  
     } catch (error) {
-      console.error("Error cleaning pincode with GPT-4:", error);
+      console.error("Error cleaning pincode with GPT:", error.response?.data || error.message);
       toast.error("Error cleaning pincode. Please try again.");
       textToSpeech("Error cleaning pincode. Please try again.");
       return '';
     }
   };
+  
 
-  const fetchAddressFromPincode = async () => {
-    const pin = pincode.join("");
-    if (pin.length === 6) {
-      try {
-        const res = await axios.get(`https://api.postalpincode.in/pincode/${pin}`);
-        const data = res.data[0];
-        if (data.Status === "Success") {
-          const postOffice = data.PostOffice[0];
-          const fullAddress = `${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${pin}`;
-          const updateRes = await axios.post("http://localhost:4000/api/user/edit-address", { address: fullAddress }, { headers: { token } });
-          if (updateRes.data.success) {
-            toast.success("Address updated successfully!");
-            textToSpeech("Address updated successfully!");
-            setAllUserData((prev) => ({ ...prev, profile: { ...prev.profile, address: fullAddress } }));
-            setShowPincodeModal(false);
-          } else {
-            toast.error("Failed to update address");
-            textToSpeech("Failed to update address");
-          }
-        } else {
-          toast.error("Invalid pincode");
-          textToSpeech("Invalid pincode");
-        }
-      } catch (err) {
-        toast.error("Error fetching address");
-        textToSpeech("Error fetching address");
-        console.error(err);
-      }
-    } else {
+  const fetchAddressFromPincode = async (pincode) => {
+    
+    let searchPIN;
+
+    if(pincode.length === 6){
+      searchPIN = pincode
+    }else{
+      searchPIN = pincode.join("");
+    }
+     
+
+    
+    if (searchPIN.length !== 6 || !/^\d{6}$/.test(searchPIN)) {
       toast.warn("Enter a valid 6-digit pincode");
       textToSpeech("Enter a valid 6-digit pincode");
+      return;
+    }
+  
+    try {
+      const res = await axios.get(`https://api.postalpincode.in/pincode/${searchPIN}`);
+      const data = res.data[0];
+  
+      if (data.Status === "Success" && data.PostOffice?.length > 0) {
+        const postOffice = data.PostOffice[0];
+        const fullAddress = `${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${searchPIN}`;
+  
+        const updateRes = await axios.post(
+          "http://localhost:4000/api/user/edit-address",
+          { address: fullAddress },
+          { headers: { token } }
+        );
+  
+        if (updateRes.data.success) {
+          toast.success("Address updated successfully!");
+          textToSpeech("Address updated successfully!");
+          setAllUserData((prev) => ({
+            ...prev,
+            profile: { ...prev.profile, address: fullAddress }
+          }));
+          setShowPincodeModal(false);
+        } else {
+          toast.error("Failed to update address");
+          textToSpeech("Failed to update address");
+        }
+  
+      } else {
+        toast.error("Invalid pincode or no address found");
+        textToSpeech("Invalid pincode or no address found");
+      }
+  
+    } catch (err) {
+      console.error("API Error:", err);
+      toast.error("Error fetching address");
+      textToSpeech("Error fetching address");
     }
   };
+  
 
   useEffect(() => {
     if (showModal) handleVoiceInputForNameAndPhone();
   }, [showModal]);
 
   const handleVoiceInputForNameAndPhone = () => {
-    const utterance = new SpeechSynthesisUtterance("Say your name and phone number like my name is John Doe and my number is 9876543210");
+    const utterance = new SpeechSynthesisUtterance("Say your name and phone number");
     utterance.rate = 0.8; 
     utterance.pitch = 1; 
     utterance.voice = speechSynthesis.getVoices().find(voice => voice.lang === "en-US");
@@ -190,8 +231,8 @@ const Dashboard = () => {
     recognition.start();
     const stopTimer = setTimeout(() => {
       recognition.stop();
-      console.log("Mic turned off after 5 seconds");
-    }, 5000);
+      console.log("Mic turned off after 7 seconds");
+    }, 7000);
 
     recognition.onresult = async (event) => {
       clearTimeout(stopTimer);
@@ -201,7 +242,7 @@ const Dashboard = () => {
       const cleanedData = await extractNameAndPhone(transcript);
       if (cleanedData) {
         setFormData(cleanedData);
-        await handleSave();
+        await handleSave(cleanedData);
       } else {
         toast.error("Please say a name and phone number");
         textToSpeech("Please say a name and phone number");
@@ -223,22 +264,37 @@ const Dashboard = () => {
     try {
       const response = await axios.post('https://api.openai.com/v1/chat/completions', {
         model: 'gpt-3.5-turbo',
-        prompt: `Extract the full name and 10-digit phone number from this sentence: "${transcript}". Return the result strictly in JSON format like this: {"name": "Full Name", "phone": "1234567890"}.`,
+        messages: [
+          {
+            role: 'user',
+            content: `Extract the full name and 10-digit phone number from this sentence: "${transcript}". Return the result strictly in JSON format like this: {"name": "Full Name", "phone": "1234567890"}.
+            and validate the name(only alphaphat) and phone number(only 10 digits) and if one of two fields failedd in validation then replace with this data ${allUserData.profile.name,allUserData.profile.phone}`
+          }
+        ],
         max_tokens: 60,
         temperature: 0.0,
       }, {
-        headers: { 'Authorization': `Bearer ${import.meta.env.VITE_GPT_KEY}` }
+        headers: {
+          'Authorization': `Bearer ${import.meta.env.VITE_GPT_KEY}`,
+          'Content-Type': 'application/json'
+        }
       });
-      const rawText = response.data.choices[0].text.trim();
+  
+      const rawText = response.data.choices[0].message.content.trim();
       const result = JSON.parse(rawText);
-      return { name: result.name || '', phone: result.phone || '' };
+      return {
+        name: result.name || '',
+        phone: result.phone || ''
+      };
+  
     } catch (error) {
-      console.error("Error extracting name and phone with GPT:", error);
+      console.error("Error extracting name and phone with GPT:", error.response?.data || error.message);
       toast.error("Failed to extract name and phone.");
       textToSpeech("Failed to extract name and phone.");
       return { name: '', phone: '' };
     }
   };
+  
   useEffect(()=>{
    
     const speechText = getDashboardPageSummary(allUserData);
@@ -325,7 +381,7 @@ const Dashboard = () => {
             <input type="text" name="phone" value={formData.phone} onChange={handleChange} placeholder="Phone" className="w-full mb-3 px-3 py-2 border rounded" />
             <div className="flex justify-end gap-3">
               <button onClick={() => setShowModal(false)} className="px-4 py-2 bg-gray-300 text-gray-800 rounded">Cancel</button>
-              <button onClick={handleSave} disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{loading ? "Saving..." : "Save"}</button>
+              <button onClick={()=>handleSave(formData)} disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">{loading ? "Saving..." : "Save"}</button>
             </div>
           </div>
         </div>

@@ -195,8 +195,8 @@ export const handleIntent = (finalResponse, contextValues) => {
     review_order: handleReviewOrder, // WORKING
 
     // Profile Actions
-    change_name: handleChangeName,
-    change_phone_number: handleChangePhoneNumber,
+    change_name: handleChangeName,  // WORKING
+    change_phone_number: handleChangePhoneNumber,  // WORKING
     update_shipping_address: handleUpdateShippingAddress,
 
     // Contact Actions

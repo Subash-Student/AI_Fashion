@@ -235,6 +235,20 @@ export const handleUpdateShippingAddress = (_, { setShowPincodeModal }) => {
   provideVoiceFeedback("Updating shipping address.");
 };
 
+export const handleChangeName = (_, { setShowModal }) => {
+  toggleModal(setShowModal);
+  vibratePattern([100, 50, 100]); // Name change feedback
+  provideVoiceFeedback("Changing name.");
+};
+
+export const handleChangePhoneNumber = (_, { setShowModal }) => {
+  toggleModal(setShowModal);
+  vibratePattern([100, 50, 100]); // Phone number change feedback
+  provideVoiceFeedback("Changing phone number.");
+};
+
+
+
 const handleOrderAction = (response, contextValues, handler) => {
   const product = findProductByName(contextValues.orderData, response.fields.productName);
   product ? handler(product) : toast.error(`Product "${response.fields.productName}" not found in your orders.`);
@@ -275,17 +289,6 @@ export const handleCancelOrder = (response, contextValues) => handleOrderAction(
 export const handleReviewOrder = (response, contextValues) => handleOrderAction(response, contextValues, p => contextValues.handleOpenReview(p._id));
 
 
-export const handleChangeName = (_, { setShowModel }) => {
-  toggleModal(setShowModel);
-  vibratePattern([100, 50, 100]); // Name change feedback
-  provideVoiceFeedback("Changing name.");
-};
-
-export const handleChangePhoneNumber = (_, { setShowModel }) => {
-  toggleModal(setShowModel);
-  vibratePattern([100, 50, 100]); // Phone number change feedback
-  provideVoiceFeedback("Changing phone number.");
-};
 
 export const handleMakeCall = () => {
   const phone = "9788306886";
