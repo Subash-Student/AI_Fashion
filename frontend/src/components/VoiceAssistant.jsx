@@ -5,15 +5,17 @@ import { extractInformation } from "../utils/extractInfo";
 import { ShopContext } from "../context/ShopContext";
 import { stopSpeech, textToSpeech } from "../utils/voiceContent";
 
+
+
 export default function VoiceAssistance() {
   const contextValues = useContext(ShopContext);
-  const { showMic, setShowMic } = useContext(ShopContext);
+  const {showMic, setShowMic} = useContext(ShopContext);
   const [voiceText, setVoiceText] = useState("");
   const [processedText, setProcessedText] = useState(null);
   const timeoutRef = useRef(null);
   const recognitionRef = useRef(null);
   const vibrationInterval = useRef(null);
-
+ 
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("Speech Recognition not supported on this browser");
@@ -36,18 +38,6 @@ export default function VoiceAssistance() {
       console.error("Speech Recognition Error:", event.error);
     };
 
-    recognition.onstart = () => {
-      console.log("Recognition started ✅");
-    };
-
-    recognition.onend = () => {
-      console.log("Recognition stopped 🛑");
-    };
-
-    recognition.onaudioend = () => {
-      console.log("Audio ended 🛑");
-    };
-
     recognitionRef.current = recognition;
   }, []);
 
@@ -56,10 +46,11 @@ export default function VoiceAssistance() {
       timeoutRef.current = setTimeout(() => {
         setShowMic(true);
         startListening();
+        navigator.vibrate?.([100, 50, 100]);
         vibrationInterval.current = setInterval(() => {
           navigator.vibrate?.([200]);
         }, 1000);
-      }, 4000);
+      }, 5000);
     };
 
     const handleRelease = () => {
@@ -86,16 +77,8 @@ export default function VoiceAssistance() {
   }, [showMic]);
 
   const startListening = () => {
-    try {
-      stopSpeech();
-      recognitionRef.current?.abort(); // Ensures it's not already running
-      recognitionRef.current?.start(); // Safe fresh start
-
-      textToSpeech("Your mic is on");
-      navigator.vibrate?.([100, 50, 100]); // One-time feedback
-    } catch (error) {
-      console.error("Error starting recognition:", error);
-    }
+    stopSpeech()
+    recognitionRef.current?.start();
   };
 
   const stopListening = () => {
@@ -111,39 +94,39 @@ export default function VoiceAssistance() {
           messages: [
             {
               role: "system",
-              content: `You are a smart assistant helping an e-commerce platform for blind users. Your job is to analyze voice inputs from users and return a structured response.`,
+              content: `You are a smart assistant helping an e-commerce platform for blind users. Your job is to analyze voice inputs from users and return a structured response.`
             },
             {
               role: "user",
               content: `Please analyze and respond in the following JSON format:
-
-{
-  "is_meaningful": <true | false>,
-  "rephrased_text": "<cleaned and clear version of the user's input>",
-  "intent": "<intent such as 'search_product', 'add_to_cart', 'checkout', or 'invalid_input'>",
-  "suggestion": "<what the user should say or clarify>",
-  "confidence_score": <number between 0 and 1>
-}
-
-Voice Input:
-"""${text}"""
-`,
-            },
+  
+  {
+    "is_meaningful": <true | false>,
+    "rephrased_text": "<cleaned and clear version of the user's input>",
+    "intent": "<intent such as 'search_product', 'add_to_cart', 'checkout', or 'invalid_input'>",
+    "suggestion": "<what the user should say or clarify>",
+    "confidence_score": <number between 0 and 1>,
+  }
+  
+  Voice Input:
+  """${text}"""
+  `
+            }
           ],
           temperature: 0.5,
-          max_tokens: 300,
+          max_tokens: 300
         },
         {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_GPT_KEY}`,
-          },
+            Authorization: `Bearer ${import.meta.env.VITE_GPT_KEY}`
+          }
         }
       );
-
+  
       const gptResponse = response.data.choices[0].message.content.trim();
       console.log("GPT Raw Response:", gptResponse);
-
+  
       try {
         const result = JSON.parse(gptResponse);
         setProcessedText(result);
@@ -159,32 +142,30 @@ Voice Input:
 
   useEffect(() => {
     if (!processedText) return;
-
+  
     if (processedText.is_meaningful && processedText.confidence_score >= 0.7) {
       if (processedText.rephrased_text) {
         extractInformation(processedText.rephrased_text, contextValues);
-        setProcessedText(null);
+        setProcessedText(null)
       } else {
-        textToSpeech(
-          processedText.suggestion || "Please say your request more clearly."
-        );
+        textToSpeech(processedText.suggestion || "Please say your request more clearly.");
         toast.warning("Voice input unclear. Suggesting improvement...");
       }
     } else if (processedText.intent === "invalid_input") {
-      const suggestion =
-        processedText.suggestion ||
-        "I didn't understand that. Please try again.";
+      // Handle invalid input case
+      const suggestion = processedText.suggestion || "I didn't understand that. Please try again.";
       setTimeout(() => {
         textToSpeech(suggestion);
       }, 500);
       toast.warning(suggestion);
     } else {
-      const fallbackMessage =
-        "Sorry, I didn't get that. Could you please repeat?";
+      // Handle other low-confidence cases
+      const fallbackMessage = "Sorry, I didn't get that. Could you please repeat?";
       textToSpeech(fallbackMessage);
       toast.warning(fallbackMessage);
     }
   }, [processedText]);
+
 
   return (
     <>
@@ -211,12 +192,19 @@ Voice Input:
                 </svg>
               </div>
             </div>
-            <p className="text-white text-xl font-semibold tracking-wide animate-pulse">
-              Listening...
-            </p>
+            <p className="text-white text-xl font-semibold tracking-wide animate-pulse">Listening...</p>
           </div>
         </div>
       )}
+
+      {/* {processedText && (
+        <div className="fixed bottom-5 left-5 bg-white/90 p-4 rounded-xl shadow-lg w-80 text-gray-800">
+          <h3 className="font-bold text-lg mb-2">Voice Analysis</h3>
+          <pre className="text-sm whitespace-pre-wrap">
+            {JSON.stringify(processedText, null, 2)}
+          </pre>
+        </div>
+      )} */}
     </>
   );
 }

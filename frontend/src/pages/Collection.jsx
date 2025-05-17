@@ -22,6 +22,7 @@ const Collection = () => {
 
     const applyFilter = () => {
         let filtered = [...products];
+        console.log({search,subCategory, category,returnable, inStock,priceRange,material })
         if (showSearch && search) filtered = filtered.filter(item => item.name.toLowerCase().includes(search.toLowerCase()));
         if (category.length) filtered = filtered.filter(item => category.includes(item.category));
         if (subCategory.length) filtered = filtered.filter(item => subCategory.includes(item.subCategory));
@@ -30,6 +31,8 @@ const Collection = () => {
         if (inStock !== null) filtered = filtered.filter(item => item.inStock === inStock);
         if (priceRange[0] > 0 || priceRange[1] < 5000) filtered = filtered.filter(item => item.price >= priceRange[0] && item.price <= priceRange[1]);
         setFilterProducts(filtered);
+        console.log(filtered);
+
     };
 
     const handlePriceChange = (e, index) => {
@@ -45,7 +48,7 @@ const Collection = () => {
         else applyFilter();
     };
 
-    useEffect(() => { applyFilter(); }, [category, subCategory, material, returnable, inStock, priceRange, search, showSearch, products]);
+    useEffect(() => { applyFilter();  }, [category, subCategory, material, returnable, inStock, priceRange, search, showSearch, products]);
     useEffect(() => { sortProduct(); }, [sortType]);
     
     useEffect(()=>{

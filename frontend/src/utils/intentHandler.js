@@ -65,27 +65,35 @@ export const handleLogout = (response,contextValues) => {
 };
 
 const updateFilterState = ( response,contextValues) => {
-  const { filters = {}, searchItemName } = response || {};
+  const { filters = {}, searchItemName } = response.fields || {};
   const {
-    setSearch, setShowSearch, setCategory, setSubCategory, setMaterial,
+    setSearch,products, setShowSearch, setCategory, setSubCategory, setMaterial,
     setReturnable, setInStock, setPriceRange
   } = contextValues;
+console.log(filters)
 
-  setSearch(searchItemName || "");
-  setShowSearch(true);
-  setCategory(filters.category || "");
-  setSubCategory(filters.subCategory || "");
-  setMaterial(filters.material || "");
-  setReturnable(filters.returnable || false);
-  setInStock(filters.inStock || false);
-  setPriceRange(filters.priceRange || [0, 5000]);
+
+if(searchItemName !== "unknow"){
+  const product = findProductByName(products,searchItemName)
+
+  setSearch(product.name) 
+  setShowSearch(true)
+}else{
+  filters.category !== "unknown" ? setCategory(filters.category) : null;
+  filters.subCategory !== "unknown" ? setSubCategory(filters.subCategory) : null;
+  filters.material !== "unknown" ? setMaterial(filters.material) : null; 
+  filters.returnable !=="unknown" ? setReturnable(filters.returnable) : setReturnable(null);
+  filters.inStock !=="unknown"? setInStock( filters.inStock) : setInStock(null);
+    setSearch("")
+    setPriceRange(filters.priceRange || [0, 5000]);
+}
 
   vibratePattern([50, 50, 50]); // Feedback for applying filters
   provideVoiceFeedback("Filters applied successfully.");
 };
 
 export const handleApplyFilter = (response, contextValues) => {
-  updateFilterState(contextValues, response);
+  updateFilterState(response,contextValues);
   contextValues.navigate("/collection");
   vibratePattern([50, 50, 50]); // Feedback for applying filters
   provideVoiceFeedback("Filters have been applied and you are redirected to the collection page.");
@@ -113,16 +121,16 @@ export const handleSortByPriceLowToHigh = (_, contextValues) => handleSort(conte
 export const handleSortByPriceHighToLow = (_, contextValues) => handleSort(contextValues, "high-low");
 
 const handleProductAction = (response, contextValues, action) => {
-  const { filterProducts, navigate } = contextValues;
-  const productNumber = response?.product?.number;
+  const { filterProducts, navigate,products } = contextValues;
+  const searchItemName = response.fields.searchItemName;
 
-  if (productNumber == null || filterProducts?.length < productNumber) {
+  
+  const product = findProductByName(products,searchItemName)
+  if (!product) {
     vibratePattern([200, 100, 200]); // Error vibration for invalid product number
-    provideVoiceFeedback("Invalid product number or product not found.");
-    return console.error("Invalid product number or filterProducts not loaded!");
+    provideVoiceFeedback("Invalid product name or product not found.");
+    return console.error("Invalid product name or filterProducts not loaded!");
   }
-
-  const product = filterProducts[productNumber - 1];
   if (product?._id) {
     vibratePattern([120]); // Product selected feedback
     provideVoiceFeedback(`Navigating to the product page for ${product.name}.`);

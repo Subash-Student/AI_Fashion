@@ -291,6 +291,8 @@ const ShopContextProvider = (props) => {
     }, [token])
 
     const resetFilters = () => {
+        setSearch("")
+        setShowSearch(false);
         setCategory([]);
         setSubCategory([]);
         setMaterial([]);

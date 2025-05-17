@@ -58,29 +58,25 @@ export const arrayOfIntents = [
         "reset_filter",
         "reset_sorting",
         "ask_question",
-        "choose_particular_product"
+        "open_particular_product"
       ],
       responseStructure: {
         intent: "",
-        search: {
-          query: ""
-        },
+        
+          searchItemName:"",
         filters: {
-          category:"",
-          subCategory:"",
-          material:"",
-          returnable:false,
-          inStock:false,
+          category:"'Men', 'Women', 'Kids'",
+          subCategory:"'Topwear', 'Bottomwear', 'Winterwear'",
+          material:"'Cotton', 'Wool', 'Polyester'",
+          returnable:"true || null",
+          inStock:"true || null",
           priceRange:[0, 5000],
           
         },
         sort: {
           sortBy: ""
         },
-        product: {
-          number: "",
-          
-        },
+        
         question :""
 
       }

@@ -72,6 +72,7 @@ console.log(pageConfig)
     - Based on the user's input, identify the best matching intent from the list above.
     - If a match is found, fill in the relevant fields from the response structure.
     - If a field cannot be confidently determined, mark it as "unknown".
+    - some fileds in response structure have only some values should be allowed it mentioned in that keys values like category:"'Men', 'Women', 'Kids'", should be in this.
     - The response must be returned in valid JSON format. If any part of the input is unclear or does not fit, mark it as "unknown".
     - Ensure the response structure is clear, consistent, and easily understandable, especially for users relying on screen readers.
     
@@ -166,15 +167,15 @@ export const handleIntent = (finalResponse, contextValues) => {
     navigate_cart: handleNavigation, // WORKING
 
     // Search & Filters
-    search_product: handleApplyFilter,
-    apply_filter: handleApplyFilter,
-    reset_filter: handleReset,
-    reset_sorting: handleReset,
+    search_product: handleApplyFilter, // WORKING
+    apply_filter: handleApplyFilter,  // WORKING
+    reset_filter: handleReset,  // WORKING
+    reset_sorting: handleReset,  // WORKING
 
     // Collection Page
-    sort_by_price_low_to_high: handleSortByPriceLowToHigh,
-    sort_by_price_high_to_low: handleSortByPriceHighToLow,
-    choose_particular_product: handleChooseParticularProduct,
+    sort_by_price_low_to_high: handleSortByPriceLowToHigh, // WORKING
+    sort_by_price_high_to_low: handleSortByPriceHighToLow, // WORKING
+    open_particular_product: handleChooseParticularProduct, 
 
     // Product Actions
     add_to_cart: handleCart, // WORKING
@@ -197,7 +198,7 @@ export const handleIntent = (finalResponse, contextValues) => {
     // Profile Actions
     change_name: handleChangeName,  // WORKING
     change_phone_number: handleChangePhoneNumber,  // WORKING
-    update_shipping_address: handleUpdateShippingAddress,
+    update_shipping_address: handleUpdateShippingAddress,   // WORKING
 
     // Contact Actions
     make_call: handleMakeCall,  // WORKING
