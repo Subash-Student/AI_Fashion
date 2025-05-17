@@ -172,13 +172,13 @@ export const handleIntent = (finalResponse, contextValues) => {
     apply_filter: handleApplyFilter,  // WORKING
     reset_filter: handleReset,  // WORKING
     reset_sorting: handleReset,  // WORKING
-    search_multiple_products_by_common_name:searchCommonProducts,
+    search_multiple_products_by_common_name:searchCommonProducts,  // WORKING
 
     // Collection Page
     sort_by_price_low_to_high: handleSortByPriceLowToHigh, // WORKING
     sort_by_price_high_to_low: handleSortByPriceHighToLow, // WORKING
-    open_particular_product: handleChooseParticularProduct, 
-
+    open_particular_product: handleChooseParticularProduct, // WORKING
+ 
     // Product Actions
     add_to_cart: handleCart, // WORKING
     remove_from_cart: handleCart,  // WORKING
@@ -204,7 +204,7 @@ export const handleIntent = (finalResponse, contextValues) => {
 
     // Contact Actions
     make_call: handleMakeCall,  // WORKING
-    ask_question: handleAskDetails,
+    ask_question: handleAskDetails, // WORKING
     read_the_content: handleReadTheContent, // WORKING
 
     stopSpeech:stopSpeech,  // WORKING

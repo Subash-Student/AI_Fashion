@@ -370,7 +370,6 @@ export const handleAskDetails = async(response,contextValues) => {
 
     const data = await response.json();
     const answer = data?.choices?.[0]?.message?.content?.trim();
-    textToSpeech(answer || "Sorry, I could not find an answer.");
     vibratePattern([300]); // Feedback for reading the answer
     provideVoiceFeedback(answer || "Sorry, I could not find an answer.");
   } catch (error) {

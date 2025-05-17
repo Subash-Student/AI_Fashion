@@ -110,7 +110,7 @@ export const getDashboardPageSummary = (allUserData) => {
 
 export const getCartPageSummary = (cartData, products, deliveryFee, getCartAmount) => {
     let cartItemsSummary = "Your cart contains the following items: ";
-
+console.log({cartData, products, deliveryFee, getCartAmount})
     if (cartData.length > 0) {
         cartData.forEach((item, index) => {
             const productData = products.find((product) => product._id === item._id);
