@@ -1,6 +1,7 @@
 import { toast } from 'react-toastify';
 import { textToSpeech } from './voiceContent';
 import stringSimilarity from 'string-similarity';
+import { products } from '../assets/assets';
 
 
 // Vibration Pattern Utility
@@ -74,7 +75,7 @@ console.log(filters)
 
 
 if(searchItemName !== "unknow"){
-  const product = findProductByName(products,searchItemName)
+  const product = findProductByName(products,searchItemName,false)
 
   setSearch(product.name) 
   setShowSearch(true)
@@ -121,29 +122,41 @@ export const handleSortByPriceLowToHigh = (_, contextValues) => handleSort(conte
 export const handleSortByPriceHighToLow = (_, contextValues) => handleSort(contextValues, "high-low");
 
 const handleProductAction = (response, contextValues, action) => {
-  const { filterProducts, navigate,products } = contextValues;
+
+  console.log({response, contextValues, action})
+  const { filterProducts,setFilterProducts, navigate,products } = contextValues;
   const searchItemName = response.fields.searchItemName;
 
-  
-  const product = findProductByName(products,searchItemName)
-  if (!product) {
-    vibratePattern([200, 100, 200]); // Error vibration for invalid product number
-    provideVoiceFeedback("Invalid product name or product not found.");
-    return console.error("Invalid product name or filterProducts not loaded!");
-  }
-  if (product?._id) {
-    vibratePattern([120]); // Product selected feedback
-    provideVoiceFeedback(`Navigating to the product page for ${product.name}.`);
-    navigate(`/product/${product._id}`);
-  } else {
-    vibratePattern([200, 100, 200]); // Error vibration
-    provideVoiceFeedback("Product ID not found.");
-    console.error("Product ID not found!");
+  if(action === "particular"){
+    const product = findProductByName(products,searchItemName,false)
+    if (!product) {
+      vibratePattern([200, 100, 200]); // Error vibration for invalid product number
+      provideVoiceFeedback("Invalid product name or product not found.");
+      return console.error("Invalid product name or filterProducts not loaded!");
+    }
+    if (product?._id) {
+      vibratePattern([120]); // Product selected feedback
+      provideVoiceFeedback(`Navigating to the product page for ${product.name}.`);
+      navigate(`/product/${product._id}`);
+    } else {
+      vibratePattern([200, 100, 200]); // Error vibration
+      provideVoiceFeedback("Product ID not found.");
+      console.error("Product ID not found!");
+    }
+  }else{
+        const product = findProductByName(products,searchItemName,true);
+        setFilterProducts(product);
+        navigate("/collection")
+        vibratePattern([50, 50, 50]); // Feedback for applying filters
+        provideVoiceFeedback("hear is your result.");
   }
 };
 
 export const handleChooseParticularProduct = (response, contextValues) => {
-  handleProductAction(response, contextValues);
+  handleProductAction(response, contextValues),"particular";
+};
+export const searchCommonProducts = (response, contextValues) => {
+  handleProductAction(response, contextValues,"common");
 };
 
 const handleCartAction = async(contextValues, action, productId, size, quantity = 0) => {
@@ -270,25 +283,39 @@ const normalizeName = (name = '') =>
     .replace(/\s+/g, ' ')       // Collapse spaces
     .trim();
 
-const findProductByName = (orderData, name) => {
-  const normalizedInput = normalizeName(name);
-  const productNames = orderData.map(item => normalizeName(item.name));
-
-  const matches = stringSimilarity.findBestMatch(normalizedInput, productNames);
-  const bestMatch = matches.bestMatch;
-
-  // If similarity is above 0.8 (i.e. 80%), accept the match
-  if (bestMatch.rating >= 0.8) {
-    const index = matches.bestMatchIndex;
-    return orderData[index];
-  } else if (bestMatch.rating >= 0.6) {
-    toast.warn(`Closest match is "${orderData[matches.bestMatchIndex].name}" (low confidence).`);
-    return orderData[matches.bestMatchIndex];
-  } else {
-    toast.error(`No good match found for "${name}".`);
-    return null;
-  }
-};
+    const findProductByName = (orderData, name, isFilter) => {
+      const normalizedInput = normalizeName(name);
+      const productNames = orderData.map(item => normalizeName(item.name));
+    
+      const matches = stringSimilarity.findBestMatch(normalizedInput, productNames);
+    
+      if (isFilter) {
+        // Return all products with similarity >= 0.5
+        const filteredProducts = matches.ratings
+          .map((match, index) => ({ ...match, index }))
+          .filter(match => match.rating >= 0.5)
+          .map(match => orderData[match.index]);
+    
+        if (filteredProducts.length === 0) {
+          toast.error(`No products found with at least 50% match for "${name}".`);
+        }
+    
+        return filteredProducts;
+      } else {
+        const bestMatch = matches.bestMatch;
+    
+        if (bestMatch.rating >= 0.8) {
+          return orderData[matches.bestMatchIndex];
+        } else if (bestMatch.rating >= 0.6) {
+          toast.warn(`Closest match is "${orderData[matches.bestMatchIndex].name}" (low confidence).`);
+          return orderData[matches.bestMatchIndex];
+        } else {
+          toast.error(`No good match found for "${name}".`);
+          return null;
+        }
+      }
+    };
+    
 
 
 

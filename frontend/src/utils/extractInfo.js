@@ -26,7 +26,8 @@ import {
   handleReset,
   handleReviews,
   selectSize,
-  readyToCheckOut
+  readyToCheckOut,
+  searchCommonProducts
 } from './intentHandler';
 
 import axios from "axios";
@@ -167,10 +168,11 @@ export const handleIntent = (finalResponse, contextValues) => {
     navigate_cart: handleNavigation, // WORKING
 
     // Search & Filters
-    search_product: handleApplyFilter, // WORKING
+    search_single_Product_by_its_name: handleApplyFilter, // WORKING
     apply_filter: handleApplyFilter,  // WORKING
     reset_filter: handleReset,  // WORKING
     reset_sorting: handleReset,  // WORKING
+    search_multiple_products_by_common_name:searchCommonProducts,
 
     // Collection Page
     sort_by_price_low_to_high: handleSortByPriceLowToHigh, // WORKING

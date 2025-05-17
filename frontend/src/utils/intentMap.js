@@ -35,7 +35,11 @@ export const arrayOfIntents = [
           currentPage: "",
           to: ""
         },
-        searchItemName:"",
+        search:{
+          isParticularProductSearch:true || false,
+          isGeneralProductSearch:true || false,
+          searchItemName:"",
+        },
 
         filters: {
           category:"",
@@ -51,7 +55,8 @@ export const arrayOfIntents = [
     {
       page: "collection",
       intents: [
-        "search_product",
+        "search_single_Product_by_its_name",
+        "search_multiple_products_by_common_name",
         "apply_filter",
         "sort_by_price_low_to_high",
         "sort_by_price_high_to_low",
@@ -62,7 +67,6 @@ export const arrayOfIntents = [
       ],
       responseStructure: {
         intent: "",
-        
           searchItemName:"",
         filters: {
           category:"'Men', 'Women', 'Kids'",
