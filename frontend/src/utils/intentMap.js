@@ -16,12 +16,11 @@ export const arrayOfIntents = [
         "navigate_nextPage",
         "navigate_priviousPage",
         "navigate_cart",
-        "search_product",
+        "search_products",
         "apply_filter",
         "read_the_content",
         "ask_question",
         "make_call",
-
 
       ],
       responseStructure: {
@@ -35,41 +34,37 @@ export const arrayOfIntents = [
           currentPage: "",
           to: ""
         },
-        search:{
-          isParticularProductSearch:true || false,
-          isGeneralProductSearch:true || false,
+        
           searchItemName:"",
-        },
+      
 
-        filters: {
-          category:"",
-          subCategory:"",
-          material:"",
-          returnable:false,
-          inStock:false,
-          priceRange:[0, 5000],
-          
-        }
+          filters: {
+            category:"Men, Women, Kids",
+            subCategory:"'Topwear', 'Bottomwear', 'Winterwear'",
+            material:"'Cotton', 'Wool', 'Polyester'",
+            returnable:"true || null",
+            inStock:"true || null",
+            priceRange:[0, 5000],
+            
+          },
       }
     },
     {
       page: "collection",
       intents: [
-        "search_single_Product_by_its_name",
-        "search_multiple_products_by_common_name",
         "apply_filter",
+        "search_products",
         "sort_by_price_low_to_high",
         "sort_by_price_high_to_low",
         "reset_filter",
         "reset_sorting",
         "ask_question",
-        "open_particular_product"
       ],
       responseStructure: {
         intent: "",
           searchItemName:"",
         filters: {
-          category:"'Men', 'Women', 'Kids'",
+          category:"Men, Women, Kids",
           subCategory:"'Topwear', 'Bottomwear', 'Winterwear'",
           material:"'Cotton', 'Wool', 'Polyester'",
           returnable:"true || null",

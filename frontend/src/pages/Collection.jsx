@@ -31,7 +31,7 @@ const Collection = () => {
         if (inStock !== null) filtered = filtered.filter(item => item.inStock === inStock);
         if (priceRange[0] > 0 || priceRange[1] < 5000) filtered = filtered.filter(item => item.price >= priceRange[0] && item.price <= priceRange[1]);
         setFilterProducts(filtered);
-        console.log(filtered);
+       
 
     };
 

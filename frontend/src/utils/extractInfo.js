@@ -8,7 +8,6 @@ import {
   handleSortByPriceLowToHigh,
   handleSortByPriceHighToLow,
   handleAskDetails,
-  handleChooseParticularProduct,
   handleCart,
   handleWishlist,
   handleQuantityAndRemoveFromCartPage,
@@ -21,13 +20,12 @@ import {
   handleChangePhoneNumber,
   handleUpdateShippingAddress,
   handleReadTheContent,
-  
   handleMakeCall,
   handleReset,
   handleReviews,
   selectSize,
   readyToCheckOut,
-  searchCommonProducts
+  handleSearchProduct
 } from './intentHandler';
 
 import axios from "axios";
@@ -168,16 +166,16 @@ export const handleIntent = (finalResponse, contextValues) => {
     navigate_cart: handleNavigation, // WORKING
 
     // Search & Filters
-    search_single_Product_by_its_name: handleApplyFilter, // WORKING
+    search_products: handleSearchProduct, // WORKING
     apply_filter: handleApplyFilter,  // WORKING
     reset_filter: handleReset,  // WORKING
     reset_sorting: handleReset,  // WORKING
-    search_multiple_products_by_common_name:searchCommonProducts,  // WORKING
+    
 
     // Collection Page
     sort_by_price_low_to_high: handleSortByPriceLowToHigh, // WORKING
     sort_by_price_high_to_low: handleSortByPriceHighToLow, // WORKING
-    open_particular_product: handleChooseParticularProduct, // WORKING
+    
  
     // Product Actions
     add_to_cart: handleCart, // WORKING

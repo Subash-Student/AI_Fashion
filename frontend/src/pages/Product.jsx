@@ -42,7 +42,7 @@ const Product = () => {
       setPageValues({
         currentPage: "ProductDetails",
         values: { productData },
-        pageContent: speechText.text
+        pageContent: speechText
       });
       textToSpeech(speechText.text)
     }

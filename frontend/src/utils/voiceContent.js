@@ -33,10 +33,9 @@ export const getProductPageSummary = (product) => {
      returnable 
     }
 
-    return {
-        text:`Welcome to the product page for ${productName}. ${product.description}. We hope you enjoy your shopping experience!`,
-        data: data
-    }
+    return `Welcome to the product page for ${productName}. ${product.description}. We hope you enjoy your shopping experience!`
+
+    
   };
 
   export const getOrdersPageSummary = (orderData) => {

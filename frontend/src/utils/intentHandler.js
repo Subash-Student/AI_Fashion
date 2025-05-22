@@ -74,12 +74,7 @@ const updateFilterState = ( response,contextValues) => {
 console.log(filters)
 
 
-if(searchItemName !== "unknow"){
-  const product = findProductByName(products,searchItemName,false)
 
-  setSearch(product.name) 
-  setShowSearch(true)
-}else{
   filters.category !== "unknown" ? setCategory(filters.category) : null;
   filters.subCategory !== "unknown" ? setSubCategory(filters.subCategory) : null;
   filters.material !== "unknown" ? setMaterial(filters.material) : null; 
@@ -87,7 +82,7 @@ if(searchItemName !== "unknow"){
   filters.inStock !=="unknown"? setInStock( filters.inStock) : setInStock(null);
     setSearch("")
     setPriceRange(filters.priceRange || [0, 5000]);
-}
+
 
   vibratePattern([50, 50, 50]); // Feedback for applying filters
   provideVoiceFeedback("Filters applied successfully.");
@@ -123,17 +118,20 @@ export const handleSortByPriceHighToLow = (_, contextValues) => handleSort(conte
 
 const handleProductAction = (response, contextValues, action) => {
 
-  console.log({response, contextValues, action})
-  const { filterProducts,setFilterProducts, navigate,products } = contextValues;
-  const searchItemName = response.fields.searchItemName;
+  console.log({ response, contextValues, action });
 
-  if(action === "particular"){
-    const product = findProductByName(products,searchItemName,false)
+  const { filterProducts, setFilterProducts, navigate, products } = contextValues;
+  const matchedProducts = response.matchedProducts;
+
+  if (action === "particular") {
+    const product = findProductByName(products, matchedProducts[0], false);
+
     if (!product) {
       vibratePattern([200, 100, 200]); // Error vibration for invalid product number
       provideVoiceFeedback("Invalid product name or product not found.");
       return console.error("Invalid product name or filterProducts not loaded!");
     }
+
     if (product?._id) {
       vibratePattern([120]); // Product selected feedback
       provideVoiceFeedback(`Navigating to the product page for ${product.name}.`);
@@ -143,21 +141,103 @@ const handleProductAction = (response, contextValues, action) => {
       provideVoiceFeedback("Product ID not found.");
       console.error("Product ID not found!");
     }
-  }else{
-        const product = findProductByName(products,searchItemName,true);
-        setFilterProducts(product);
-        navigate("/collection")
-        vibratePattern([50, 50, 50]); // Feedback for applying filters
-        provideVoiceFeedback("hear is your result.");
+  } else {
+    // ✅ Find the full product objects whose name matches any name in matchedProducts
+    const matchedFullProducts = products.filter(product =>
+      matchedProducts.some(name =>
+        product.name.toLowerCase().includes(name.toLowerCase())
+      )
+    );
+
+    // ✅ Set filtered products
+    setFilterProducts(matchedFullProducts);
+
+    // ✅ Navigate and provide feedback
+    navigate("/collection");
+    vibratePattern([50, 50, 50]); // Feedback for applying filters
+    provideVoiceFeedback("Here is your result.");
   }
 };
 
-export const handleChooseParticularProduct = (response, contextValues) => {
-  handleProductAction(response, contextValues),"particular";
+
+export const handleSearchProduct = async (response, contextValues) => {
+  const searchItemName = response.fields.searchItemName; // SEARCH ITEM NAME
+  const { products } = contextValues;
+ 
+  const productNameArray = products.map(item => item.name); // ARRAY OF ALL PRODUCT NAMES
+
+  const question = `
+Based on the search term and product list, determine the user's intent:
+1. Is it a 'particular' product or a 'common' category?
+2. Return the intent as either "particular" or "common".
+3. Based on the intent, also return:
+   - If "particular", the best matching product name from the list.
+   - If "common", a list of product names from the list that are similar to the search term.
+
+Search Term: ${searchItemName}
+Product List: ${productNameArray.join(", ")}
+Return in JSON format like:
+{
+  "intent": "particular" or "common",
+  "matchedProducts": ["product1", "product2", ...]
+}
+`;
+
+  try {
+    const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${import.meta.env.VITE_GPT_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a helpful assistant. Analyze the user's search term with the product list and return the intent and matching products in the given JSON format only.",
+          },
+          {
+            role: "user",
+            content: question,
+          },
+        ],
+        temperature: 0.4,
+      }),
+    });
+
+    const data = await gptResponse.json();
+    const content = data?.choices?.[0]?.message?.content?.trim();
+
+    // Parse the JSON content returned by GPT
+    let parsed;
+    try {
+      parsed = JSON.parse(content);
+    } catch (err) {
+      console.error("Failed to parse GPT response:", content);
+      return handleProductAction(response, contextValues, "common"); // fallback
+    }
+
+    const { intent, matchedProducts } = parsed;
+
+    // You can store or use matchedProducts array as needed
+    console.log("User Intent:", intent);
+    console.log("Matched Products:", matchedProducts);
+
+    // Call appropriate handler
+    handleProductAction(
+      { ...response, matchedProducts }, // pass matched products
+      contextValues,
+      intent === "particular" ? "particular" : "common"
+    );
+  } catch (error) {
+    console.error("GPT API error:", error);
+    handleProductAction(response, contextValues, "common"); // fallback
+  }
 };
-export const searchCommonProducts = (response, contextValues) => {
-  handleProductAction(response, contextValues,"common");
-};
+
+
 
 const handleCartAction = async(contextValues, action, productId, size, quantity = 0) => {
   const { addToCart, updateQuantity } = contextValues;
@@ -285,23 +365,21 @@ const normalizeName = (name = '') =>
 
     const findProductByName = (orderData, name, isFilter) => {
       const normalizedInput = normalizeName(name);
-      const productNames = orderData.map(item => normalizeName(item.name));
-    
-      const matches = stringSimilarity.findBestMatch(normalizedInput, productNames);
     
       if (isFilter) {
-        // Return all products with similarity >= 0.5
-        const filteredProducts = matches.ratings
-          .map((match, index) => ({ ...match, index }))
-          .filter(match => match.rating >= 0.5)
-          .map(match => orderData[match.index]);
+        // Filter products where the name includes the normalized input
+        const filteredProducts = orderData.filter(item =>
+          normalizeName(item.name).includes(normalizedInput)
+        );
     
         if (filteredProducts.length === 0) {
-          toast.error(`No products found with at least 50% match for "${name}".`);
+          toast.error(`No products found containing "${name}".`);
         }
     
         return filteredProducts;
       } else {
+        const productNames = orderData.map(item => normalizeName(item.name));
+        const matches = stringSimilarity.findBestMatch(normalizedInput, productNames);
         const bestMatch = matches.bestMatch;
     
         if (bestMatch.rating >= 0.8) {
@@ -315,6 +393,7 @@ const normalizeName = (name = '') =>
         }
       }
     };
+    
     
 
 
@@ -343,13 +422,24 @@ export const handleReadTheContent = (_, { pageValues }) => {
 };
 
 
-export const handleAskDetails = async(response,contextValues) => {
-  const {pageValues} = contextValues;
+export const handleAskDetails = async (response, contextValues) => {
+  const { pageValues } = contextValues;
+
   const speechText = pageValues.pageContent;
   const question = response.fields.question;
-  console.log(response)
-  console.log({speechText,question})
+
   if (!speechText || !question) return;
+
+  let contextToUse = speechText;
+
+  // Use full context object only if on ProductDetails page
+  if (pageValues.currentPage === "ProductDetails") {
+    const context = {
+      text: speechText,
+      productData: pageValues.values.productData,
+    };
+    contextToUse = JSON.stringify(context, null, 2); // Pretty JSON format
+  }
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -361,8 +451,15 @@ export const handleAskDetails = async(response,contextValues) => {
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
         messages: [
-          { role: "system", content: "You are a helpful assistant. Read the context and answer the question clearly in a short sentence." },
-          { role: "user", content: `Context:\n${speechText}\n\nQuestion: ${question}` }
+          {
+            role: "system",
+            content:
+              "You are a helpful assistant. Read the provided context carefully and answer the question concisely in a short sentence. The context may contain speech text or product information, so ensure your response is appropriately tailored.",
+          },
+          {
+            role: "user",
+            content: `Context:\n${contextToUse}\n\nQuestion: ${question}`,
+          },
         ],
         temperature: 0.7,
       }),
@@ -379,6 +476,7 @@ export const handleAskDetails = async(response,contextValues) => {
     provideVoiceFeedback("There was an error answering your question.");
   }
 };
+
 
 export const handleLogin = (response,contextValues) => {
  
