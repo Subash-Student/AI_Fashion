@@ -35,7 +35,10 @@ const PlaceOrder = () => {
             if (cleanedPincode.length === 6) {
                 setPincode(cleanedPincode.split(''));
                 await fetchAddressFromPincode(cleanedPincode,true);
-            } else toast.error("Please say a valid 6-digit pincode");textToSpeech("Please say a valid 6-digit pincode")
+            } else {
+                toast.error("Please say a valid 6-digit pincode");
+                textToSpeech("Please say a valid 6-digit pincode")
+            }
         };
         recognition.onerror = (event) => { clearTimeout(stopTimer); recognition.stop(); toast.error("Error recognizing voice input"); console.log(event.error); };
     };
@@ -73,26 +76,35 @@ const PlaceOrder = () => {
     };
     
 
-    const fetchAddressFromPincode = async (cleanedPin,isVoice) => {
+    const fetchAddressFromPincode = async (cleanedPin, isVoice) => {
         const pin = pincode.join("");
-        console.log({pin,cleanedPin})
-
+        console.log({ pin, cleanedPin });
+      
         if (pin.length === 6 || cleanedPin.length === 6) {
-            try {
-                const res = await axios.get(`https://api.postalpincode.in/pincode/${!isVoice ? pin : cleanedPin}`);
-                const data = res.data[0];
-                if (data.Status === "Success") {
-                    const postOffice = data.PostOffice[0];
-                    setAddress(`${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${pin}`);
-                    setShowPincodeModal(false);
-                } else toast.error("Invalid pincode");textToSpeech("Invalid pincode")
-            } catch (err) {
-                toast.error("Enter a valid 6-digit pincode");
-                textToSpeech("Enter a valid 6-digit pincode")
-                console.error(err);
+          try {
+            const res = await axios.get(`https://api.postalpincode.in/pincode/${!isVoice ? pin : cleanedPin}`);
+            const data = res.data[0];
+      
+            if (data.Status === "Success") {
+              const postOffice = data.PostOffice[0];
+              setAddress(`${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${!isVoice ? pin : cleanedPin}`);
+              setShowPincodeModal(false);
+              textToSpeech(`Your address is set to be ${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${pin}`);
+            } else {
+              toast.error("Invalid pincode");
+              textToSpeech("Invalid pincode");
             }
-        } else toast.warn("Enter a valid 6-digit pincode");textToSpeech("Enter a valid 6-digit pincode")
-    };
+          } catch (err) {
+            toast.error("Enter a valid 6-digit pincode");
+            textToSpeech("Enter a valid 6-digit pincode");
+            console.error(err);
+          }
+        } else {
+          toast.warn("Enter a valid 6-digit pincode");
+          textToSpeech("Enter a valid 6-digit pincode");
+        }
+      };
+      
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();

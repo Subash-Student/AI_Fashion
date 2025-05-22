@@ -114,8 +114,8 @@ export const arrayOfIntents = [
         intent: "",
         action:"remove || adjust_quantity",
         adjust_quantity: "increment || decrement",
-        product_number_for_action:"1,2,3,4,5,...",
-        // productName:"",
+        productName:"",
+        // product_number_for_action:"1,2,3,4,5,...",
         quantity:"1,2,3,4,5,...",
         question :""
       }

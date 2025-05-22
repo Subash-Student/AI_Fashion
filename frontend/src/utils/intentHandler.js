@@ -277,14 +277,22 @@ export const selectSize = (response,contextValues)=>{
   const size = response.fields.size;
 
   setSize(size)
-
+provideVoiceFeedback(`The Size${size} is selected`)
 }
 
 
 export const handleQuantityAndRemoveFromCartPage = (response, contextValues) => {
-  const { cartData } = contextValues;
-  // const product = findProductByName(cartData,response.fields.productName)
-  const product = cartData[Number(response.fields.product_number_for_action) - 1]; 
+  const { cartData, products } = contextValues;
+
+  // Get product IDs from cartData
+  const cartProductIds = cartData.map(item => item._id);
+
+  // Filter products that are in cartData
+  const filteredCartProducts = products.filter(prod => cartProductIds.includes(prod._id));
+
+  // Use the filtered products to find the one matching the spoken product name
+  const product = findProductByName(filteredCartProducts, response.fields.productName, false);
+
   const action = response.fields.action;
 
   if (!["adjust_quantity", "remove"].includes(action)) {
@@ -293,8 +301,31 @@ export const handleQuantityAndRemoveFromCartPage = (response, contextValues) => 
     return console.warn("Unknown cart action:", action);
   }
 
-  handleCartAction(contextValues, action, product._id, product.size, action === "adjust_quantity" ? response.fields.quantity : 0);
+  if (!product || !product._id) {
+    vibratePattern([200, 100, 200]); // Error vibration
+    provideVoiceFeedback("Product not found in your cart.");
+    return;
+  }
+
+  // Get the cart item to access its size
+  const cartItem = cartData.find(item => item._id === product._id);
+
+  if (!cartItem) {
+    vibratePattern([200, 100, 200]);
+    provideVoiceFeedback("Matching cart item not found.");
+    return;
+  }
+
+  handleCartAction(
+    contextValues,
+    action,
+    product._id,
+    cartItem.size,
+    action === "adjust_quantity" ? response.fields.quantity : 0
+  );
 };
+
+
 
 export const handleWishlist = (response, contextValues) => {
   const { toggleWishlist, pageValues, setIsWishlisted } = contextValues;
@@ -316,7 +347,10 @@ export const handleWishlist = (response, contextValues) => {
 export const handlePlaceOrder = () => {
   vibratePattern([500]); // Confirm place order
   provideVoiceFeedback("Order placed successfully.");
-  window.dispatchEvent(new CustomEvent('voice_place_order'));
+
+  setTimeout(() => {
+    window.dispatchEvent(new CustomEvent('voice_place_order'));
+  }, 1500);
 };
 
 const toggleModal = (setter) => setter(true);
@@ -379,6 +413,7 @@ const normalizeName = (name = '') =>
         return filteredProducts;
       } else {
         const productNames = orderData.map(item => normalizeName(item.name));
+        
         const matches = stringSimilarity.findBestMatch(normalizedInput, productNames);
         const bestMatch = matches.bestMatch;
     
