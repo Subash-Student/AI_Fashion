@@ -11,7 +11,7 @@ const Collection = () => {
         subCategory, setSubCategory, material, setMaterial, returnable, 
         setReturnable, inStock, setInStock, sortType, setSortType, 
         priceRange, setPriceRange, filterProducts, setFilterProducts, 
-        resetFilters, setPageValues 
+        resetFilters, setPageValues ,manualFilterOverride
     } = useContext(ShopContext);
 
     const [showFilter, setShowFilter] = useState(false);
@@ -22,7 +22,7 @@ const Collection = () => {
 
     const applyFilter = () => {
         let filtered = [...products];
-        console.log({search,subCategory, category,returnable, inStock,priceRange,material })
+       
         if (showSearch && search) filtered = filtered.filter(item => item.name.toLowerCase().includes(search.toLowerCase()));
         if (category.length) filtered = filtered.filter(item => category.includes(item.category));
         if (subCategory.length) filtered = filtered.filter(item => subCategory.includes(item.subCategory));
@@ -34,7 +34,7 @@ const Collection = () => {
        
 
     };
-
+ console.log(filterProducts)
     const handlePriceChange = (e, index) => {
         const newPriceRange = [...priceRange];
         newPriceRange[index] = parseInt(e.target.value);
@@ -48,8 +48,20 @@ const Collection = () => {
         else applyFilter();
     };
 
-    useEffect(() => { applyFilter();  }, [category, subCategory, material, returnable, inStock, priceRange, search, showSearch, products]);
-    useEffect(() => { sortProduct(); }, [sortType]);
+    useEffect(() => {
+        console.log(manualFilterOverride)
+        if (!manualFilterOverride) {
+            console.log("hi")
+          applyFilter();
+        }
+      }, [category, subCategory, material, returnable, inStock, priceRange, search, showSearch, products]);
+      
+    useEffect(() => {
+        if (!manualFilterOverride) {
+            console.log("hi")
+            sortProduct(); 
+        }
+        }, [sortType]);
     
     useEffect(()=>{
         

@@ -83,13 +83,11 @@ export const getHomePageSummary = () => {
     return `Welcome to the home page. Explore our latest collections, best sellers, and new arrivals for men, women, and kids.`;
 };
 
-export const getCollectionPageSummary = () => {
+export const getCollectionPageSummary = (products) => {
     return `Welcome to the collections page. 
-        Use the filters on the left to explore items by category, type, material, returnability, availability, and price. 
-        You can also sort the results by relevance or price. 
-        Products are listed on the right side, each assigned a number starting from one. 
-        To open a product, say or click open product one, open product two, and so on, based on its position. 
-        For example, say open product one to view the first product.`;
+        Use the filters on the products items by category, type, material, returnability, availability, and price. 
+        You can also sort the results by  price.  
+        To open a product, say open product name to view the  product name.`;
 };
 
 export const getDashboardPageSummary = (allUserData) => {

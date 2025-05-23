@@ -118,9 +118,9 @@ export const handleSortByPriceHighToLow = (_, contextValues) => handleSort(conte
 
 const handleProductAction = (response, contextValues, action) => {
 
-  console.log({ response, contextValues, action });
+  
 
-  const { filterProducts, setFilterProducts, navigate, products } = contextValues;
+  const { filterProducts, setFilterProducts, navigate, products,setManualFilterOverride } = contextValues;
   const matchedProducts = response.matchedProducts;
 
   if (action === "particular") {
@@ -150,10 +150,13 @@ const handleProductAction = (response, contextValues, action) => {
     );
 
     // ✅ Set filtered products
-    setFilterProducts(matchedFullProducts);
+    
+    setManualFilterOverride(true);
+setFilterProducts(matchedFullProducts);
+navigate("/collection");
 
+    
     // ✅ Navigate and provide feedback
-    navigate("/collection");
     vibratePattern([50, 50, 50]); // Feedback for applying filters
     provideVoiceFeedback("Here is your result.");
   }

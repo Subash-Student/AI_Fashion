@@ -44,7 +44,7 @@ const Product = () => {
         values: { productData },
         pageContent: speechText
       });
-      textToSpeech(speechText.text)
+      textToSpeech(speechText)
     }
   }, [productData]);
   useEffect(() => {
