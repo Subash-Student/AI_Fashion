@@ -65,7 +65,7 @@ const Collection = () => {
     
     useEffect(()=>{
         
-        const speechText = getCollectionPageSummary();
+        const speechText = getCollectionPageSummary(filterProducts);
         
         textToSpeech(speechText);
         setPageValues({ currentPage: "collection",pageContent:speechText });

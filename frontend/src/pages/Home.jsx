@@ -9,12 +9,16 @@ import Mens from '../components/Mens'
 import Women from '../components/Women'
 import Kids from '../components/Kids'
 import { ShopContext } from '../context/ShopContext'
+import { getHomePageSummary, textToSpeech } from '../utils/voiceContent'
 
 const Home = () => {
   const {token,setPageValues,pageValues} = useContext(ShopContext);
 
   useEffect(() => {
     setPageValues({ currentPage: "common" });
+    const speechText = getHomePageSummary();
+
+    textToSpeech(speechText)
   }, []);
   
   
