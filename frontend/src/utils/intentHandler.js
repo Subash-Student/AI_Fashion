@@ -165,7 +165,7 @@ navigate("/collection");
 
 export const handleSearchProduct = async (response, contextValues) => {
   const searchItemName = response.fields.searchItemName; // SEARCH ITEM NAME
-  const { products } = contextValues;
+  const { setIsLoading,products } = contextValues;
  
   const productNameArray = products.map(item => item.name); // ARRAY OF ALL PRODUCT NAMES
 
@@ -187,6 +187,8 @@ Return in JSON format like:
 `;
 
   try {
+    setIsLoading(true)
+
     const gptResponse = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -209,6 +211,7 @@ Return in JSON format like:
         temperature: 0.4,
       }),
     });
+    setIsLoading(false)
 
     const data = await gptResponse.json();
     const content = data?.choices?.[0]?.message?.content?.trim();
@@ -461,7 +464,7 @@ export const handleReadTheContent = (_, { pageValues }) => {
 
 
 export const handleAskDetails = async (response, contextValues) => {
-  const { pageValues } = contextValues;
+  const {setIsLoading, pageValues } = contextValues;
 
   const speechText = pageValues.pageContent;
   const question = response.fields.question;
@@ -480,6 +483,8 @@ export const handleAskDetails = async (response, contextValues) => {
   }
 
   try {
+    setIsLoading(true)
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -502,6 +507,7 @@ export const handleAskDetails = async (response, contextValues) => {
         temperature: 0.7,
       }),
     });
+    setIsLoading(false)
 
     const data = await response.json();
     const answer = data?.choices?.[0]?.message?.content?.trim();

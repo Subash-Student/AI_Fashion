@@ -8,7 +8,7 @@ import { textToSpeech } from '../utils/voiceContent';
 
 const Login = () => {
   const [currentState, setCurrentState] = useState('Login');
-  const { token, setToken, navigate, backendUrl } = useContext(ShopContext);
+  const { token, setToken,setIsLoading, navigate, backendUrl } = useContext(ShopContext);
 
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
@@ -114,6 +114,8 @@ const responseStructure = {
   const extractAndFillDetails = async (text, action) => {
     try {
       // Call GPT API to extract structured data
+      setIsLoading(true)
+
       const response = await axios.post('https://api.openai.com/v1/chat/completions', {
         model: 'gpt-3.5-turbo',
         messages: [{
@@ -130,6 +132,7 @@ const responseStructure = {
           'Content-Type': 'application/json'
         }
       });
+      setIsLoading(false)
 
       const data = JSON.parse(response.data.choices[0].message.content);
       console.log(data)
@@ -213,7 +216,11 @@ const responseStructure = {
     
     try {
       if (currentState === 'Sign Up') {
+        setIsLoading(true)
+
         const response = await axios.post(`${backendUrl}/api/user/register`, { name, phone:contact, password });
+        setIsLoading(false)
+
         if (response.data.success) {
           textToSpeech("Successfully regitered");
           setTimeout(() => {
@@ -226,7 +233,11 @@ const responseStructure = {
           textToSpeech(response.data.message);
         }
       } else if (currentState === 'Login') {
+        setIsLoading(true)
+
         const response = await axios.post(`${backendUrl}/api/user/login`, { phone:contact, password });
+        setIsLoading(false)
+
         if (response.data.success) {
           textToSpeech("Successfully you are logged in");
           setTimeout(() => {
@@ -240,7 +251,11 @@ const responseStructure = {
         }
       } else if (currentState === 'Forgot Password') {
         if (!isOTPSent) {
+        setIsLoading(true)
+
           const response = await axios.post(`${backendUrl}/api/auth/send-otp`, { phone:contact });
+        setIsLoading(false)
+
           if (response.data.success) {
             toast.success('OTP sent to your phone');
             setIsOTPSent(true);
@@ -255,7 +270,11 @@ const responseStructure = {
             textToSpeech(response.data.message);
           }
         } else if (!isOTPVerified) {
+        setIsLoading(true)
+
           const response = await axios.post(`${backendUrl}/api/auth/verify-otp`, { phone:contact, otp });
+        setIsLoading(false)
+
           if (response.data.success) {
             toast.success('OTP verified');
             setIsOTPVerified(true);
@@ -280,7 +299,11 @@ const responseStructure = {
             textToSpeech('Passwords do not match');
             return;
           }
+        setIsLoading(true)
+
           const response = await axios.post(`${backendUrl}/api/user/reset-password`, { phone:contact, newPassword });
+        setIsLoading(false)
+
           if (response.data.success) {
             toast.success('Password reset successfully');
             setCurrentState('Login');

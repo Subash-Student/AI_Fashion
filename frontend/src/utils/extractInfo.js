@@ -34,7 +34,7 @@ import { stopSpeech, textToSpeech } from "./voiceContent";
 
 
 export const extractInformation = async (voiceInputText, contextValues) => {
-  const { pageValues } = contextValues;
+  const {setIsLoading, pageValues } = contextValues;
   const { currentPage } = pageValues;
 
   try {
@@ -86,6 +86,7 @@ console.log(pageConfig)
     }
     
 `;
+setIsLoading(true)
 
     // 3. Call GPT-3.5 Turbo API
     const gptResponse = await axios.post(
@@ -133,6 +134,7 @@ console.log(pageConfig)
       }
       return validated;
     };
+    setIsLoading(false)
 
     const finalResponse = validateFields(responseStructure, result);
    console.log(result)

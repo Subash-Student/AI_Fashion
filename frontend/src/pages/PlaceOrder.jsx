@@ -8,7 +8,7 @@ import { getPlaceOrderPageSummary, textToSpeech } from '../utils/voiceContent';
 
 const PlaceOrder = () => {
     const [method, setMethod] = useState('cod');
-    const { navigate, user, showPincodeModal,showMic, setShowMic,loadOrderData, setShowPincodeModal,setPageValues, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
+    const { navigate, user,setIsLoading, showPincodeModal,showMic, setShowMic,loadOrderData, setShowPincodeModal,setPageValues, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
     const [pincode, setPincode] = useState(Array(6).fill(""));
     const [address, setAddress] = useState(user.address);
 
@@ -45,6 +45,8 @@ const PlaceOrder = () => {
 
     const cleanPincode = async (transcript) => {
         try {
+        setIsLoading(true)
+
             const response = await axios.post(
                 'https://api.openai.com/v1/chat/completions',
                 {
@@ -65,6 +67,7 @@ const PlaceOrder = () => {
                     },
                 }
             );
+            setIsLoading(false)
     
             return response.data.choices[0].message.content.trim().replace(/\D/g, '');
         } catch (error) {
@@ -81,9 +84,12 @@ const PlaceOrder = () => {
         console.log({ pin, cleanedPin });
       
         if (pin.length === 6 || cleanedPin.length === 6) {
+        setIsLoading(true)
+
           try {
             const res = await axios.get(`https://api.postalpincode.in/pincode/${!isVoice ? pin : cleanedPin}`);
             const data = res.data[0];
+            setIsLoading(false)
       
             if (data.Status === "Success") {
               const postOffice = data.PostOffice[0];
@@ -123,7 +129,11 @@ const PlaceOrder = () => {
             }
             const orderData = { address, items: orderItems, amount: getCartAmount() + delivery_fee };
             if (method === 'cod') {
+        setIsLoading(true)
+
                 const response = await axios.post(`${backendUrl}/api/order/place`, orderData, { headers: { token } });
+        setIsLoading(false)
+
                 if (response.data.success) {
                     textToSpeech("Your order was successfully placed");
                     loadOrderData();

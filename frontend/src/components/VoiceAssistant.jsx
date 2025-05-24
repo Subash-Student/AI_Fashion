@@ -7,7 +7,7 @@ import { stopSpeech, textToSpeech } from "../utils/voiceContent";
 
 export default function VoiceAssistance() {
   const contextValues = useContext(ShopContext);
-  const { showMic, setShowMic } = useContext(ShopContext);
+  const { showMic, setIsLoading,setShowMic } = useContext(ShopContext);
   const [voiceText, setVoiceText] = useState("");
   const [processedText, setProcessedText] = useState(null);
   const timeoutRef = useRef(null);
@@ -95,6 +95,8 @@ export default function VoiceAssistance() {
 
   const handleVoiceProcessing = async (text) => {
     try {
+      setIsLoading(true)
+
       const response = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
@@ -131,6 +133,7 @@ export default function VoiceAssistance() {
           }
         }
       );
+      setIsLoading(false)
   
       const gptResponse = response.data.choices[0].message.content.trim();
       console.log("GPT Raw Response:", gptResponse);

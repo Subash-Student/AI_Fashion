@@ -7,7 +7,7 @@ import { FaCheckCircle, FaTimesCircle, FaHourglassHalf, FaTruck, FaBox, FaStar }
 import { getOrdersPageSummary, textToSpeech } from '../utils/voiceContent';
 
 const Orders = () => {
-  const { backendUrl,navigate, orderData, token, currency, showStatusModal, setShowStatusModal, selectedStatus, 
+  const { backendUrl,navigate,setIsLoading, orderData, token, currency, showStatusModal, setShowStatusModal, selectedStatus, 
     setSelectedStatus, showCancelModal, setShowCancelModal, cancelReason, setCancelReason, selectedItem, 
     setSelectedItem, showReviewModal, setShowReviewModal, reviewText, setReviewText, reviewRating, 
     setReviewRating, reviewProductId, setReviewProductId, handleTrackOrder, handleCancelOrder, 
@@ -15,8 +15,11 @@ const Orders = () => {
 
   const submitReview = async (text = reviewText) => {
     try {
+      setIsLoading(true)
+
       const res = await axios.post(backendUrl + '/api/product/review/add', 
-        { productId: reviewProductId, review: text, rating: reviewRating }, { headers: { token } });
+      { productId: reviewProductId, review: text, rating: reviewRating }, { headers: { token } });
+      setIsLoading(false)
       if(res.data.success){
         toast.success('Review submitted successfully!');
         textToSpeech('Review submitted successfully!')
@@ -35,9 +38,13 @@ const Orders = () => {
 
   const submitCancelOrder = async (text = cancelReason) => {
     try {
+      setIsLoading(true)
+
       const response = await axios.post(backendUrl + '/api/order/cancel', {
         orderId: selectedItem.orderId, productId: selectedItem.id, reason: text
       }, { headers: { token } });
+      setIsLoading(false)
+
       if(response.data.success){
         toast.success("Order cancelled successfully.")
         textToSpeech("Order cancelled successfully.");

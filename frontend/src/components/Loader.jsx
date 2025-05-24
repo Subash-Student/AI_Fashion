@@ -1,6 +1,29 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 const Loader = () => {
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    // Create audio instance
+    const audio = new Audio('/loading-sound.wav'); // Place your sound file in the public folder
+    audio.loop = true;
+    audio.volume = 0.7; // Adjust volume as needed
+    audioRef.current = audio;
+
+    // Play the sound
+    audio
+      .play()
+      .catch((error) => {
+        console.error("Autoplay failed:", error);
+      });
+
+    return () => {
+      // Stop the sound when component unmounts
+      audio.pause();
+      audio.currentTime = 0; // Reset to start
+    };
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-white">
       <div className="relative w-16 h-16">
