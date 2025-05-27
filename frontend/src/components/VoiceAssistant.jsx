@@ -197,14 +197,7 @@ export default function VoiceAssistance() {
         </div>
       )}
 
-      {/* {processedText && (
-        <div className="fixed bottom-5 left-5 bg-white/90 p-4 rounded-xl shadow-lg w-80 text-gray-800">
-          <h3 className="font-bold text-lg mb-2">Voice Analysis</h3>
-          <pre className="text-sm whitespace-pre-wrap">
-            {JSON.stringify(processedText, null, 2)}
-          </pre>
-        </div>
-      )} */}
+
     </>
   );
 }
