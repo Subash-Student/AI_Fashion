@@ -5,17 +5,16 @@ import { extractInformation } from "../utils/extractInfo";
 import { ShopContext } from "../context/ShopContext";
 import { stopSpeech, textToSpeech } from "../utils/voiceContent";
 
-
-
 export default function VoiceAssistance() {
   const contextValues = useContext(ShopContext);
-  const {showMic, setShowMic} = useContext(ShopContext);
+  const { showMic, setIsLoading,setShowMic } = useContext(ShopContext);
   const [voiceText, setVoiceText] = useState("");
   const [processedText, setProcessedText] = useState(null);
   const timeoutRef = useRef(null);
   const recognitionRef = useRef(null);
   const vibrationInterval = useRef(null);
- 
+  const isMicTurningOnRef = useRef(false); // New ref to track mic activation state
+
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) {
       alert("Speech Recognition not supported on this browser");
@@ -41,21 +40,37 @@ export default function VoiceAssistance() {
     recognitionRef.current = recognition;
   }, []);
 
+  const startListening = async () => {
+    stopSpeech();
+    isMicTurningOnRef.current = true;
+    textToSpeech("Your mic is on"); // Play the mic on message
+    isMicTurningOnRef.current = false;
+    setTimeout(() => {
+      setShowMic(true);
+      recognitionRef.current?.start(); // Start listening only after the message completes
+      
+    }, 1500);
+  };
+
+  const stopListening = async () => {
+    recognitionRef.current?.stop();
+     textToSpeech("Your mic is off"); // Play the mic off message
+  };
+
   useEffect(() => {
     const handlePress = () => {
       timeoutRef.current = setTimeout(() => {
-        setShowMic(true);
         startListening();
         navigator.vibrate?.([100, 50, 100]);
         vibrationInterval.current = setInterval(() => {
           navigator.vibrate?.([200]);
         }, 1000);
-      }, 5000);
+      }, 3000); // Changed from 5000 to 3000 ms (3 seconds)
     };
 
     const handleRelease = () => {
       clearTimeout(timeoutRef.current);
-      if (showMic) {
+      if (showMic || isMicTurningOnRef.current) {
         stopListening();
         setShowMic(false);
         navigator.vibrate?.(0);
@@ -76,17 +91,12 @@ export default function VoiceAssistance() {
     };
   }, [showMic]);
 
-  const startListening = () => {
-    stopSpeech()
-    recognitionRef.current?.start();
-  };
 
-  const stopListening = () => {
-    recognitionRef.current?.stop();
-  };
 
   const handleVoiceProcessing = async (text) => {
     try {
+      setIsLoading(true)
+
       const response = await axios.post(
         "https://api.openai.com/v1/chat/completions",
         {
@@ -123,6 +133,7 @@ export default function VoiceAssistance() {
           }
         }
       );
+      setIsLoading(false)
   
       const gptResponse = response.data.choices[0].message.content.trim();
       console.log("GPT Raw Response:", gptResponse);
@@ -196,8 +207,11 @@ export default function VoiceAssistance() {
           </div>
         </div>
       )}
+<<<<<<< HEAD
 
 
+=======
+>>>>>>> d2bc854269b5750e34bb1448b459efe373f5c98d
     </>
   );
 }

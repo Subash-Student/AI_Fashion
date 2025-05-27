@@ -8,7 +8,7 @@ import { getPlaceOrderPageSummary, textToSpeech } from '../utils/voiceContent';
 
 const PlaceOrder = () => {
     const [method, setMethod] = useState('cod');
-    const { navigate, user, showPincodeModal,showMic, setShowMic,loadOrderData, setShowPincodeModal,setPageValues, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
+    const { navigate, user,setIsLoading, showPincodeModal,showMic, setShowMic,loadOrderData, setShowPincodeModal,setPageValues, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
     const [pincode, setPincode] = useState(Array(6).fill(""));
     const [address, setAddress] = useState(user.address);
 
@@ -35,13 +35,18 @@ const PlaceOrder = () => {
             if (cleanedPincode.length === 6) {
                 setPincode(cleanedPincode.split(''));
                 await fetchAddressFromPincode(cleanedPincode,true);
-            } else toast.error("Please say a valid 6-digit pincode");textToSpeech("Please say a valid 6-digit pincode")
+            } else {
+                toast.error("Please say a valid 6-digit pincode");
+                textToSpeech("Please say a valid 6-digit pincode")
+            }
         };
         recognition.onerror = (event) => { clearTimeout(stopTimer); recognition.stop(); toast.error("Error recognizing voice input"); console.log(event.error); };
     };
 
     const cleanPincode = async (transcript) => {
         try {
+        setIsLoading(true)
+
             const response = await axios.post(
                 'https://api.openai.com/v1/chat/completions',
                 {
@@ -62,6 +67,7 @@ const PlaceOrder = () => {
                     },
                 }
             );
+            setIsLoading(false)
     
             return response.data.choices[0].message.content.trim().replace(/\D/g, '');
         } catch (error) {
@@ -73,26 +79,38 @@ const PlaceOrder = () => {
     };
     
 
-    const fetchAddressFromPincode = async (cleanedPin,isVoice) => {
+    const fetchAddressFromPincode = async (cleanedPin, isVoice) => {
         const pin = pincode.join("");
-        console.log({pin,cleanedPin})
-
+        console.log({ pin, cleanedPin });
+      
         if (pin.length === 6 || cleanedPin.length === 6) {
-            try {
-                const res = await axios.get(`https://api.postalpincode.in/pincode/${!isVoice ? pin : cleanedPin}`);
-                const data = res.data[0];
-                if (data.Status === "Success") {
-                    const postOffice = data.PostOffice[0];
-                    setAddress(`${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${pin}`);
-                    setShowPincodeModal(false);
-                } else toast.error("Invalid pincode");textToSpeech("Invalid pincode")
-            } catch (err) {
-                toast.error("Enter a valid 6-digit pincode");
-                textToSpeech("Enter a valid 6-digit pincode")
-                console.error(err);
+        setIsLoading(true)
+
+          try {
+            const res = await axios.get(`https://api.postalpincode.in/pincode/${!isVoice ? pin : cleanedPin}`);
+            const data = res.data[0];
+            setIsLoading(false)
+      
+            if (data.Status === "Success") {
+              const postOffice = data.PostOffice[0];
+              setAddress(`${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${!isVoice ? pin : cleanedPin}`);
+              setShowPincodeModal(false);
+              textToSpeech(`Your address is set to be ${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${pin}`);
+            } else {
+              toast.error("Invalid pincode");
+              textToSpeech("Invalid pincode");
             }
-        } else toast.warn("Enter a valid 6-digit pincode");textToSpeech("Enter a valid 6-digit pincode")
-    };
+          } catch (err) {
+            toast.error("Enter a valid 6-digit pincode");
+            textToSpeech("Enter a valid 6-digit pincode");
+            console.error(err);
+          }
+        } else {
+          toast.warn("Enter a valid 6-digit pincode");
+          textToSpeech("Enter a valid 6-digit pincode");
+        }
+      };
+      
 
     const onSubmitHandler = async (event) => {
         event.preventDefault();
@@ -111,7 +129,11 @@ const PlaceOrder = () => {
             }
             const orderData = { address, items: orderItems, amount: getCartAmount() + delivery_fee };
             if (method === 'cod') {
+        setIsLoading(true)
+
                 const response = await axios.post(`${backendUrl}/api/order/place`, orderData, { headers: { token } });
+        setIsLoading(false)
+
                 if (response.data.success) {
                     textToSpeech("Your order was successfully placed");
                     loadOrderData();

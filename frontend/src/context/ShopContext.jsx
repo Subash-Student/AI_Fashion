@@ -23,6 +23,7 @@ const ShopContextProvider = (props) => {
     const [orderData, setOrderData] = useState([]);
     const[isLoading,setIsLoading] = useState(false);
     const [showPincodeModal, setShowPincodeModal] = useState(false);
+    const [manualFilterOverride, setManualFilterOverride] = useState(false);
 
   const [category, setCategory] = useState([]);
   const [subCategory, setSubCategory] = useState([]);
@@ -291,6 +292,8 @@ const ShopContextProvider = (props) => {
     }, [token])
 
     const resetFilters = () => {
+        setSearch("")
+        setShowSearch(false);
         setCategory([]);
         setSubCategory([]);
         setMaterial([]);
@@ -358,7 +361,7 @@ const ShopContextProvider = (props) => {
         handleOpenReview,
         statusSteps,
 
-        showMic, setShowMic
+        showMic, setShowMic,manualFilterOverride, setManualFilterOverride
       };
       
 

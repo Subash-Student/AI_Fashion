@@ -16,12 +16,11 @@ export const arrayOfIntents = [
         "navigate_nextPage",
         "navigate_priviousPage",
         "navigate_cart",
-        "search_product",
+        "search_products",
         "apply_filter",
         "read_the_content",
         "ask_question",
         "make_call",
-
 
       ],
       responseStructure: {
@@ -35,52 +34,48 @@ export const arrayOfIntents = [
           currentPage: "",
           to: ""
         },
-        searchItemName:"",
+        
+          searchItemName:"",
+      
 
-        filters: {
-          category:"",
-          subCategory:"",
-          material:"",
-          returnable:false,
-          inStock:false,
-          priceRange:[0, 5000],
-          
-        }
+          filters: {
+            category:"Men, Women, Kids",
+            subCategory:"'Topwear', 'Bottomwear', 'Winterwear'",
+            material:"'Cotton', 'Wool', 'Polyester'",
+            returnable:"true || null",
+            inStock:"true || null",
+            priceRange:[0, 5000],
+            
+          },
       }
     },
     {
       page: "collection",
       intents: [
-        "search_product",
         "apply_filter",
+        "search_products",
         "sort_by_price_low_to_high",
         "sort_by_price_high_to_low",
         "reset_filter",
         "reset_sorting",
         "ask_question",
-        "choose_particular_product"
       ],
       responseStructure: {
         intent: "",
-        search: {
-          query: ""
-        },
+          searchItemName:"",
         filters: {
-          category:"",
-          subCategory:"",
-          material:"",
-          returnable:false,
-          inStock:false,
+          category:"Men, Women, Kids",
+          subCategory:"'Topwear', 'Bottomwear', 'Winterwear'",
+          material:"'Cotton', 'Wool', 'Polyester'",
+          returnable:"true || null",
+          inStock:"true || null",
           priceRange:[0, 5000],
           
         },
         sort: {
           sortBy: ""
         },
-        product: {
-          number: "",
-          
-        },
+        
         question :""
 
       }
@@ -119,8 +114,8 @@ export const arrayOfIntents = [
         intent: "",
         action:"remove || adjust_quantity",
         adjust_quantity: "increment || decrement",
-        product_number_for_action:"1,2,3,4,5,...",
-        // productName:"",
+        productName:"",
+        // product_number_for_action:"1,2,3,4,5,...",
         quantity:"1,2,3,4,5,...",
         question :""
       }

@@ -1,45 +1,15 @@
 export const getProductPageSummary = (product) => {
+    const fallback = checkPageVisited("productPage", "You are on the Product Page.");
+    if (fallback) return fallback;
 
     const productName = product.name || "Product";
-    const productPrice =   product.price;
-    const productBrand = product.brand || "Unknown Brand";
-    const productRating = product.averageRating || 0;
-    const reviewsCount = product.reviews ? product.reviews.length : 0;
-    const availableSizes = product.sizes ? product.sizes.join(", ") : "No sizes available";
-    const availableColors = product.colorOptions || "No colors available";
-    const occasion = product.occasion || "Not specified";
-    const material = product.material || "Material not specified";
-    const sleeveType = product.sleeveType || "Not specified";
-    const neckType = product.neckType || "Not specified";
-    const pattern = product.pattern || "Not specified";
-    const washCare = product.washCare || "Wash care instructions not provided";
-    const inStock = product.inStock ? "Yes" : "No";
-    const returnable = product.returnable ? "Yes" : "No";
-  
-    const data = {
-    productPrice,
-     productBrand,
-     productRating ,
-     reviewsCount, 
-     availableSizes,
-     availableColors,
-     occasion ,
-     material, 
-     sleeveType, 
-     neckType ,
-     pattern ,
-     washCare ,
-     inStock ,
-     returnable 
-    }
+    return `Welcome to the product page for ${productName}. ${product.description}. We hope you enjoy your shopping experience!`;
+};
 
-    return {
-        text:`Welcome to the product page for ${productName}. ${product.description}. We hope you enjoy your shopping experience!`,
-        data: data
-    }
-  };
+export const getOrdersPageSummary = (orderData) => {
+    const fallback = checkPageVisited("ordersPage", "You are on the Orders Page.");
+    if (fallback) return fallback;
 
-  export const getOrdersPageSummary = (orderData) => {
     if (orderData && orderData.length > 0) {
         return orderData.map(item => {
             const statusText = item.status.toLowerCase();
@@ -60,7 +30,10 @@ export const getProductPageSummary = (product) => {
     return '';
 };
 
-export const getPlaceOrderPageSummary = (getCartAmount,address,delivery_fee) => {
+export const getPlaceOrderPageSummary = (getCartAmount, address, delivery_fee) => {
+    const fallback = checkPageVisited("placeOrderPage", "You are on the Place Order Page.");
+    if (fallback) return fallback;
+
     const subtotal = getCartAmount();
     const shipping = delivery_fee;
     const total = subtotal === 0 ? 0 : subtotal + shipping;
@@ -81,19 +54,35 @@ export const getPlaceOrderPageSummary = (getCartAmount,address,delivery_fee) => 
 };
 
 export const getHomePageSummary = () => {
+    const fallback = checkPageVisited("homePage", "You are on the Home Page.");
+    if (fallback) return fallback;
+
     return `Welcome to the home page. Explore our latest collections, best sellers, and new arrivals for men, women, and kids.`;
 };
 
-export const getCollectionPageSummary = () => {
-    return `Welcome to the collections page. 
-        Use the filters on the left to explore items by category, type, material, returnability, availability, and price. 
-        You can also sort the results by relevance or price. 
-        Products are listed on the right side, each assigned a number starting from one. 
-        To open a product, say or click open product one, open product two, and so on, based on its position. 
-        For example, say open product one to view the first product.`;
+export const getCollectionPageSummary = (products) => {
+    const visitedPages = JSON.parse(sessionStorage.getItem("visitedPages")) || {};
+
+    if (!visitedPages.collectionPage) {
+        visitedPages.collectionPage = "visited";
+        sessionStorage.setItem("visitedPages", JSON.stringify(visitedPages));
+        return `Welcome to the collections page. 
+            Use the filters on the products items by category, type, material, returnability, availability, and price. 
+            You can also sort the results by price.  
+            To open a product, say open product name to view the product name.`;
+    } else {
+        const productSummaries = products.map((product, index) => {
+            return `Product ${index + 1}: ${product.name}, priced at ₹${product.price}.`;
+        }).join(" ");
+        return `You are on the Collections Page. ${productSummaries}`;
+    }
 };
 
+
 export const getDashboardPageSummary = (allUserData) => {
+    const fallback = checkPageVisited("dashboardPage", "You are on the Dashboard Page.");
+    if (fallback) return fallback;
+
     const { profile, orders = [] } = allUserData;
     const wishlist = profile?.wishlist || [];
     const address = profile?.address || "no address set";
@@ -109,6 +98,9 @@ export const getDashboardPageSummary = (allUserData) => {
 };
 
 export const getCartPageSummary = (cartData, products, deliveryFee, getCartAmount) => {
+    const fallback = checkPageVisited("cartPage", "You are on the Cart Page.");
+    if (fallback) return fallback;
+
     let cartItemsSummary = "Your cart contains the following items: ";
 
     if (cartData.length > 0) {
@@ -134,14 +126,33 @@ export const getCartPageSummary = (cartData, products, deliveryFee, getCartAmoun
         The total amount to be paid is ${totalAmount} rupees.`;
 };
 
+export const getContactPageSummary = () => {
+    const fallback = checkPageVisited("contactPage", "You are on the Contact Page.");
+    if (fallback) return fallback;
 
+    return "Welcome to our Contact Page! You can find us at 54709 Willms Station, Suite 350, Washington, USA. If you need any help or have questions, feel free to call us at 415-555-0132 or email us at admin@forever.com. For direct assistance in India, you can also reach us at +91 97883 06886. We're always here to help!";
+};
 
-export const getContactPageSummary = ()=>{
-    return "Welcome to our Contact Page! You can find us at 54709 Willms Station, Suite 350, Washington, USA. If you need any help or have questions, feel free to call us at 415-555-0132 or email us at admin@forever.com. For direct assistance in India, you can also reach us at +91 97883 06886. We're always here to help!"
-}
-export const getAboutPageSummary = ()=>{
-    return "Welcome to FeelWays! We’re a fashion platform built with heart and innovation—designed especially to empower visually impaired individuals. Our goal is simple: to make online shopping more inclusive through voice-powered and AI-driven technology.From stylish dresses to smart, accessible experiences, everything we do is centered around ease, independence, and confidence. At FeelWays, we believe everyone deserves to shop with freedom—guided by voice, supported by AI, and delivered with care.We promise top-quality products, a smooth shopping experience, and exceptional support—every step of the way."
-}
+export const getAboutPageSummary = () => {
+    const fallback = checkPageVisited("aboutPage", "You are on the About Page.");
+    if (fallback) return fallback;
+
+    return "Welcome to FeelWays! We’re a fashion platform built with heart and innovation—designed especially to empower visually impaired individuals. Our goal is simple: to make online shopping more inclusive through voice-powered and AI-driven technology. From stylish dresses to smart, accessible experiences, everything we do is centered around ease, independence, and confidence. At FeelWays, we believe everyone deserves to shop with freedom—guided by voice, supported by AI, and delivered with care. We promise top-quality products, a smooth shopping experience, and exceptional support—every step of the way.";
+};
+
+const checkPageVisited = (key, defaultMessage) => {
+    const visited = JSON.parse(sessionStorage.getItem("pageVisit") || "{}");
+
+    if (visited[key]) {
+        return defaultMessage;
+    }
+
+    // Mark page as visited
+    visited[key] = "visited";
+    sessionStorage.setItem("pageVisit", JSON.stringify(visited));
+
+    return null; // Means: not visited, return full content
+};
 
 
 // Start speaking

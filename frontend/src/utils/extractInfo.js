@@ -8,7 +8,6 @@ import {
   handleSortByPriceLowToHigh,
   handleSortByPriceHighToLow,
   handleAskDetails,
-  handleChooseParticularProduct,
   handleCart,
   handleWishlist,
   handleQuantityAndRemoveFromCartPage,
@@ -21,12 +20,12 @@ import {
   handleChangePhoneNumber,
   handleUpdateShippingAddress,
   handleReadTheContent,
-  
   handleMakeCall,
   handleReset,
   handleReviews,
   selectSize,
-  readyToCheckOut
+  readyToCheckOut,
+  handleSearchProduct
 } from './intentHandler';
 
 import axios from "axios";
@@ -35,7 +34,7 @@ import { stopSpeech, textToSpeech } from "./voiceContent";
 
 
 export const extractInformation = async (voiceInputText, contextValues) => {
-  const { pageValues } = contextValues;
+  const {setIsLoading, pageValues } = contextValues;
   const { currentPage } = pageValues;
 
   try {
@@ -72,6 +71,7 @@ console.log(pageConfig)
     - Based on the user's input, identify the best matching intent from the list above.
     - If a match is found, fill in the relevant fields from the response structure.
     - If a field cannot be confidently determined, mark it as "unknown".
+    - some fileds in response structure have only some values should be allowed it mentioned in that keys values like category:"'Men', 'Women', 'Kids'", should be in this.
     - The response must be returned in valid JSON format. If any part of the input is unclear or does not fit, mark it as "unknown".
     - Ensure the response structure is clear, consistent, and easily understandable, especially for users relying on screen readers.
     
@@ -86,6 +86,7 @@ console.log(pageConfig)
     }
     
 `;
+setIsLoading(true)
 
     // 3. Call GPT-3.5 Turbo API
     const gptResponse = await axios.post(
@@ -133,6 +134,7 @@ console.log(pageConfig)
       }
       return validated;
     };
+    setIsLoading(false)
 
     const finalResponse = validateFields(responseStructure, result);
    console.log(result)
@@ -166,16 +168,17 @@ export const handleIntent = (finalResponse, contextValues) => {
     navigate_cart: handleNavigation, // WORKING
 
     // Search & Filters
-    search_product: handleApplyFilter,
-    apply_filter: handleApplyFilter,
-    reset_filter: handleReset,
-    reset_sorting: handleReset,
+    search_products: handleSearchProduct, // WORKING
+    apply_filter: handleApplyFilter,  // WORKING
+    reset_filter: handleReset,  // WORKING
+    reset_sorting: handleReset,  // WORKING
+    
 
     // Collection Page
-    sort_by_price_low_to_high: handleSortByPriceLowToHigh,
-    sort_by_price_high_to_low: handleSortByPriceHighToLow,
-    choose_particular_product: handleChooseParticularProduct,
-
+    sort_by_price_low_to_high: handleSortByPriceLowToHigh, // WORKING
+    sort_by_price_high_to_low: handleSortByPriceHighToLow, // WORKING
+    
+ 
     // Product Actions
     add_to_cart: handleCart, // WORKING
     remove_from_cart: handleCart,  // WORKING
@@ -195,13 +198,13 @@ export const handleIntent = (finalResponse, contextValues) => {
     review_order: handleReviewOrder, // WORKING
 
     // Profile Actions
-    change_name: handleChangeName,
-    change_phone_number: handleChangePhoneNumber,
-    update_shipping_address: handleUpdateShippingAddress,
+    change_name: handleChangeName,  // WORKING
+    change_phone_number: handleChangePhoneNumber,  // WORKING
+    update_shipping_address: handleUpdateShippingAddress,   // WORKING
 
     // Contact Actions
     make_call: handleMakeCall,  // WORKING
-    ask_question: handleAskDetails,
+    ask_question: handleAskDetails, // WORKING
     read_the_content: handleReadTheContent, // WORKING
 
     stopSpeech:stopSpeech,  // WORKING
