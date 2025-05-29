@@ -86,7 +86,7 @@ console.log(pageConfig)
     }
     
 `;
-setIsLoading(true)
+
 
     // 3. Call GPT-3.5 Turbo API
     const gptResponse = await axios.post(

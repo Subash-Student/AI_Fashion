@@ -24,11 +24,15 @@ const Cart = () => {
     useEffect(()=>{
    
       const speechText = getCartPageSummary(cartData,products,delivery_fee, getCartAmount);
-      
-      textToSpeech(speechText);
+      if(cartData.length < 0){
+        return
+      }else{
+
+          textToSpeech(speechText);
+      }
       setPageValues({ currentPage:"cart",pageContent:speechText})
 
-        },[cartData])
+        },[])
     return (
         <div className='border-t pt-14'>
             <div className='text-2xl mb-3'>

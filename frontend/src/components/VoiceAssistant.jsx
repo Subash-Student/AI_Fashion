@@ -7,13 +7,14 @@ import { stopSpeech, textToSpeech } from "../utils/voiceContent";
 
 export default function VoiceAssistance() {
   const contextValues = useContext(ShopContext);
-  const { showMic, setIsLoading,setShowMic } = useContext(ShopContext);
+  const { showMic, setIsLoading, setShowMic } = useContext(ShopContext);
   const [voiceText, setVoiceText] = useState("");
   const [processedText, setProcessedText] = useState(null);
   const timeoutRef = useRef(null);
   const recognitionRef = useRef(null);
   const vibrationInterval = useRef(null);
-  const isMicTurningOnRef = useRef(false); // New ref to track mic activation state
+  const isMicTurningOnRef = useRef(false);
+  const isProcessingRef = useRef(false);
 
   useEffect(() => {
     if (!("webkitSpeechRecognition" in window)) {
@@ -30,51 +31,80 @@ export default function VoiceAssistance() {
       const transcript = event.results[0][0].transcript;
       console.log("Voice Input:", transcript);
       setVoiceText(transcript);
+      isProcessingRef.current = true;
       await handleVoiceProcessing(transcript);
+      isProcessingRef.current = false;
     };
 
     recognition.onerror = (event) => {
       console.error("Speech Recognition Error:", event.error);
+      isProcessingRef.current = false;
+      if (event.error === 'no-speech') {
+        // Handle no speech detected
+        stopListening();
+      }
+    };
+
+    recognition.onend = () => {
+      if (!isProcessingRef.current && showMic) {
+        // Only restart if we're still supposed to be listening
+        recognitionRef.current?.start();
+      }
     };
 
     recognitionRef.current = recognition;
   }, []);
 
   const startListening = async () => {
-    stopSpeech();
+    if (showMic || isMicTurningOnRef.current) return;
+    
     isMicTurningOnRef.current = true;
-    textToSpeech("Your mic is on"); // Play the mic on message
+     stopSpeech();
+     textToSpeech("Your mic is on");
     isMicTurningOnRef.current = false;
-    setTimeout(() => {
-      setShowMic(true);
-      recognitionRef.current?.start(); // Start listening only after the message completes
-      
-    }, 1500);
+    
+    setShowMic(true);
+    try {
+      recognitionRef.current?.start();
+    } catch (error) {
+      console.error("Error starting recognition:", error);
+      setShowMic(false);
+    }
   };
 
   const stopListening = async () => {
-    recognitionRef.current?.stop();
-     textToSpeech("Your mic is off"); // Play the mic off message
+    if (!showMic) return;
+    
+    try {
+      recognitionRef.current?.stop();
+       textToSpeech("Your mic is off");
+    } catch (error) {
+      console.error("Error stopping recognition:", error);
+    } finally {
+      setShowMic(false);
+      clearInterval(vibrationInterval.current);
+      navigator.vibrate?.(0);
+    }
   };
 
   useEffect(() => {
     const handlePress = () => {
+      // Clear any existing timeouts to prevent multiple triggers
+      clearTimeout(timeoutRef.current);
+      
       timeoutRef.current = setTimeout(() => {
         startListening();
         navigator.vibrate?.([100, 50, 100]);
         vibrationInterval.current = setInterval(() => {
           navigator.vibrate?.([200]);
         }, 1000);
-      }, 3000); // Changed from 5000 to 3000 ms (3 seconds)
+      }, 1000); // Reduced to 1 second for better responsiveness
     };
 
     const handleRelease = () => {
       clearTimeout(timeoutRef.current);
       if (showMic || isMicTurningOnRef.current) {
         stopListening();
-        setShowMic(false);
-        navigator.vibrate?.(0);
-        clearInterval(vibrationInterval.current);
       }
     };
 
@@ -84,6 +114,8 @@ export default function VoiceAssistance() {
     window.addEventListener("touchend", handleRelease);
 
     return () => {
+      clearTimeout(timeoutRef.current);
+      clearInterval(vibrationInterval.current);
       window.removeEventListener("mousedown", handlePress);
       window.removeEventListener("mouseup", handleRelease);
       window.removeEventListener("touchstart", handlePress);
@@ -133,7 +165,7 @@ export default function VoiceAssistance() {
           }
         }
       );
-      setIsLoading(false)
+     
   
       const gptResponse = response.data.choices[0].message.content.trim();
       console.log("GPT Raw Response:", gptResponse);

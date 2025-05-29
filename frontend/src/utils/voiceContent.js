@@ -1,14 +1,14 @@
 export const getProductPageSummary = (product) => {
-    const fallback = checkPageVisited("productPage", "You are on the Product Page.");
-    if (fallback) return fallback;
+    // const fallback = checkPageVisited("productPage", "You are on the Product Page.");
+    // if (fallback) return fallback;
 
     const productName = product.name || "Product";
     return `Welcome to the product page for ${productName}. ${product.description}. We hope you enjoy your shopping experience!`;
 };
 
 export const getOrdersPageSummary = (orderData) => {
-    const fallback = checkPageVisited("ordersPage", "You are on the Orders Page.");
-    if (fallback) return fallback;
+    // const fallback = checkPageVisited("ordersPage", "You are on the Orders Page.");
+    // if (fallback) return fallback;
 
     if (orderData && orderData.length > 0) {
         return orderData.map(item => {
@@ -31,8 +31,8 @@ export const getOrdersPageSummary = (orderData) => {
 };
 
 export const getPlaceOrderPageSummary = (getCartAmount, address, delivery_fee) => {
-    const fallback = checkPageVisited("placeOrderPage", "You are on the Place Order Page.");
-    if (fallback) return fallback;
+    // const fallback = checkPageVisited("placeOrderPage", "You are on the Place Order Page.");
+    // if (fallback) return fallback;
 
     const subtotal = getCartAmount();
     const shipping = delivery_fee;
@@ -54,8 +54,8 @@ export const getPlaceOrderPageSummary = (getCartAmount, address, delivery_fee) =
 };
 
 export const getHomePageSummary = () => {
-    const fallback = checkPageVisited("homePage", "You are on the Home Page.");
-    if (fallback) return fallback;
+    // const fallback = checkPageVisited("homePage", "You are on the Home Page.");
+    // if (fallback) return fallback;
 
     return `Welcome to the home page. Explore our latest collections, best sellers, and new arrivals for men, women, and kids.`;
 };
@@ -80,8 +80,8 @@ export const getCollectionPageSummary = (products) => {
 
 
 export const getDashboardPageSummary = (allUserData) => {
-    const fallback = checkPageVisited("dashboardPage", "You are on the Dashboard Page.");
-    if (fallback) return fallback;
+    // const fallback = checkPageVisited("dashboardPage", "You are on the Dashboard Page.");
+    // if (fallback) return fallback;
 
     const { profile, orders = [] } = allUserData;
     const wishlist = profile?.wishlist || [];
@@ -98,8 +98,8 @@ export const getDashboardPageSummary = (allUserData) => {
 };
 
 export const getCartPageSummary = (cartData, products, deliveryFee, getCartAmount) => {
-    const fallback = checkPageVisited("cartPage", "You are on the Cart Page.");
-    if (fallback) return fallback;
+    // const fallback = checkPageVisited("cartPage", "You are on the Cart Page.");
+    // if (fallback) return fallback;
 
     let cartItemsSummary = "Your cart contains the following items: ";
 
@@ -127,15 +127,15 @@ export const getCartPageSummary = (cartData, products, deliveryFee, getCartAmoun
 };
 
 export const getContactPageSummary = () => {
-    const fallback = checkPageVisited("contactPage", "You are on the Contact Page.");
-    if (fallback) return fallback;
+    // const fallback = checkPageVisited("contactPage", "You are on the Contact Page.");
+    // if (fallback) return fallback;
 
     return "Welcome to our Contact Page! You can find us at 54709 Willms Station, Suite 350, Washington, USA. If you need any help or have questions, feel free to call us at 415-555-0132 or email us at admin@forever.com. For direct assistance in India, you can also reach us at +91 97883 06886. We're always here to help!";
 };
 
 export const getAboutPageSummary = () => {
-    const fallback = checkPageVisited("aboutPage", "You are on the About Page.");
-    if (fallback) return fallback;
+    // const fallback = checkPageVisited("aboutPage", "You are on the About Page.");
+    // if (fallback) return fallback;
 
     return "Welcome to FeelWays! We’re a fashion platform built with heart and innovation—designed especially to empower visually impaired individuals. Our goal is simple: to make online shopping more inclusive through voice-powered and AI-driven technology. From stylish dresses to smart, accessible experiences, everything we do is centered around ease, independence, and confidence. At FeelWays, we believe everyone deserves to shop with freedom—guided by voice, supported by AI, and delivered with care. We promise top-quality products, a smooth shopping experience, and exceptional support—every step of the way.";
 };
