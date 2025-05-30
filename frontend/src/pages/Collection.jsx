@@ -21,15 +21,17 @@ const Collection = () => {
     };
 
     const applyFilter = () => {
-        let filtered = [...products];
+        let filtered ;
        
+        filterProducts.length > 0 ? filtered = [...filterProducts] : filtered = [...products];
+
         if (showSearch && search) filtered = filtered.filter(item => item.name.toLowerCase().includes(search.toLowerCase()));
         if (category.length) filtered = filtered.filter(item => category.includes(item.category));
         if (subCategory.length) filtered = filtered.filter(item => subCategory.includes(item.subCategory));
         if (material.length) filtered = filtered.filter(item => material.includes(item.material));
         if (returnable !== null) filtered = filtered.filter(item => item.returnable === returnable);
         if (inStock !== null) filtered = filtered.filter(item => item.inStock === inStock);
-        if (priceRange[0] > 0 || priceRange[1] < 5000) filtered = filtered.filter(item => item.price >= priceRange[0] && item.price <= priceRange[1]);
+        if (priceRange[0] > 0 || priceRange[1] < 10000) filtered = filtered.filter(item => item.price >= priceRange[0] && item.price <= priceRange[1]);
         setFilterProducts(filtered);
        
 
@@ -49,18 +51,18 @@ const Collection = () => {
     };
 
     useEffect(() => {
-        console.log(manualFilterOverride)
-        if (!manualFilterOverride) {
-            console.log("hi")
+        
+           
           applyFilter();
-        }
+        
       }, [category, subCategory, material, returnable, inStock, priceRange, search, showSearch, products]);
       
     useEffect(() => {
-        if (!manualFilterOverride) {
-            console.log("hi")
+        
+
+       
             sortProduct(); 
-        }
+        
         }, [sortType]);
     
     useEffect(()=>{
@@ -70,7 +72,7 @@ const Collection = () => {
         textToSpeech(speechText);
         setPageValues({ currentPage: "collection",pageContent:speechText });
       
-        },[])
+        },[filterProducts])
 
     return (
         <div className='flex flex-col sm:flex-row gap-1 sm:gap-10 pt-10 border-t'>
@@ -85,7 +87,7 @@ const Collection = () => {
                 {/* Category */}
                 <div className={`border border-gray-300 pl-5 py-3 mt-6 ${showFilter ? '' : 'hidden'} sm:block`}>
                     <p className='mb-3 text-sm font-medium'>CATEGORIES</p>
-                    {['Men', 'Women', 'Kids'].map(cat => (
+                    {["Men", "Women", "Kids"].map(cat => (
                         <label className='flex gap-2 text-sm text-gray-700' key={cat}>
                             <input type='checkbox' value={cat} checked={category.includes(cat)} onChange={(e) => toggleFilterArray(e.target.value, setCategory, category)} />
                             {cat}
@@ -150,8 +152,8 @@ const Collection = () => {
                             <span>₹{priceRange[1]}</span>
                         </div>
                         <div className='flex flex-col gap-2'>
-                            <input type="range" min="0" max="5000" value={priceRange[0]} onChange={(e) => handlePriceChange(e, 0)} className="w-full" />
-                            <input type="range" min="0" max="5000" value={priceRange[1]} onChange={(e) => handlePriceChange(e, 1)} className="w-full" />
+                            <input type="range" min="0" max="10000" value={priceRange[0]} onChange={(e) => handlePriceChange(e, 0)} className="w-full" />
+                            <input type="range" min="0" max="10000" value={priceRange[1]} onChange={(e) => handlePriceChange(e, 1)} className="w-full" />
                         </div>
                     </div>
                 </div>
@@ -168,9 +170,16 @@ const Collection = () => {
                     </select>
                 </div>
                 <div className='grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 gap-y-6'>
-                    {filterProducts.map((item, index) => (
-                        <ProductItem key={index} name={item.name} id={item._id} price={item.price} image={item.image} />
-                    ))}
+                    {filterProducts.length > 0 ?
+                        filterProducts.map((item, index) => (
+                            <ProductItem key={index} name={item.name} id={item._id} price={item.price} image={item.image} />
+                        )):
+                        products.map((item, index) => (
+                            <ProductItem key={index} name={item.name} id={item._id} price={item.price} image={item.image} />
+                        ))
+
+                    }
+                    
                 </div>
             </div>
         </div>

@@ -54,8 +54,8 @@ export const getPlaceOrderPageSummary = (getCartAmount, address, delivery_fee) =
 };
 
 export const getHomePageSummary = () => {
-    // const fallback = checkPageVisited("homePage", "You are on the Home Page.");
-    // if (fallback) return fallback;
+    const fallback = checkPageVisited("homePage", "You are on the Home Page.");
+    if (fallback) return fallback;
 
     return `Welcome to the home page. Explore our latest collections, best sellers, and new arrivals for men, women, and kids.`;
 };
@@ -66,10 +66,18 @@ export const getCollectionPageSummary = (products) => {
     if (!visitedPages.collectionPage) {
         visitedPages.collectionPage = "visited";
         sessionStorage.setItem("visitedPages", JSON.stringify(visitedPages));
+        const productSummaries = products.map((product, index) => {
+            return `Product ${index + 1}: ${product.name}, priced at ₹${product.price}.`;
+        }).join(" ");
+    
+
         return `Welcome to the collections page. 
             Use the filters on the products items by category, type, material, returnability, availability, and price. 
             You can also sort the results by price.  
-            To open a product, say open product name to view the product name.`;
+            To open a product, say open product name to view the product name.
+            
+            You are on the Collections Page. ${productSummaries}
+            `;
     } else {
         const productSummaries = products.map((product, index) => {
             return `Product ${index + 1}: ${product.name}, priced at ₹${product.price}.`;

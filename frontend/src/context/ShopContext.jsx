@@ -31,7 +31,7 @@ const ShopContextProvider = (props) => {
   const [returnable, setReturnable] = useState(null);
   const [inStock, setInStock] = useState(null);
   const [sortType, setSortType] = useState('relavent');
-  const [priceRange, setPriceRange] = useState([0, 5000]);
+  const [priceRange, setPriceRange] = useState([0, 10000]);
   const [showModal, setShowModal] = useState(false);
   
   const [filterProducts, setFilterProducts] = useState([]);
@@ -300,7 +300,7 @@ const ShopContextProvider = (props) => {
         setReturnable(null);
         setInStock(null);
         setSortType('relavent');
-        setPriceRange([0, 5000]);
+        setPriceRange([0, 10000]);
       };
 
 
