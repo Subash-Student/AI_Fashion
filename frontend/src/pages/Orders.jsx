@@ -7,7 +7,7 @@ import { FaCheckCircle, FaTimesCircle, FaHourglassHalf, FaTruck, FaBox, FaStar }
 import { getOrdersPageSummary, textToSpeech } from '../utils/voiceContent';
 
 const Orders = () => {
-  const { backendUrl,navigate,setIsLoading, orderData, token, currency, showStatusModal, setShowStatusModal, selectedStatus, 
+  const { backendUrl,loadOrderData,navigate,setIsLoading, orderData, token, currency, showStatusModal, setShowStatusModal, selectedStatus, 
     setSelectedStatus, showCancelModal, setShowCancelModal, cancelReason, setCancelReason, selectedItem, 
     setSelectedItem, showReviewModal, setShowReviewModal, reviewText, setReviewText, reviewRating, 
     setReviewRating, reviewProductId, setReviewProductId, handleTrackOrder, handleCancelOrder, 
@@ -24,7 +24,7 @@ const Orders = () => {
         toast.success('Review submitted successfully!');
         textToSpeech('Review submitted successfully!')
         setTimeout(() => {
-          navigate("/orders")
+          loadOrderData()
         }, 2000);
       }else{
         toast.error('Failed to submit review');
@@ -49,7 +49,7 @@ const Orders = () => {
         toast.success("Order cancelled successfully.")
         textToSpeech("Order cancelled successfully.");
         setTimeout(() => {
-          navigate("/orders")
+          loadOrderData()
         }, 2000);
         
       }else{
