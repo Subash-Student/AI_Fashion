@@ -43,7 +43,7 @@ const Add = ({ token }) => {
   useEffect(() => {
     if (isEditMode) {
       axios.post(
-        'http://localhost:4000/api/product/admin/single',
+        `${backendUrl}/api/product/admin/single`,
         { productId: id },
         { headers: { token } }
       )

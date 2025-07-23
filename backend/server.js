@@ -22,7 +22,8 @@ app.use(express.json())
 
 const allowedOrigins = [
     'http://localhost:5173', 
-    'https://your-second-domain.com'
+    'https://feel-ways.vercel.app',
+    'https://feel-ways-admin.vercel.app',
 ];
 
 // CORS configuration options
