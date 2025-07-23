@@ -39,6 +39,13 @@ const Navbar = () => {
             <p>CONTACT</p>
             <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
         </NavLink>
+        <NavLink
+  to='https://feel-ways-admin.vercel.app'
+  className='flex flex-col items-center gap-1 border border-gray-700 rounded-full py-1 px-2'
+>
+  <p>Admin Panel</p>
+  <hr className='w-2/4 border-none h-[1.5px] bg-gray-700 hidden' />
+</NavLink>
 
       </ul>
 

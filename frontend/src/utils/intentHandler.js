@@ -1,7 +1,7 @@
 import { toast } from 'react-toastify';
 import { textToSpeech } from './voiceContent';
 import stringSimilarity from 'string-similarity';
-import { products } from '../assets/assets';
+
 
 
 // Vibration Pattern Utility
