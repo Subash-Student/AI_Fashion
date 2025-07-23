@@ -6,9 +6,9 @@ import authUser from "../middleware/auth.js";
 
 
 const gptRouter = express.Router();
-const upload = multer({ dest: "uploads/" }); 
 
-gptRouter.post("/extract-dress-info", upload.array("images", 4), extractDressDetails);
+
+gptRouter.post("/extract-dress-info", multer().array("images", 4), extractDressDetails);
 
 
 
