@@ -3,15 +3,19 @@ import React, { useEffect, useState } from 'react'
 import { backendUrl, currency } from '../App'
 import { toast } from 'react-toastify'
 import { useNavigate } from 'react-router-dom'
+import { useLoader } from '../context/LoaderContext.jsx';
 
 const List = ({ token }) => {
-
+  
   const [list, setList] = useState([])
   const navigate = useNavigate()
+  const { setIsLoading } = useLoader();
 
   const fetchList = async () => {
     try {
+      setIsLoading(true)
       const response = await axios.get(backendUrl + '/api/product/list')
+      setIsLoading(false)
       if (response.data.success) {
         setList(response.data.products.reverse());
       } else {
@@ -25,7 +29,9 @@ const List = ({ token }) => {
 
   const removeProduct = async (id) => {
     try {
+      setIsLoading(true)
       const response = await axios.post(backendUrl + '/api/product/remove', { id }, { headers: { token } })
+      setIsLoading(false)
       if (response.data.success) {
         toast.success(response.data.message)
         await fetchList();

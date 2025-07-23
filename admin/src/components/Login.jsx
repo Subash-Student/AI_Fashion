@@ -2,16 +2,20 @@ import axios from 'axios'
 import React, { useState } from 'react'
 import { backendUrl } from '../App'
 import { toast } from 'react-toastify'
+import { useLoader } from '../context/LoaderContext.jsx';
 
 const Login = ({setToken}) => {
-
+    
+    const { setIsLoading } = useLoader();
     const [email,setEmail] = useState('subash827@gmail.com')
     const [password,setPassword] = useState('subash2020$')
 
     const onSubmitHandler = async (e) => {
         try {
             e.preventDefault();
+            setIsLoading(true)
             const response = await axios.post(backendUrl + '/api/user/admin',{email,password})
+            setIsLoading(false)
             if (response.data.success) {
                 setToken(response.data.token)
             } else {

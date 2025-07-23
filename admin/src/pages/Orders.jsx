@@ -3,19 +3,24 @@ import axios from 'axios'
 import { backendUrl, currency } from '../App'
 import { toast } from 'react-toastify'
 import { assets } from '../assets/assets'
+import { useLoader } from '../context/LoaderContext.jsx';
+
 
 const Orders = ({ token }) => {
   const [orders, setOrders] = useState([])
   const [showReason, setShowReason] = useState(false)
   const [selectedReason, setSelectedReason] = useState("")
-
+  const { setIsLoading } = useLoader();
+  
   const fetchAllOrders = async () => {
     if (!token) return;
 
     try {
+      setIsLoading(true);
       const response = await axios.post(`${backendUrl}/api/order/list`, {}, {
         headers: { token }
       })
+      setIsLoading(false);
       if (response.data.success) {
         setOrders(response.data.orders.reverse())
       } else {
@@ -28,12 +33,14 @@ const Orders = ({ token }) => {
 
   const statusHandler = async (event, orderId) => {
     try {
+      setIsLoading(true)
       const response = await axios.post(`${backendUrl}/api/order/status`, {
         orderId,
         status: event.target.value
       }, {
         headers: { token }
       })
+      setIsLoading(false)
       if (response.data.success) {
         await fetchAllOrders()
       }

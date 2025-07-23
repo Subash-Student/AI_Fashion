@@ -1,4 +1,4 @@
-import fs from "fs";
+
 import {OpenAI} from "openai"
 import dotenv from "dotenv";
 dotenv.config()
@@ -52,8 +52,9 @@ export const extractDressDetails = async (req, res) => {
 
     // Convert images to data URIs and add to content array
     for (const file of files) {
-      const base64Image = fs.readFileSync(file.path, { encoding: "base64" });
+      const base64Image = file.buffer.toString("base64");
       const imageDataURI = `data:${file.mimetype};base64,${base64Image}`;
+
       contentArray.push({
         type: "image_url",
         image_url: { url: imageDataURI }
@@ -78,8 +79,6 @@ export const extractDressDetails = async (req, res) => {
     });
     
 
-    // Clean up uploaded files
-    files.forEach(file => fs.unlinkSync(file.path));
 
     // Extract and parse model output
     let gptText = response.choices[0]?.message?.content;

@@ -5,9 +5,10 @@ import { backendUrl } from '../App';
 import { toast } from 'react-toastify';
 import {useParams} from "react-router-dom"
 import { useEffect } from 'react';
-
+import { useLoader } from '../context/LoaderContext.jsx';
 const Add = ({ token }) => {
-
+  
+  const { setIsLoading } = useLoader();
   const { id } = useParams();
   const isEditMode = id !== "new";
 
@@ -42,20 +43,22 @@ const Add = ({ token }) => {
 
   useEffect(() => {
     if (isEditMode) {
+      setIsLoading(true)
       axios.post(
         `${backendUrl}/api/product/admin/single`,
         { productId: id },
         { headers: { token } }
       )
-        .then((res) => {
-          const product = res.data.product;
-          const imgs = product.image || [];
-          setImages({
-            image1: imgs[0] || false,
-            image2: imgs[1] || false,
-            image3: imgs[2] || false,
-            image4: imgs[3] || false
-          });
+      .then((res) => {
+        const product = res.data.product;
+        const imgs = product.image || [];
+        setImages({
+          image1: imgs[0] || false,
+          image2: imgs[1] || false,
+          image3: imgs[2] || false,
+          image4: imgs[3] || false
+        });
+        setIsLoading(false)
           setProduct({
             name: product.name || "",
             description: product.description || "",
@@ -79,6 +82,7 @@ const Add = ({ token }) => {
           });
         })
         .catch((err) => {
+          setIsLoading(false)
           toast.error("Error loading product details.");
           console.error(err);
         });
@@ -118,9 +122,11 @@ const Add = ({ token }) => {
         ? backendUrl + "/api/product/update"
         : backendUrl + "/api/product/add";
   
-      const response = await axios.post(url, formData, {
-        headers: { token },
-      });
+        setIsLoading(true)
+        const response = await axios.post(url, formData, {
+          headers: { token },
+        });
+        setIsLoading(false)
   
       if (response.data.success) {
         toast.success(response.data.message);
@@ -206,10 +212,11 @@ const Add = ({ token }) => {
 
 
     try {
-      
-      const response = await axios.post(backendUrl +"/api/gpt/extract-dress-info",formData,{
+      setIsLoading(true);
+      const response = await axios.post("http://localhost:4000" +"/api/gpt/extract-dress-info",formData,{
         headers:{token}
       });
+      setIsLoading(false)
     //  setImages(product.image)
       if (response.data.success) {
         const data = response.data.data;
