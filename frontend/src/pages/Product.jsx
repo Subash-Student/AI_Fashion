@@ -9,7 +9,7 @@ import { getProductPageSummary, textToSpeech } from '../utils/voiceContent'
 
 const Product = () => {
   const { productId } = useParams()
-  const { currency,setIsLoading, addToCart,user,pageValues,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist } = useContext(ShopContext)
+  const { currency,backendUrl,setIsLoading, addToCart,user,pageValues,setPageValues,size,setSize,isWishlisted,setIsWishlisted,toggleWishlist } = useContext(ShopContext)
   const [productData, setProductData] = useState(null)
   const [image, setImage] = useState('')
   const [activeTab, setActiveTab] = useState('description')
@@ -19,7 +19,7 @@ const Product = () => {
       try {
         setIsLoading(true)
         const token = localStorage.getItem('token')
-        const res = await axios.post('http://localhost:4000/api/product/single',{ productId },{ headers: { token } })
+        const res = await axios.post(`${backendUrl}/api/product/single`,{ productId },{ headers: { token } })
         setIsLoading(false)
 
         if (res.data.success) {

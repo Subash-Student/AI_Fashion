@@ -16,7 +16,7 @@ const sections = [
 const Dashboard = () => {
 
  
-  const { user, token,setPageValues,showPincodeModal, setShowPincodeModal,showMic, setShowMic, orderData, getUserData, setIsWishlisted, isWishlisted, loadOrderData, showModal, setShowModal } = useContext(ShopContext);
+  const { user, token,backendUrl,setPageValues,showPincodeModal, setShowPincodeModal,showMic, setShowMic, orderData, getUserData, setIsWishlisted, isWishlisted, loadOrderData, showModal, setShowModal } = useContext(ShopContext);
   const [allUserData, setAllUserData] = useState({ profile: user, orders: orderData });
   
   const [formData, setFormData] = useState({ name: allUserData.profile.name, phone: allUserData.profile.phone });
@@ -34,7 +34,7 @@ const Dashboard = () => {
     
     try {
       setLoading(true);
-      const res = await axios.post("http://localhost:4000/api/user/edit", { ...data }, { headers: { token } });
+      const res = await axios.post(`${backendUrl}/api/user/edit`, { ...data }, { headers: { token } });
       if (res.data.success) {
         toast.success("Profile updated successfully!");
         getUserData(token)
@@ -56,7 +56,7 @@ const Dashboard = () => {
 
   const toggleWishlist = async (productId) => {
     try {
-      const res = await axios.post("http://localhost:4000/api/product/wishlist/remove", { productId }, { headers: { token: localStorage.getItem('token') } });
+      const res = await axios.post(`${backendUrl}/api/product/wishlist/remove`, { productId }, { headers: { token: localStorage.getItem('token') } });
       if (res.data.success) setIsWishlisted(!isWishlisted);
     } catch (error) {
       console.error('Wishlist toggle error:', error);
@@ -177,7 +177,7 @@ const Dashboard = () => {
         const fullAddress = `${postOffice.Name}, ${postOffice.District}, ${postOffice.State} - ${searchPIN}`;
   
         const updateRes = await axios.post(
-          "http://localhost:4000/api/user/edit-address",
+          `${backendUrl}/api/user/edit-address`,
           { address: fullAddress },
           { headers: { token } }
         );

@@ -21,6 +21,7 @@ import { ShopContext } from './context/ShopContext'
 import Loader from './components/Loader'
 import VoiceAssistant from './components/VoiceAssistant'
 import { stopSpeech } from './utils/voiceContent'
+import MicInfoDisplay from './components/MicInfoDisplay'
 
 const App = () => {
 
@@ -59,6 +60,7 @@ const App = () => {
         <Route path='/orders' element={<Orders />} />
        
       </Routes>
+      <MicInfoDisplay />
       <Footer />
     </div>
   )

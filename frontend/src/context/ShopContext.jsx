@@ -307,7 +307,7 @@ const ShopContextProvider = (props) => {
       const toggleWishlist = async (productId) => {
         try {
           const token = localStorage.getItem('token')
-          const url = `http://localhost:4000/api/product/wishlist/${isWishlisted ? 'remove' : 'add'}`
+          const url = `${backendUrl}/api/product/wishlist/${isWishlisted ? 'remove' : 'add'}`
           const res = await axios.post(url, { productId }, { headers: { token } })
     
           if (res.data.success) {

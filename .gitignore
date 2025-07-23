@@ -1,1 +1,30 @@
-.qodo
+# Node dependencies
+frontend/node_modules/
+backend/node_modules/
+
+# Build output
+frontend/dist/
+backend/dist/
+frontend/.vite/
+backend/.vite/
+
+# Environment files
+frontend/.env*
+backend/.env*
+
+# Logs
+**/npm-debug.log*
+
+# OS files
+**/.DS_Store
+**/Thumbs.db
+
+# IDE configs
+**/.vscode/
+**/.idea/
+**/*.sublime-project
+**/*.sublime-workspace
+
+# Misc caches
+**/.cache/
+**/.parcel-cache/
