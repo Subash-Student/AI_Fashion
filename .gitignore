@@ -11,6 +11,7 @@ backend/.vite/
 # Environment files
 frontend/.env*
 backend/.env*
+admin/.env*
 
 # Logs
 **/npm-debug.log*
